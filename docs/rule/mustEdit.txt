@@ -1,3 +1,8 @@
 SecurityConfig.java
 - 보안(인가) 풀어놓은거 수정
 
+Place 관련 API
+- 파일 구조만 잡아놓은거라 손보기
+
+JWT
+-

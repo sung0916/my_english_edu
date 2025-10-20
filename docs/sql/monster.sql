@@ -9,7 +9,7 @@ CREATE TABLE users (
     username   VARCHAR(100) NOT NULL COMMENT '이름',
     login_id   VARCHAR(100) NOT NULL UNIQUE COMMENT '아이디',
     password   VARCHAR(255) NOT NULL COMMENT '비밀번호',
-    tel        VARCHAR(20)  NULL COMMENT '전화번호',
+    tel        VARCHAR(20)  NOT NULL COMMENT '전화번호',
     role       VARCHAR(20)  NOT NULL COMMENT '역할 (STUDENT, TEACHER, ADMIN)',
     status     VARCHAR(20)  NOT NULL COMMENT '회원 상태 (ACTIVE, DORMANT, WITHDRAWN)',
     created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',

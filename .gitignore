@@ -1,0 +1,37 @@
+# =================================================
+# General
+# =================================================
+.DS_Store
+*.log
+
+# =================================================
+# IDEs - IntelliJ IDEA / VSCode
+# =================================================
+.idea/
+.vscode/
+*.iml
+
+# =================================================
+# Java / Spring Boot / Gradle (Backend)
+# =================================================
+api-server/build/
+api-server/.gradle/
+
+# !! SECURITY !!
+# Ignore sensitive application configuration
+api-server/src/main/resources/application.yml
+
+# =================================================
+# Node.js / Expo (Frontend)
+# =================================================
+english-edu/node_modules/
+english-edu/.expo/
+english-edu/dist/
+english-edu/web-build/
+english-edu/expo-env.d.ts
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# local env files
+.env*.local
