@@ -5,4 +5,14 @@ Place 관련 API
 - 파일 구조만 잡아놓은거라 손보기
 
 JWT
--
+- 비밀번호 토큰화해서 암호화 필요
+
+WebConfig.java
+- 프론트엔드의 8081을 일시적으로 허용함
+- 추후 서비스에 맞춰서 수정
+
+AuthController.java
+- 임시 코드 수정
+
+UserRespository.java
+- 임시 코드 수정

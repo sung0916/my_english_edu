@@ -14,24 +14,14 @@ const Header = () => {
       </View>
 
       <View style={styles.navContainer}>
-        <Link href="/" asChild><Pressable><Text style={styles.navItem}>Home</Text></Pressable></Link>
         {/* <Link href="/about" asChild><Pressable><Text style={styles.navItem}>About</Text></Pressable></Link>
         <Link href="/test" asChild><Pressable><Text style={styles.navItem}>Test</Text></Pressable></Link>
         <Link href="/games" asChild><Pressable><Text style={styles.navItem}>Games</Text></Pressable></Link>
         <Link href="/store" asChild><Pressable><Text style={styles.navItem}>Store</Text></Pressable></Link>
         <Link href="/board" asChild><Pressable><Text style={styles.navItem}>Board</Text></Pressable></Link> */}
-
-        {/* 테스트 후 제거 */}
-        <Link href="/login" asChild>
-          <Pressable><Text style={styles.userItem}>로그인</Text></Pressable>
-        </Link>
-
-        
-        {/* 테스트 후 제거 */}
-
       </View>
 
-      {/* <View style={styles.userContainer}>
+      <View style={styles.userContainer}>
         {isLoggedIn ? (
           <>
             <Link href="/mypage" asChild>
@@ -47,12 +37,12 @@ const Header = () => {
             <Link href="/login" asChild>
               <Pressable><Text style={styles.userItem}>로그인</Text></Pressable>
             </Link>
-            <Link href="/create" asChild>
+            <Link href="/signup" asChild>
               <Pressable><Text style={styles.userItem}>회원가입</Text></Pressable>
             </Link>
           </>
-        )};
-      </View> */}
+        )}
+      </View>
     </View>
   );
 };

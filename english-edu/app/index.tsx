@@ -1,39 +1,51 @@
-import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function HomePage() {
-    const {width} = useWindowDimensions();  // 현재 화면의 가로, 세로 길이를 가져온다.
+    // const {width} = useWindowDimensions(); 현재 화면의 가로, 세로 길이를 가져온다.
 
     return (
-        // <div> 대신 <View> 사용. 레이아웃의 기본 단위.
-        <View style={styles.container}>
-            {/* <p>나 <span> 대신 <Text> 사용. 모든 텍스트를 이 안에서 사용.
-                화면 너비 768px을 기준으로 웹/모바일 버전 텍스트 변경 
-                <Text style={styles.title}>Monster English</Text> */}
-            
-            <Text style={[styles.title, {fontSize: width > 768 ? 48 :32}]}>
-                {width > 768 ? 'Monster English(웹 사용 중)' : 'Monster English(모바일 사용 중)'}
-            </Text>
+    // 최상위 View는 화면 전체를 차지합니다.
+    <View style={styles.container}>
+      {/* 1. 배너 공간 */}
+      <View style={styles.bannerContainer}>
+        <Text style={styles.placeholderText}>배너 공간 (Banner Area)</Text>
+      </View>
 
-            <Text style={styles.subtitle}>Let's get started Learning!!</Text>
-        </View>
-    );
+      {/* 2. 컨텐츠 공간 */}
+      <View style={styles.contentContainer}>
+        <Text style={styles.placeholderText}>컨텐츠 공간 (Content Area)</Text>
+      </View>
+    </View>
+  );
 }
 
 // CSS 파일 대신 StyleSheet.create()를 사용해 스타일을 정의한다.
 const styles = StyleSheet.create({
-    container: {
-        flex: 1, // 화면 전체를 차지하도록 설정 (매우 중요!)
-        justifyContent: 'center', // 자식 요소들을 세로 방향 중앙에 배치
-        alignItems: 'center',     // 자식 요소들을 가로 방향 중앙에 배치
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 32, // CSS 속성은 camelCase로 작성합니다.
-        fontWeight: 'bold',
-    },
-    subtitle: {
-        fontSize: 18,
-        color: 'gray',
-        marginTop: 8,
-    },
+  container: {
+    flex: 1, // 화면 전체를 차지하도록 설정 (필수)
+    backgroundColor: '#fff',
+  },
+  // 상단 배너 영역 스타일
+  bannerContainer: {
+    flex: 1, // container의 전체 공간 중 1의 비율을 차지
+    backgroundColor: '#d7eef9', // 임시 배경색 (하늘색 계열)
+    justifyContent: 'center', // 내부 텍스트를 세로 중앙에 배치
+    alignItems: 'center',     // 내부 텍스트를 가로 중앙에 배치
+    borderBottomWidth: 1,     // 하단에 경계선 추가
+    borderBottomColor: '#ccc',
+  },
+  // 하단 컨텐츠 영역 스타일
+  contentContainer: {
+    flex: 3, // container의 전체 공간 중 3의 비율을 차지 (배너보다 3배 크게)
+    backgroundColor: '#f5f5f5', // 임시 배경색 (회색 계열)
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20, // 내부 여백
+  },
+  // 임시 텍스트 스타일
+  placeholderText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#888',
+  },
 });

@@ -3,6 +3,8 @@ show databases;
 use monster;
 show tables;
 
-desc users;
+desc user;
 
-drop database monster;
+-- drop database monster;
+
+select * from user;
