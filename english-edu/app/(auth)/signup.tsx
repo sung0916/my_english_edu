@@ -1,8 +1,9 @@
 import apiClient from "@/api";
+import CustomButton from "@/components/common/CustomButtonProps";
 import { isNotEmpty, validateEmail, validatePassword } from "@/utils/validators";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Button, Platform, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 
 interface SignUpErrors {
   username?: string;
@@ -135,7 +136,7 @@ const SignUpPage = () => {
           <Text style={styles.errorText}>{errors.tel || ''}</Text>
         </View>
         
-        <Button title="가입하기" onPress={handleSignUp} />
+        <CustomButton title="가입하기" onPress={handleSignUp} />
       </View>
     </View>
   );

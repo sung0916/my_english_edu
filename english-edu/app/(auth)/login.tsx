@@ -1,9 +1,9 @@
 import apiClient from "@/api";
+import CustomButton from "@/components/common/CustomButtonProps";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Button, Platform, StyleSheet, Text, TextInput, View } from "react-native";
-
+import { Alert, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 
 const LoginPage = () => {
   const [loginId, setLoginId] = useState('');
@@ -65,7 +65,7 @@ const LoginPage = () => {
           secureTextEntry // 비밀번호 가리기
         />
 
-        <Button title="Login" onPress={handleLogin} />
+        <CustomButton title="로그인" onPress={handleLogin} />
       </View>
     </View>
   );
