@@ -32,14 +32,28 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 검증 로직(추후 Filter에서 사용)
-    /*public boolean validateToken(String token) {
+    // 정보 추출
+    private Claims extractClaims(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
 
-    }*/
+    // loginId 추출
+    public String getLoginIdFromToken(String token) {
+        return extractClaims(token).get("loginId", String.class);
+    }
 
-    // JWT에서 사용자 정보 추출(추후 Filter에서 사용)
-    /*public Claims extractClaims(String token) {
+    // 토큰 만료 체크
+    public boolean isTokenExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date());
+    }
 
-    }*/
+    // 토큰 유효성 체크
+    public boolean validateToken(String token) {
 
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

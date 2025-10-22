@@ -4,9 +4,10 @@ SecurityConfig.java
 Place 관련 API
 - 파일 구조만 잡아놓은거라 손보기
 
-WebConfig.java
+WebConfig.java (CORS 설정)
 - 프론트엔드의 8081을 일시적으로 허용함
 - 추후 서비스에 맞춰서 수정
+-
 
 UserRespository.java
 - 임시 코드 수정
@@ -14,9 +15,15 @@ UserRespository.java
 JwtUtil
 - 로직 완성 예정
 
-AuthServiceImpl.java 마무리
+(완료) AuthServiceImpl.java 마무리
 - ▲몬스터어학원5-4 (프론트엔드 질문 및 에러2)
 - 지금 가지고 있는건 request밖에 없는데 response로 만들어야할까?
 - 네, 아주 정확하고 핵심적인 질문을 하셨습니다.
   UserRequest DTO만 가지고 계신 상황에서 UserDto가 무엇인지,
   그리고 왜 필요한지에 대해 명확하게 설명해 드리겠습니다.
+
+프론트엔드(회원가입)
+- 바로 가입이 아닌 요청으로 처리하도록 로직 수정
+
+백엔드(jwt에러-'Could not resolve placeholder jwt.secret' in value "${jwt.secret}")
+- Caused by: org.springframework.util.PlaceholderResolutionException: Could not resolve placeholder 'jwt.secret' in value "${jwt.secret}"

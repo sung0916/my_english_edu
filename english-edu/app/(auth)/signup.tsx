@@ -69,7 +69,7 @@ const SignUpPage = () => {
 
     try {
       // 백엔드 API 엔드포인트 수정 및 요청 데이터 구성
-      const response = await apiClient.post('/api/users', {
+      const response = await apiClient.post('/api/users/signup', {
         username, // username: username 과 동일
         loginId,
         password,

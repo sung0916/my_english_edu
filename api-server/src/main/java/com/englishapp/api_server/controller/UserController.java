@@ -1,14 +1,16 @@
 package com.englishapp.api_server.controller;
 
 import com.englishapp.api_server.dto.request.UserRequest;
+import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
-import com.englishapp.api_server.repository.UserRepository;
 import com.englishapp.api_server.service.UserService;
+import com.englishapp.api_server.service.impl.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,84 +22,61 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userRepository.save(user);
+    // 가입 요청
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+        UserResponse savedUser = userService.signup(request);
 
-        try {
-            return ResponseEntity
+        return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(savedUser);
-        } catch (Exception e) {
-            log.error("Error 발생 => ", e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
     }
 
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return ResponseEntity.ok(users);
+    // 회원 수정
+    @PatchMapping(("/me"))
+    public ResponseEntity<UserResponse> editUser(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody UserRequest request) {
+
+        int currentUserId = userDetails.getUserId();
+        UserResponse updatedUser = userService.updateUser(currentUserId, request);
+        log.info("계정 수정 완료: {}", currentUserId);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable int userId) {
-        User user = userService.findUserById(userId);
-        try {
-            return ResponseEntity.ok(user);
-        } catch (EntityNotFoundException e) {
-            log.error("사용자를 찾을 수 없습니다. ID: {}", userId, e);
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .build();
-        } catch (Exception e) {
-            log.error("예상치 못한 에러 발생. ID: {}", userId, e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
+    // 프로필 조회
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        // userDetails 객체에서 사용자 ID 꺼내기
+        int currentUserId = userDetails.getUserId();
+
+        // 서비스 호출
+        UserResponse myInfo = userService.findMyProfile(currentUserId);
+
+        return ResponseEntity.ok(myInfo);
     }
 
-    @PatchMapping(("/{userId}"))
-    public ResponseEntity<User> editUser(@PathVariable int userId, @RequestBody UserRequest request) {
-        User updateUser = userService.updateUser(userId, request);
+    // 회원 탈퇴
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        int currentUserId = userDetails.getUserId();
 
         try {
-            log.info("계정 수정 완료 : {}", userId);
-            return ResponseEntity.ok(updateUser);
+            // UserDetailsImpl에서 현재 로그인한 사용자의 ID를 꺼냄
 
-        } catch (EntityNotFoundException e) {
-            log.error("업데이트 실패 : {}", userId, e);
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .build();
-        } catch (Exception e) {
-            log.error("예상치 못한 에러 : {}", userId, e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
-    }
-
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int userId) {
-
-        try {
-            userService.deleteUser(userId);
-            log.info("삭제 완료 : {}", userId);
+            userService.withdraw(currentUserId);
+            log.info("삭제 완료 : {}", currentUserId);
 
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
-            log.error("해당 계정이 없습니다. : {}", userId, e);
+            log.error("해당 계정이 없습니다. : {}", currentUserId, e);
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .build();
         } catch (Exception e) {
-            log.error("예상치 못한 에러 : {}", userId, e);
+            log.error("예상치 못한 에러 : {}", currentUserId, e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .build();

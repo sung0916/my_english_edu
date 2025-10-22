@@ -39,6 +39,6 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.createToken(user.getLoginId(), user.getRole());
 
         // 4. 응답 DTO 생성
-        //return new LoginResponse(token, new UserResponse(user));
+        return new LoginResponse(token, new UserResponse(user));
     }
 }
