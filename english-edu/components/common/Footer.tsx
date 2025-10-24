@@ -33,7 +33,7 @@ const Footer = () => {
       </View>
 
       <Text style={styles.copyrightText}>
-        Copyright © 2022-2025 Monster English Online. All Rights Reserved.
+        Copyright © 2025-2028 Monster English Online. All Rights Reserved.
       </Text>
     </View>
   );
@@ -42,7 +42,7 @@ const Footer = () => {
 const styles = StyleSheet.create({
   footerContainer: {
     backgroundColor: '#f0f0f0', // 이미지와 유사한 배경색
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 30,
     alignItems: 'center', // 웹에서의 중앙 정렬을 위해
   },

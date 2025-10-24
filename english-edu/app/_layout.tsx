@@ -42,6 +42,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   layoutContainer: {
     flex: 1,
-    backgroundColor: '#fff', // 기본 배경색
+    backgroundColor: '#fff',
+    userSelect: 'none',
   },
 });

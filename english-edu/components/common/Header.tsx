@@ -42,7 +42,7 @@ const Header = () => {
           <>
             <View style={styles.navContainer}>
               <Link href="/about" asChild><Pressable><Text style={styles.navItem}>About</Text></Pressable></Link>
-              <Link href="/test" asChild><Pressable><Text style={styles.navItem}>Test</Text></Pressable></Link>
+              <Link href="/english" asChild><Pressable><Text style={styles.navItem}>English</Text></Pressable></Link>
               <Link href="/games" asChild><Pressable><Text style={styles.navItem}>Games</Text></Pressable></Link>
               <Link href="/store" asChild><Pressable><Text style={styles.navItem}>Store</Text></Pressable></Link>
               <Link href="/board" asChild><Pressable><Text style={styles.navItem}>Board</Text></Pressable></Link>
@@ -52,7 +52,7 @@ const Header = () => {
               {isLoggedIn ? (
                 <>
                   {user?.role === 'ADMIN' ? (
-                    <Link href="/admin" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
+                    <Link href="/studentList" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
                   ) : (
                     <Link href="/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
                   )}
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   logo: { fontSize: 25, fontWeight: 'bold', color: 'orange' },
   logoContainer: {},
   navContainer: { flex: 1, justifyContent: 'space-evenly', flexDirection: 'row', alignItems: 'center' },
-  navItem: { fontSize: 18, fontFamily: 'Mulish-SemiBold' },
+  navItem: { fontSize: 18, fontFamily: 'Mulish-Bold' },
   userContainer: { flexDirection: 'row', alignItems: 'center' },
   userItem: { marginHorizontal: 10, fontSize: 14 },
   modalContainer: {
