@@ -1,5 +1,6 @@
 package com.englishapp.api_server.service;
 
+import com.englishapp.api_server.domain.UserRole;
 import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
 
@@ -11,7 +12,7 @@ public interface AdminService {
     List<UserResponse> findPendingUsers();
 
     // 가입 허가
-    UserResponse approveUser(int userId);
+    UserResponse approveUser(int userId, UserRole role);
 
     // 회원 삭제
     void deleteUser(int userId);

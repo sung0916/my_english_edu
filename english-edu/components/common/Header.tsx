@@ -6,24 +6,20 @@ import { Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Header = () => {
-  const { isLoggedIn, logout } = useUserStore();
+  // userStore에서 user 객체 전체를 추출
+  const { isLoggedIn, logout, user } = useUserStore();
   const router = useRouter();
 
-  // 반응형 설계
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
-
-  // 햄버거 모달 관리
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 로그아웃 시 홈으로
   const handleLogout = () => {
     logout();
     setIsMenuOpen(false);
     router.push('/');
   }
 
-  // 클릭하면 모달닫고 이동
   const navigateAndCloseMenu = (path: string) => {
     router.push(path as Href);
     setIsMenuOpen(false);
@@ -32,21 +28,17 @@ const Header = () => {
   return (
     <>
       <View style={styles.header}>
-        {/* 로고 */}
         <View style={styles.logoContainer}>
           <Link href="/" asChild>
             <Pressable><Text style={styles.logo}>Monster English</Text></Pressable>
           </Link>
         </View>
 
-        {/* 4. isMobile 값에 따라 다른 UI를 렌더링합니다. */}
         {isMobile ? (
-          // 모바일 뷰: 햄버거 아이콘
           <Pressable onPress={() => setIsMenuOpen(true)}>
             <Feather name="menu" size={28} color="black" />
           </Pressable>
         ) : (
-          // 데스크톱 뷰: 기존 전체 메뉴
           <>
             <View style={styles.navContainer}>
               <Link href="/about" asChild><Pressable><Text style={styles.navItem}>About</Text></Pressable></Link>
@@ -59,9 +51,14 @@ const Header = () => {
             <View style={styles.userContainer}>
               {isLoggedIn ? (
                 <>
-                  <Link href="/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
+                  {user?.role === 'ADMIN' ? (
+                    <Link href="/admin" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
+                  ) : (
+                    <Link href="/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
+                  )}
+
                   <Link href="/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
-                  <Pressable onPress={logout}><Text style={styles.userItem}>로그아웃</Text></Pressable>
+                  <Pressable onPress={handleLogout}><Text style={styles.userItem}>로그아웃</Text></Pressable>
                 </>
               ) : (
                 <>
@@ -74,11 +71,10 @@ const Header = () => {
         )}
       </View>
 
-      {/* 5. 모바일 메뉴를 위한 Modal 컴포넌트 */}
       <Modal
         visible={isMenuOpen}
         animationType="slide"
-        onRequestClose={() => setIsMenuOpen(false)} // 안드로이드 뒤로가기 버튼 처리
+        onRequestClose={() => setIsMenuOpen(false)}
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
@@ -88,18 +84,22 @@ const Header = () => {
           </View>
 
           <View style={styles.modalContent}>
-            {/* 모바일 메뉴 링크 (수직 정렬) */}
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/about')}><Text style={styles.modalLinkText}>About</Text></Pressable>
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/test')}><Text style={styles.modalLinkText}>Study</Text></Pressable>
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/games')}><Text style={styles.modalLinkText}>Games</Text></Pressable>
-            {/* <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/store')}><Text style={styles.modalLinkText}>Store</Text></Pressable> */}
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/board')}><Text style={styles.modalLinkText}>Board</Text></Pressable>
 
             <View style={styles.separator} />
 
             {isLoggedIn ? (
               <>
-                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/mypage')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
+                {/* 모바일 */}
+                {user?.role === 'ADMIN' ? (
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/admin')}><Text style={styles.modalLinkText}>관리자 페이지</Text></Pressable>
+                ) : (
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/mypage')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
+                )}
+
                 <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
                 <Pressable style={styles.modalLink} onPress={handleLogout}><Text style={styles.modalLinkText}>로그아웃</Text></Pressable>
               </>
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20, // 좌우 패딩 증가
+    paddingHorizontal: 20,
     alignItems: 'center',
     backgroundColor: '#fff',
     height: 80,
@@ -129,12 +129,10 @@ const styles = StyleSheet.create({
   },
   logo: { fontSize: 25, fontWeight: 'bold', color: 'orange' },
   logoContainer: {},
-  // --- 데스크톱 스타일 ---
   navContainer: { flex: 1, justifyContent: 'space-evenly', flexDirection: 'row', alignItems: 'center' },
   navItem: { fontSize: 18, fontFamily: 'Mulish-SemiBold' },
   userContainer: { flexDirection: 'row', alignItems: 'center' },
   userItem: { marginHorizontal: 10, fontSize: 14 },
-  // --- 모달 (모바일 메뉴) 스타일 ---
   modalContainer: {
     flex: 1,
     backgroundColor: 'white',

@@ -76,10 +76,18 @@ const SignUpPage = () => {
         email,
         tel, // 하이픈이 포함된 채로 전송
       });
-
+          
       if (response.status === 201) {
-        Alert.alert("성공", "회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.");
-        router.push('/login');
+        if (Platform.OS === 'web') {
+          alert("요청이 완료되었습니다.\n관리자 승인 후 로그인이 가능합니다.");
+          router.replace('/');
+        } else {
+          Alert.alert(
+            "요청 완료",
+            "관리자 승인 후 이용이 가능합니다.",
+            [{ text: "확인", onPress: () => router.replace('/') }]
+          );
+        }
       }
     } catch (error: any) {
       console.error("회원가입 실패: ", error);

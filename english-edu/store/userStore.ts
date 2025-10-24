@@ -6,6 +6,7 @@ interface UserState {
         userId: number | null;
         username: string | null;
         email: string | null;
+        role: string | null;
     };
     token: string | null;
     isLoggedIn: boolean;
@@ -20,6 +21,7 @@ export const useUserStore = create<UserState>((set) => ({
         userId: null,
         username: null,
         email: null,
+        role: null,
     },
     token: null,
     isLoggedIn: false,
@@ -32,7 +34,7 @@ export const useUserStore = create<UserState>((set) => ({
     }),
 
     logout: () => set({
-        user: { userId: null, username: null, email: null },
+        user: { userId: null, username: null, email: null, role: null },
         token: null,
         isLoggedIn: false,
     }),

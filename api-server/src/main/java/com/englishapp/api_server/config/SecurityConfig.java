@@ -34,8 +34,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login", "api/users/signup").permitAll()  // 로그인, 회원가입 허용
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/login", "/api/users/signup").permitAll()  // 로그인, 회원가입 허용
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
                 )
                 // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가

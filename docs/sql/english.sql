@@ -5,6 +5,11 @@ show tables;
 
 desc user;
 
+select * from user;
+
+-- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
 -- drop database monster;
 
-select * from user;
+-- ALTER TABLE user MODIFY COLUMN status ENUM('ACTIVE', 'DELETED', 'PENDING');
+

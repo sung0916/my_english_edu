@@ -10,8 +10,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 경로에 대해 CORS 정책을 적용
-                // 허용할 프론트엔드 서버의 출처를 명시합니다.
-                // Expo 웹 기본 포트는 19006 또는 8081일 수 있습니다. 둘 다 추가해두면 좋습니다.
+                // 허용할 프론트엔드 서버의 출처 명시
+                // Expo 포트 : 19006 또는 8081
                 .allowedOrigins("http://localhost:8081", "http://localhost:19006")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // 허용할 HTTP 메소드
                 .allowedHeaders("*") // 모든 헤더를 허용

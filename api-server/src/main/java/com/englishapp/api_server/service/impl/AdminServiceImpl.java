@@ -1,5 +1,6 @@
 package com.englishapp.api_server.service.impl;
 
+import com.englishapp.api_server.domain.UserRole;
 import com.englishapp.api_server.domain.UserStatus;
 import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
@@ -33,14 +34,18 @@ public class AdminServiceImpl implements AdminService {
     // 가입 허가
     @Override
     @Transactional
-    public UserResponse approveUser(int userId) {
+    public UserResponse approveUser(int userId, UserRole role) {
         User user = findUserById(userId);
 
         // 활성화 중복 체크
         if (user.getStatus() == UserStatus.ACTIVE) {
             throw new IllegalStateException("이미 활성화된 사용자입니다.");
         }
+        if (role == null) {
+            throw new IllegalArgumentException("역할(role)은 반드시 지정되어야 합니다.");
+        }
 
+        user.setRole(role);
         user.setStatus(UserStatus.ACTIVE);
         return new UserResponse(user);
     }

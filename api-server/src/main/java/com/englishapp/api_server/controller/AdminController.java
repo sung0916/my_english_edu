@@ -1,5 +1,6 @@
 package com.englishapp.api_server.controller;
 
+import com.englishapp.api_server.dto.request.ApproveUserRequest;
 import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.repository.UserRepository;
@@ -34,9 +35,11 @@ public class AdminController {
 
     // 가입 승인
     @PatchMapping("/{userId}/approve")
-    public ResponseEntity<UserResponse> approveUser(@PathVariable int userId) {
+    public ResponseEntity<UserResponse> approveUser(
+            @PathVariable int userId,
+            @RequestBody ApproveUserRequest request) {
 
-        UserResponse approvedUser = adminService.approveUser(userId);
+        UserResponse approvedUser = adminService.approveUser(userId, request.getRole());
         return ResponseEntity.ok(approvedUser);
     }
 
