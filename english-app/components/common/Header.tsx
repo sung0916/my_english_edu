@@ -57,7 +57,9 @@ const Header = () => {
                     <Link href="/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
                   )}
 
-                  <Link href="/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
+                  {user?.role !== 'ADMIN' && (
+                    <Link href="/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
+                  )}
                   <Pressable onPress={handleLogout}><Text style={styles.userItem}>로그아웃</Text></Pressable>
                 </>
               ) : (
@@ -100,7 +102,9 @@ const Header = () => {
                   <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/mypage')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
                 )}
 
-                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
+                {user?.role !== 'ADMIN' && (
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
+                )}
                 <Pressable style={styles.modalLink} onPress={handleLogout}><Text style={styles.modalLinkText}>로그아웃</Text></Pressable>
               </>
             ) : (
