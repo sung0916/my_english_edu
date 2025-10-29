@@ -1,76 +1,88 @@
+// --- 1 & 2. 임포트 및 스플래시 화면 (기존과 동일) ---
 import Footer from "../components/common/Footer";
 import Header from "../components/common/Header";
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from "expo-router";
+import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert, Platform } from "react-native";
 import { useUserStore } from "../store/userStore";
 
-// 스플래시 화면 실종 방지
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  
-  // 폰트 훅 사용
+
+  // --- 3 & 4. 폰트 로딩 및 Zustand 수화 로직 (기존과 동일) ---
   const [fontsLoaded, fontError] = useFonts({
     'Mulish-Medium': require('../assets/fonts/mulish/Mulish-Medium.ttf'),
     'Mulish-Semibold': require('../assets/fonts/mulish/Mulish-SemiBold.ttf'),
   });
-
-  // 3. 스토어의 수화(hydration) 상태를 관리할 상태 추가
   const [isHydrated, setIsHydrated] = useState(false);
-
-  // 4. 앱이 시작될 때 딱 한 번만 실행
   useEffect(() => {
-    // Zustand persist가 AsyncStorage에서 데이터를 모두 불러왔는지 확인
-    const unsubscribe = useUserStore.persist.onFinishHydration(() => {
-      setIsHydrated(true); // 수화가 완료되면 상태를 true로 변경
-    });
-
-    // Zustand v4 최신 버전에서는 이미 수화가 끝난 상태일 수 있으므로,
-    // hasHydrated 상태를 직접 체크하는 것이 더 안정적입니다.
-    if (useUserStore.persist.hasHydrated()) {
-      setIsHydrated(true);
-    }
-
-    return () => {
-      unsubscribe(); // 컴포넌트 언마운트 시 리스너 정리
-    };
+    const unsubscribe = useUserStore.persist.onFinishHydration(() => setIsHydrated(true));
+    if (useUserStore.persist.hasHydrated()) setIsHydrated(true);
+    return () => unsubscribe();
   }, []);
 
+
+  // --- 5. 최종 업그레이드된 '이중 방벽' 페이지 접근 제어 로직 ---
+  const { isLoggedIn, user } = useUserStore();
+  const router = useRouter();
+  const segments = useSegments();
+
   useEffect(() => {
-    // 폰트 로딩과 스토어 수화가 모두 완료되었을 때 스플래시 화면을 숨깁니다.
-    if ((fontsLoaded || fontError) && isHydrated) {
-      SplashScreen.hideAsync();
+    // 경비원 활동 조건: 모든 로딩(수화, 폰트)이 끝나야만 일을 시작합니다.
+    if (!isHydrated || (!fontsLoaded && !fontError)) return;
+
+    // 현재 경로가 어느 구역에 속하는지 정의합니다.
+    const inAdminZone = segments[0] === 'admin';
+    const inUserZone = segments[0] === 'cart' || segments[0] === 'mypage';
+
+    // --- 1차 방벽: 로그인 여부 검사 ---
+    // "보안 구역(관리자 또는 사용자 전용)에 들어가려는데, 로그인을 안 했군요!"
+    if (!isLoggedIn && (inAdminZone || inUserZone)) {
+      // Alert 없이 즉시 로그인 페이지로 쫓아냅니다.
+      router.replace('/auth/login');
+      return; // 1차 방벽에서 걸렸으므로, 검사를 즉시 종료합니다.
     }
+
+    // --- 2차 방벽: 관리자 역할 검사 ---
+    // 1차 방벽을 통과했다는 것은, 사용자가 '로그인 상태'임을 의미합니다.
+    // "관리자 구역에 들어왔는데, 당신은 관리자가 아니군요!"
+    if (inAdminZone && user?.role !== 'ADMIN') {
+      Alert.alert("접근 불가", "관리자 권한이 없습니다.", [{ text: "확인", onPress: () => router.back() }]);
+      return; // 2차 방벽에서 걸렸으므로, 검사를 즉시 종료합니다.
+    }
+
+  }, [isLoggedIn, user, segments, isHydrated, fontsLoaded, fontError]);
+
+
+  // --- 6 & 7. 스플래시 숨기기 및 최종 렌더링 로직 (기존과 동일) ---
+  useEffect(() => {
+    if ((fontsLoaded || fontError) && isHydrated) SplashScreen.hideAsync();
   }, [fontsLoaded, fontError, isHydrated]);
 
-  // 폰트 로딩과 수화가 완료될 때까지는 아무것도 렌더링하지 않음 (로딩 화면)
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  if (!fontsLoaded && !fontError || !isHydrated) return null;
 
   return (
-    // 전체 화면을 Flexbox View로 감쌉니다.
     <View style={styles.layoutContainer}>
-      <Header /> 
-
-      {/* 
-        Stack 네비게이터가 남은 공간을 모두 차지하도록 설정합니다.
-        이제 Stack 자체의 헤더는 사용하지 않으므로 headerShown: false로 설정합니다.
-      */}
+      <Header />
       <Stack screenOptions={{ headerShown: false }} />
-
       <Footer />
     </View>
   );
 }
 
-// 레이아웃을 위한 스타일 추가
+// --- 8. 스타일 정의 ---
 const styles = StyleSheet.create({
   layoutContainer: {
-    flex: 1,
+    flex: 1, // 화면 전체를 차지하도록 설정
     backgroundColor: '#fff',
-    userSelect: 'none',
+    // 'userSelect: none'은 웹에서 텍스트 드래그를 방지하는 스타일입니다.
+    // Platform.select를 사용하면 웹에서만 이 스타일이 적용되어 더 안전합니다.
+    ...Platform.select({
+      web: {
+        userSelect: 'none',
+      }
+    }),
   },
 });

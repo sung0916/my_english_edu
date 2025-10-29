@@ -1,12 +1,12 @@
-import { Href, Link, usePathname } from "expo-router";
+import { Link, usePathname } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const menuItems = [
-    { name: 'Student List', href: '/studentList' },
-    { name: 'Teacher List', href: '/teacherList' },
-    { name: 'Board List', href: '/boardList' },
-    { name: 'Chart', href: '/chart' },
-    { name: '', href: '/' },
+    { name: 'Student List', href: '/admin/studentList' },
+    { name: 'Teacher List', href: '/admin/teacherList' },
+    { name: 'Permit-required List', href: '/admin/permitList' },
+    { name: 'Board List', href: '/admin/boardList' },
+    { name: 'Chart', href: '/admin/chart' },
     { name: '', href: '/' },
 ];
 
@@ -19,7 +19,7 @@ const AdminSidebar = () => {
                 const isActive = pathname === item.href;
 
                 return (
-                    <Link href={item.href as Href} asChild key={item.name}>
+                    <Link href={item.href} asChild key={item.name}>
                         <Pressable>
                             <Text style={[styles.menuItem, isActive && styles.activeMenuItem]}>
                                 {item.name}
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         borderRightColor: '#dee2e6',
     },
     menuItem: {
-        fontSize: 17,
+        fontSize: 16,
         paddingVertical: 12,
         color: '#495057',
         fontFamily: 'Mulish-Bold',

@@ -1,6 +1,6 @@
-import AdminHeader from "@/components/admin/AdminHeader";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import { useUIStore } from "@/store/uiStore";
+import AdminHeader from "../../components/admin/AdminHeader";
+import AdminSidebar from "../../components/admin/AdminSidebar";
+import { useUIStore } from "../../store/uiStore";
 import { Slot } from "expo-router";
 import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

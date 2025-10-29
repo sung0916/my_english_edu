@@ -2,6 +2,7 @@ package com.englishapp.api_server.service.impl;
 
 import com.englishapp.api_server.domain.UserRole;
 import com.englishapp.api_server.domain.UserStatus;
+import com.englishapp.api_server.dto.response.AdminSignupPermitResponse;
 import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.repository.UserRepository;
@@ -25,9 +26,9 @@ public class AdminServiceImpl implements AdminService {
     // 승인 대기 목록
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> findPendingUsers() {
+    public List<AdminSignupPermitResponse> findPendingUsers() {
         return userRepository.findByStatus(UserStatus.PENDING).stream()
-                .map(UserResponse::new)
+                .map(AdminSignupPermitResponse::new)
                 .collect(Collectors.toList());
     }
 

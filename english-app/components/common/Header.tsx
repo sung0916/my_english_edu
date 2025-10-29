@@ -1,8 +1,8 @@
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "../../store/userStore";
 import { Feather } from '@expo/vector-icons';
-import { Href, Link, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, useWindowDimensions, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Header = () => {
@@ -21,7 +21,7 @@ const Header = () => {
   }
 
   const navigateAndCloseMenu = (path: string) => {
-    router.push(path as Href);
+    router.push(path);
     setIsMenuOpen(false);
   }
 
@@ -30,7 +30,12 @@ const Header = () => {
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Link href="/" asChild>
-            <Pressable><Text style={styles.logo}>Monster English</Text></Pressable>
+            <Pressable>
+              <Image 
+                source={require('../../assets/favicon.png')} 
+                style={styles.logo} 
+              />
+            </Pressable>
           </Link>
         </View>
 
@@ -41,31 +46,31 @@ const Header = () => {
         ) : (
           <>
             <View style={styles.navContainer}>
-              <Link href="/about" asChild><Pressable><Text style={styles.navItem}>About</Text></Pressable></Link>
-              <Link href="/english" asChild><Pressable><Text style={styles.navItem}>English</Text></Pressable></Link>
-              <Link href="/games" asChild><Pressable><Text style={styles.navItem}>Games</Text></Pressable></Link>
-              <Link href="/store" asChild><Pressable><Text style={styles.navItem}>Store</Text></Pressable></Link>
-              <Link href="/board" asChild><Pressable><Text style={styles.navItem}>Board</Text></Pressable></Link>
+              <Link href="/main/about" asChild><Pressable><Text style={styles.navItem}>About</Text></Pressable></Link>
+              <Link href="/main/english" asChild><Pressable><Text style={styles.navItem}>English</Text></Pressable></Link>
+              <Link href="/main/games" asChild><Pressable><Text style={styles.navItem}>Games</Text></Pressable></Link>
+              <Link href="/main/store" asChild><Pressable><Text style={styles.navItem}>Store</Text></Pressable></Link>
+              <Link href="/main/board" asChild><Pressable><Text style={styles.navItem}>Board</Text></Pressable></Link>
             </View>
 
             <View style={styles.userContainer}>
               {isLoggedIn ? (
                 <>
                   {user?.role === 'ADMIN' ? (
-                    <Link href="/studentList" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
+                    <Link href="/admin/studentList" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
                   ) : (
-                    <Link href="/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
+                    <Link href="/auth/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
                   )}
 
                   {user?.role !== 'ADMIN' && (
-                    <Link href="/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
+                    <Link href="/auth/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
                   )}
                   <Pressable onPress={handleLogout}><Text style={styles.userItem}>로그아웃</Text></Pressable>
                 </>
               ) : (
                 <>
-                  <Link href="/login" asChild><Pressable><Text style={styles.userItem}>로그인</Text></Pressable></Link>
-                  <Link href="/signup" asChild><Pressable><Text style={styles.userItem}>회원가입</Text></Pressable></Link>
+                  <Link href="/auth/login" asChild><Pressable><Text style={styles.userItem}>로그인</Text></Pressable></Link>
+                  <Link href="/auth/signup" asChild><Pressable><Text style={styles.userItem}>회원가입</Text></Pressable></Link>
                 </>
               )}
             </View>
@@ -86,10 +91,10 @@ const Header = () => {
           </View>
 
           <View style={styles.modalContent}>
-            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/about')}><Text style={styles.modalLinkText}>About</Text></Pressable>
-            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/test')}><Text style={styles.modalLinkText}>Study</Text></Pressable>
-            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/games')}><Text style={styles.modalLinkText}>Games</Text></Pressable>
-            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/board')}><Text style={styles.modalLinkText}>Board</Text></Pressable>
+            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/about')}><Text style={styles.modalLinkText}>About</Text></Pressable>
+            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/test')}><Text style={styles.modalLinkText}>Study</Text></Pressable>
+            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/games')}><Text style={styles.modalLinkText}>Games</Text></Pressable>
+            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/board')}><Text style={styles.modalLinkText}>Board</Text></Pressable>
 
             <View style={styles.separator} />
 
@@ -97,20 +102,20 @@ const Header = () => {
               <>
                 {/* 모바일 */}
                 {user?.role === 'ADMIN' ? (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/admin')}><Text style={styles.modalLinkText}>관리자 페이지</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/admin/studentList')}><Text style={styles.modalLinkText}>관리자 페이지</Text></Pressable>
                 ) : (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/mypage')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/mypage')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
                 )}
 
                 {user?.role !== 'ADMIN' && (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
                 )}
                 <Pressable style={styles.modalLink} onPress={handleLogout}><Text style={styles.modalLinkText}>로그아웃</Text></Pressable>
               </>
             ) : (
               <>
-                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/login')}><Text style={styles.modalLinkText}>로그인</Text></Pressable>
-                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/signup')}><Text style={styles.modalLinkText}>회원가입</Text></Pressable>
+                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/login')}><Text style={styles.modalLinkText}>로그인</Text></Pressable>
+                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/signup')}><Text style={styles.modalLinkText}>회원가입</Text></Pressable>
               </>
             )}
           </View>
@@ -131,7 +136,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  logo: { fontSize: 25, fontWeight: 'bold', color: 'orange' },
+  logo: { 
+    width: 70,
+    resizeMode: 'contain',
+  },
   logoContainer: {},
   navContainer: { flex: 1, justifyContent: 'space-evenly', flexDirection: 'row', alignItems: 'center' },
   navItem: { fontSize: 18, fontFamily: 'Mulish-Bold' },

@@ -1,7 +1,7 @@
-import { Button } from "@react-navigation/elements";
 import { useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import CustomButton from "./PermitButtonProps";
 
 export interface SearchOption {
     value: string;  // api요청 시 사용할 키
@@ -14,7 +14,7 @@ interface SearchBoxProps {
 }
 
 // options가 없으면 렌더링X
-const SearchBox: React.FC<SearchBoxProps> = ({ options, onSearch }) => {
+export const SearchBox = ({ options, onSearch }: SearchBoxProps) => {
     if (!options || options.length === 0) {
         return null;
     }
@@ -39,9 +39,9 @@ const SearchBox: React.FC<SearchBoxProps> = ({ options, onSearch }) => {
                         setSearchQuery('');
                     }}
                 >
-                    {options.map(option) => {
-                        <Picker.item key={options.value} label={option.label} value={option.value} />
-                    }}
+                    {options.map((option) => (
+                        <Picker.Item key={option.value} label={option.label} value={option.value} />
+                    ))}
                 </Picker>
             </View>
 
@@ -50,9 +50,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({ options, onSearch }) => {
                 placeholder="검색어를 입력하세요"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
+                onSubmitEditing={handleSearch} // 엔터 키로도 검색 실행
             />
 
-            <Button title="검색" onPress={handleSearch} />
+            <CustomButton title="검색" onPress={handleSearch} />
         </View>
     );
 }
@@ -60,24 +61,28 @@ const SearchBox: React.FC<SearchBoxProps> = ({ options, onSearch }) => {
 const styles = StyleSheet.create({
     searchBoxContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        padding: 10,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        margin: 10,
+        padding: 3,
+        margin: 3,
+        justifyContent: 'space-around',
+        // borderBottomWidth: 1,
+        // borderColor: '#ddd',
+        // borderRadius: 10,
+        // alignItems: 'center',
     },
     pickerContainer: {
-        flex: 0.4, // 드롭다운이 차지할 너비 비율
+        flex: 0.15, // 드롭다운이 차지할 너비 비율
         height: 50,
         justifyContent: 'center',
-        borderRightWidth: 1,
-        borderColor: '#ddd',
     },
     input: {
         flex: 0.6, // 입력창이 차지할 너비 비율
         height: 50,
         paddingHorizontal: 10,
         fontSize: 16,
+        borderWidth: 2,
+        borderColor: '#ddd',
+        borderRadius: 10,
     },
 });
+
+export default SearchBox;

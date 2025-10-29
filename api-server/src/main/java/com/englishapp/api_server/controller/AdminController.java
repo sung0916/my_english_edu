@@ -1,6 +1,7 @@
 package com.englishapp.api_server.controller;
 
 import com.englishapp.api_server.dto.request.ApproveUserRequest;
+import com.englishapp.api_server.dto.response.AdminSignupPermitResponse;
 import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.repository.UserRepository;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @Slf4j
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
 
     private final AdminService adminService;
@@ -27,9 +28,9 @@ public class AdminController {
 
     // 승인 대기 목록 조회
     @GetMapping("/pending")
-    public ResponseEntity<List<UserResponse>> getPendingUsers() {
+    public ResponseEntity<List<AdminSignupPermitResponse>> getPendingUsers() {
 
-        List<UserResponse> pendingUsers = adminService.findPendingUsers();
+        List<AdminSignupPermitResponse> pendingUsers = adminService.findPendingUsers();
         return ResponseEntity.ok(pendingUsers);
     }
 

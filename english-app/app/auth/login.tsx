@@ -1,6 +1,6 @@
-import apiClient from "@/api";
-import CustomButton from "@/components/common/CustomButtonProps";
-import { useUserStore } from "@/store/userStore";
+import apiClient from "../../api";
+import CustomButton from "../../components/common/PermitButtonProps";
+import { useUserStore } from "../../store/userStore";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Platform, StyleSheet, Text, TextInput, View } from "react-native";

@@ -1,6 +1,7 @@
 package com.englishapp.api_server.service;
 
 import com.englishapp.api_server.domain.UserRole;
+import com.englishapp.api_server.dto.response.AdminSignupPermitResponse;
 import com.englishapp.api_server.dto.response.UserResponse;
 import com.englishapp.api_server.entity.User;
 
@@ -9,7 +10,7 @@ import java.util.List;
 public interface AdminService {
 
     // 승인 대기 목록
-    List<UserResponse> findPendingUsers();
+    List<AdminSignupPermitResponse> findPendingUsers();
 
     // 가입 허가
     UserResponse approveUser(int userId, UserRole role);

@@ -5,7 +5,7 @@ interface CustomButtonProps extends PressableProps {
   title: string;
 }
 
-const CustomButton = ({ title, onPress, ...props }: CustomButtonProps) => {
+const PermitCustomButton = ({ title, onPress, ...props }: CustomButtonProps) => {
   // 1. 마우스가 위에 있는지 여부를 저장할 state를 만듭니다. (기본값: false)
   const [isHovered, setIsHovered] = useState(false);
 
@@ -56,4 +56,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomButton;
+export default PermitCustomButton;

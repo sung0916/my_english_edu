@@ -1,4 +1,4 @@
-import { useUIStore } from "@/store/uiStore";
+import { useUIStore } from "../../store/uiStore";
 import { Feather } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
