@@ -1,51 +1,84 @@
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, ScrollView } from "react-native";
+import Footer from "../components/common/Footer";
 
 export default function HomePage() {
-    // const {width} = useWindowDimensions(); 현재 화면의 가로, 세로 길이를 가져온다.
+  
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
 
-    return (
-    // 최상위 View는 화면 전체를 차지합니다.
+  const handleScroll = (event: any) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const isAtBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 1;
+
+    if (isAtBottom !== isFooterVisible) {
+      setIsFooterVisible(isAtBottom);
+    }
+  };
+
+  return (
+    // [핵심] 최상위 View는 이제 푸터를 포함할 '기준점'이 됩니다.
     <View style={styles.container}>
-      {/* 1. 배너 공간 */}
-      <View style={styles.bannerContainer}>
-        <Text style={styles.placeholderText}>배너 공간 (Banner Area)</Text>
-      </View>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.bannerContainer}>
+          <Text style={styles.placeholderText}>배너 공간 (Banner Area)</Text>
+        </View>
 
-      {/* 2. 컨텐츠 공간 */}
-      <View style={styles.contentContainer}>
-        <Text style={styles.placeholderText}>컨텐츠 공간 (Content Area)</Text>
+        <View style={styles.contentContainer}>
+          <Text style={styles.placeholderText}>컨텐츠 공간 (Content Area)</Text>
+          {/* 스크롤 테스트용 임시 뷰 */}
+          <View style={{ height: 800 }} /> 
+        </View>
+      </ScrollView>
+
+      {/* 
+        [수정] isFooterVisible 상태에 따라 스타일을 동적으로 변경합니다.
+        이제 Footer는 항상 렌더링되지만, 투명도와 위치가 조절됩니다.
+      */}
+      <View style={[styles.footerWrapper, { opacity: isFooterVisible ? 1 : 0 }]}>
+        <Footer />
       </View>
     </View>
   );
 }
 
-// CSS 파일 대신 StyleSheet.create()를 사용해 스타일을 정의한다.
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // 화면 전체를 차지하도록 설정 (필수)
+    flex: 1,
     backgroundColor: '#fff',
+    // position: 'relative'와 같은 역할. 자식의 absolute 위치 기준점이 됨.
   },
-  // 상단 배너 영역 스타일
   bannerContainer: {
-    flex: 1, // container의 전체 공간 중 1의 비율을 차지
-    backgroundColor: '#d7eef9', // 임시 배경색 (하늘색 계열)
-    justifyContent: 'center', // 내부 텍스트를 세로 중앙에 배치
-    alignItems: 'center',     // 내부 텍스트를 가로 중앙에 배치
-    borderBottomWidth: 1,     // 하단에 경계선 추가
-    borderBottomColor: '#ccc',
-  },
-  // 하단 컨텐츠 영역 스타일
-  contentContainer: {
-    flex: 3, // container의 전체 공간 중 3의 비율을 차지 (배너보다 3배 크게)
-    backgroundColor: '#f5f5f5', // 임시 배경색 (회색 계열)
+    minHeight: 300, 
+    backgroundColor: '#d7eef9',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20, // 내부 여백
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
-  // 임시 텍스트 스타일
+  contentContainer: {
+    minHeight: 600,
+    flexGrow: 1,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   placeholderText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#888',
+  },
+  // --- [추가] 푸터를 감싸는 Wrapper 스타일 ---
+  footerWrapper: {
+    position: 'absolute', // [핵심] 절대 위치 지정
+    bottom: 0,            // 화면 맨 아래에 고정
+    left: 0,
+    right: 0,
+    transition: 'opacity 0.3s ease-in-out', // 부드러운 전환 효과 (웹 전용)
   },
 });

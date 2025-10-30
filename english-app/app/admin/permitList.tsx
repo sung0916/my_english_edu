@@ -6,7 +6,7 @@ import { Picker } from "@react-native-picker/picker";
 import PermitCustomButton from "../../components/common/PermitButtonProps";
 import RefuseCustomButton from "../../components/common/RefuseButtonProps";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 enum UserRole {
     STUDENT = '학생',
@@ -33,7 +33,7 @@ const PermitList = () => {
     // --- 데이터 로딩 함수 (API 호출) ---
     const fetchPendingUsers = useCallback(async () => {
         try {
-            // [API 연동] 승인 대기 중인 사용자 목록만
+            // [API 연동] 승인 대기 중인 사용자 목록
             const response = await apiClient.get<PendingUser[]>('/api/admin/pending');
             setAllPendingUsers(response.data);
 
@@ -77,7 +77,7 @@ const PermitList = () => {
             // [API 연동] 서버에 승인 요청을 보냅니다.
             await apiClient.patch(`/api/admin/${userId}/approve`, { role: roleToApprove });
             Alert.alert("성공", "사용자 승인이 완료되었습니다.");
-            
+
             // 성공 시, 전체 목록에서 해당 사용자를 즉시 제거하여 UI를 업데이트합니다.
             setAllPendingUsers(prevUsers => prevUsers.filter(user => user.userId !== userId));
 
@@ -111,9 +111,9 @@ const PermitList = () => {
             <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.username}</Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.loginId}</Text>
             <Text style={[styles.tableCell, { flex: 2 }]}>{item.tel}</Text>
-            
+
             {/* 역할 선택 셀 */}
-            <View style={[styles.tableCell, { flex: 2 }]}>
+            <View style={[styles.tableCell, { flex: 1 }]}>
                 {Platform.OS === 'web' ? (
                     <select
                         value={selectedRoles[item.userId] || ''}
@@ -138,61 +138,75 @@ const PermitList = () => {
             </View>
 
             {/* 허가 상태 버튼 셀 */}
-            <View style={[styles.tableCell, styles.actionCell, { flex: 2 }]}>
-                <PermitCustomButton title="허가" onPress={() => handleApprove(item.userId)} />
-                <View style={{ width: 8 }} />
-                <RefuseCustomButton title="제거" onPress={() => handleRemove(item.userId)} />
+            <View style={[styles.tableCell, styles.actionCell, { flex: 2.5 }]}>
+                {/* [적용] 버튼을 flex: 1 스타일을 가진 View로 감쌉니다. */}
+                <View style={{ flex: 1, marginRight: 4, marginLeft: 10, minWidth: 80, maxWidth: 100 }}>
+                    <PermitCustomButton title="허가" onPress={() => handleApprove(item.userId)} />
+                </View>
+                <View style={{ flex: 1, marginLeft: 4, minWidth: 80, maxWidth: 100 }}>
+                    <RefuseCustomButton title="제거" onPress={() => handleRemove(item.userId)} />
+                </View>
             </View>
         </View>
     );
 
+    // [추가] 테이블 헤더를 별도의 컴포넌트로 분리
+    const renderTableHeader = () => (
+        <View style={styles.tableHeader}>
+            <Text style={[styles.headerCell, { flex: 1.5 }]}>이름</Text>
+            <Text style={[styles.headerCell, { flex: 1.5 }]}>아이디</Text>
+            <Text style={[styles.headerCell, { flex: 2 }]}>연락처</Text>
+            <Text style={[styles.headerCell, { flex: 1 }]}>역할</Text>
+            <Text style={[styles.headerCell, { flex: 2.5 }]}>허가 상태</Text>
+        </View>
+    );
+
     return (
+        // 1. 최상위 View가 화면 전체를 차지합니다.
         <View style={styles.safeArea}>
-            <View style={styles.container}>
-                
-                {/* --- 테이블 UI 부분 --- */}
-                <View style={styles.table}>
-                    {/* 테이블 헤더 (첫 행) */}
-                    <View style={styles.tableHeader}>
-                        <Text style={[styles.headerCell, { flex: 1.5 }]}>이름</Text>
-                        <Text style={[styles.headerCell, { flex: 1.5 }]}>아이디</Text>
-                        <Text style={[styles.headerCell, { flex: 2 }]}>연락처</Text>
-                        <Text style={[styles.headerCell, { flex: 2 }]}>역할</Text>
-                        <Text style={[styles.headerCell, { flex: 2 }]}>허가 상태</Text>
-                    </View>
-                    
-                    {/* 테이블 바디 (데이터 목록) */}
-                    <FlatList
-                        data={displayedUsers}
-                        renderItem={renderUserRow}
-                        keyExtractor={(item) => item.userId.toString()}
-                        ListEmptyComponent={<Text style={styles.emptyText}>승인을 기다리는 사용자가 없습니다.</Text>}
+            {/* 
+              2. FlatList를 담는 컨테이너가 flex: 1을 가져
+                 페이지네이션을 제외한 모든 남은 공간을 차지합니다.
+            */}
+            <FlatList
+                style={styles.listContainer}
+                data={displayedUsers}
+                renderItem={renderUserRow}
+                keyExtractor={(item) => item.userId.toString()}
+                ListHeaderComponent={renderTableHeader}
+                ListEmptyComponent={<Text style={styles.emptyText}>승인을 기다리는 사용자가 없습니다.</Text>}
+            />
+
+            {/* 3. 페이지네이션은 고정 높이를 가지며 화면 하단에 위치합니다. */}
+            {allPendingUsers.length > 0 && (
+                <View style={styles.paginationContainer}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={allPendingUsers.length}
+                        itemsPerPage={ITEMS_PER_PAGE}
+                        onPageChange={(page) => setCurrentPage(page)}
                     />
                 </View>
-            </View>
-
-            {/* 페이지네이션 */}
-            {allPendingUsers.length > 0 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalItems={allPendingUsers.length}
-                    itemsPerPage={ITEMS_PER_PAGE}
-                    onPageChange={(page) => setCurrentPage(page)}
-                />
             )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#fff' },
-    container: { flex: 1, padding: 20 },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    table: {
-        flex: 1, // 페이지네이션을 제외한 모든 공간을 차지
+    safeArea: { 
+        flex: 1, 
+        backgroundColor: '#fff',
+        padding: 20,
+        minWidth: 900,
+    },
+    listContainer: {
+        flex: 1, // FlatList가 남은 공간을 모두 차지
         borderWidth: 1,
         borderColor: '#dee2e6',
         borderRadius: 4,
+    },
+    paginationContainer: {
+        paddingTop: 10, // 목록과 페이지네이션 사이 간격
     },
     tableHeader: {
         flexDirection: 'row',
@@ -229,7 +243,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 4,
         backgroundColor: 'white',
-        width: '100%',
+        width: 100,
     },
     pickerNative: {
         width: '100%',
@@ -242,6 +256,5 @@ const styles = StyleSheet.create({
         padding: 20,
     },
 });
-
 
 export default PermitList;

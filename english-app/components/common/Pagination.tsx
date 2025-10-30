@@ -13,8 +13,7 @@ export const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange
   // 1. 전체 페이지 수 계산 (소수점은 올림 처리)
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  // 페이지가 1개 이하라면 페이지네이션을 보여줄 필요가 없음
-  if (totalPages <= 1) {
+  if (totalPages < 1) {
     return null;
   }
 

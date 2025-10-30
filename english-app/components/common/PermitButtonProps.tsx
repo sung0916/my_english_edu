@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, PressableProps, StyleSheet, Text } from 'react-native';
+import { Pressable, PressableProps, StyleProp, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
 interface CustomButtonProps extends PressableProps {
   title: string;

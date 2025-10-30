@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, PressableProps, StyleSheet, Text } from 'react-native';
+import { Pressable, PressableProps, StyleProp, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
 interface CustomButtonProps extends PressableProps {
   title: string;
@@ -14,7 +14,7 @@ const RefuseCustomButton = ({ title, onPress, ...props }: CustomButtonProps) => 
       // 2. onHoverIn/onHoverOut 이벤트를 사용하여 isHovered 상태를 변경합니다.
       onHoverIn={() => setIsHovered(true)} // 마우스가 컴포넌트 안으로 들어오면 true
       onHoverOut={() => setIsHovered(false)} // 마우스가 컴포넌트 밖으로 나가면 false
-      
+
       // 3. style을 배열로 전달하여 isHovered 상태에 따라 조건부 스타일을 적용합니다.
       style={[
         styles.button,

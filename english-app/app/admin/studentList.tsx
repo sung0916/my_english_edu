@@ -1,9 +1,21 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import { Platform, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Pagination } from "../../components/common/Pagination";
+import apiClient from "../../api";
+import { Ionicons } from "@expo/vector-icons";
 
 const ITEMS_PER_PAGE = 10;
+
+interface Student {
+    userId: number;
+    username: string;
+    loginId: string;
+    tel: string;
+    email: string;
+    status: 'ACTIVE' | 'DELETED';
+    role: 'STUDENT' | 'TEACHER';
+}
 
 const StudentList = () => {
     const studentSearchOptions: SearchOption[] = [
@@ -11,39 +23,127 @@ const StudentList = () => {
         { value: 'userId', label: '아이디' },
     ];
 
-    const [students, setStudents] = useState([]); 
-    const [currentPage, setCurrentPage] = useState(1); 
-    const [totalStudents, setTotalStudents] = useState(0); 
+    const [isLoading, setIsLoading] = useState(true); // 데이터 로딩 상태
+    const [allStudents, setAllStudents] = useState<Student[]>([]);
+    const [displayedStudents, setDisplayedStudents] = useState<Student[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // --- 데이터 로딩 함수 (API 호출) ---
-    const fetchStudents = async () => {
+    const fetchStudents = useCallback(async () => {
+        setIsLoading(true);
         try {
-            // 예시: /api/admin/users?page=1&size=10
-            // const response = await apiClient.get(`/api/admin/users?page=${currentPage}&size=${ITEMS_PER_PAGE}`);
-            // setStudents(response.data.content);
-            // setTotalStudents(response.data.totalElements);
-
-            // --- API 연동 전 임시 데이터 ---
-            console.log(`${currentPage} 페이지의 학생 데이터를 불러옵니다.`);
-            setTotalStudents(55); 
+            // [API 연동] GET /api/admin 호출하여 모든 사용자 정보 가져오기
+            const response = await apiClient.get<Student[]>('/api/admin');
+            
+            // 요구사항: ACTIVE, DELETED 상태의 학생만 필터링
+            const filteredStudents = response.data.filter(
+                user => user.role === 'STUDENT' && (user.status === 'ACTIVE' || user.status === 'DELETED')
+            );
+            
+            setAllStudents(filteredStudents);
 
         } catch (error) {
             console.error("학생 목록을 불러오는 데 실패했습니다.", error);
+            Alert.alert("오류", "학생 목록을 불러오는 중 오류가 발생했습니다.");
+        } finally {
+            setIsLoading(false); // 로딩 종료
         }
-    };
+    }, []);
 
-    // currentPage가 바뀔 때마다 학생 데이터를 새로 불러옴
+    // 컴포넌트 마운트 시 학생 데이터를 불러옴
     useEffect(() => {
         fetchStudents();
-    }, [currentPage]);
+    }, [fetchStudents]);
 
+    // 클라이언트 사이드 페이지네이션
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        setDisplayedStudents(allStudents.slice(startIndex, endIndex));
+    }, [allStudents, currentPage]);
+
+    // 검색 핸들러
     const handleStudentSearch = (type: string, query: string) => {
         console.log(`학생 검색 실행 >> 조건: ${type}, 검색어: ${query}`);
-        // 실제로는 이 정보를 바탕으로 백엔드 API를 호출합니다.
-        // 예시: fetchUsersAPI({ [type]: query });
-        // 예를 들어 type이 'userId'이고 query가 'user123'이라면,
-        // API 요청 URL은 `/api/admin/users?userId=user123` 형태가 될 것입니다.
+        // TODO: 백엔드에 검색 API가 추가되면 연동합니다.
+        // 현재는 클라이언트 사이드 검색으로 구현 가능합니다.
+        // 예: const results = allStudents.filter(s => s[type].includes(query));
     };
+
+    // 삭제 핸들러
+    const handleDelete = (userId: number, username: string) => {
+        Alert.alert(
+            "학생 삭제",
+            `'${username}' 학생을 정말로 삭제(비활성화)하시겠습니까?`,
+            [
+                { text: "취소", style: "cancel" },
+                {
+                    text: "삭제",
+                    onPress: async () => {
+                        try {
+                            // [API 연동] DELETE /api/admin/{userId} 호출
+                            await apiClient.delete(`/api/admin/${userId}`);
+
+                            // API 호출 성공 시, 클라이언트 상태를 즉시 업데이트
+                            const updatedStudents = allStudents.map(student =>
+                                student.userId === userId ? { ...student, status: 'DELETED' as const } : student
+                            );
+                            setAllStudents(updatedStudents);
+
+                            Alert.alert("성공", "학생이 삭제(비활성화)되었습니다.");
+                        } catch (error) {
+                            console.error("학생 삭제 실패:", error);
+                            Alert.alert("오류", "학생 삭제 처리 중 오류가 발생했습니다.");
+                        }
+                    },
+                    style: "destructive",
+                },
+            ]
+        );
+    };
+
+    // --- 렌더링 함수 ---
+
+    const renderTableHeader = () => (
+        <View style={styles.tableHeader}>
+            <Text style={[styles.headerCell, { flex: 1.5 }]}>이름</Text>
+            <Text style={[styles.headerCell, { flex: 2 }]}>아이디</Text>
+            <Text style={[styles.headerCell, { flex: 2.5 }]}>연락처</Text>
+            <Text style={[styles.headerCell, { flex: 3 }]}>이메일</Text>
+            <Text style={[styles.headerCell, { flex: 1.2 }]}>삭제</Text>
+        </View>
+    );
+
+    const renderStudentRow = ({ item }: { item: Student }) => {
+        const isDeleted = item.status === 'DELETED';
+
+        return (
+            <View style={styles.tableRow}>
+                <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.username}</Text>
+                <Text style={[styles.tableCell, { flex: 2 }]}>{isDeleted ? '-' : item.loginId}</Text>
+                <Text style={[styles.tableCell, { flex: 2.5 }]}>{isDeleted ? '-' : item.tel}</Text>
+                <Text style={[styles.tableCell, { flex: 3 }]}>{isDeleted ? '-' : item.email}</Text>
+                <View style={[styles.tableCell, { flex: 1.2, alignItems: 'center' }]}>
+                    {isDeleted ? (
+                        <Text style={styles.deletedText}>삭제됨</Text>
+                    ) : (
+                        <TouchableOpacity onPress={() => handleDelete(item.userId, item.username)}>
+                            <Ionicons name="trash-outline" size={22} color="red" />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+        );
+    };
+
+    // 로딩 중일 때 보여줄 UI
+    if (isLoading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.safeArea}>
@@ -52,42 +152,42 @@ const StudentList = () => {
                 onSearch={handleStudentSearch}
             />
 
-            <View style={styles.studentContainer}>
-                {/* 학생 목록 렌더링 */}
+            <View style={styles.listContainer}>
+                <FlatList
+                    data={displayedStudents}
+                    renderItem={renderStudentRow}
+                    keyExtractor={(item) => item.userId.toString()}
+                    ListHeaderComponent={renderTableHeader}
+                    ListEmptyComponent={<Text style={styles.emptyText}>표시할 학생이 없습니다.</Text>}
+                />
             </View>
-
-            <Pagination
-                currentPage={currentPage}
-                totalItems={totalStudents}
-                itemsPerPage={ITEMS_PER_PAGE}
-                onPageChange={(page) => setCurrentPage(page)} 
-            />
+            
+            {allStudents.length > 0 && (
+                <View style={styles.paginationContainer}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={allStudents.length}
+                        itemsPerPage={ITEMS_PER_PAGE}
+                        onPageChange={(page) => setCurrentPage(page)}
+                    />
+                </View>
+            )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    /* title: {
-        fontSize: 18,
-        fontWeight: '400',
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#dee2e6',
-        marginBottom: 16,
-    }, */
-    bottomLine: {
-        borderStyle: 'solid',
-        borderColor: '#ddd',
-    },
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    studentContainer: {
-        flex: 1,
-        padding: 16,
-        paddingTop: Platform.OS === 'android' ? 10 : 0,
-    },
+    // (이전과 동일한 스타일)
+    safeArea: { flex: 1, backgroundColor: '#fff', padding: 20 },
+    listContainer: { flex: 1, marginTop: 16, borderWidth: 1, borderColor: '#dee2e6', borderRadius: 4 },
+    paginationContainer: { paddingTop: 10 },
+    tableHeader: { flexDirection: 'row', backgroundColor: '#f8f9fa', borderBottomWidth: 2, borderColor: '#dee2e6', paddingHorizontal: 10, paddingVertical: 12 },
+    headerCell: { fontWeight: 'bold', textAlign: 'center' },
+    tableRow: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderColor: '#dee2e6', paddingHorizontal: 10, minHeight: 50 },
+    tableCell: { textAlign: 'center', paddingVertical: 10 },
+    deletedText: { color: '#868e96', fontStyle: 'italic' },
+    emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: 'gray' },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' }, // 로딩 컨테이너 스타일 추가
 });
 
 export default StudentList;

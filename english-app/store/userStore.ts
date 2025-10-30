@@ -2,17 +2,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+// User 타입을 명확히 분리 -> 재사용성 및 가독성
+interface User {
+    userId: number;
+    username: string;
+    email: string;
+    tel: string;
+    role: 'STUDENT' | 'TEACHER' | 'ADMIN'; 
+}
+
 // 스토어에서 관리할 상태의 타입
 interface UserState {
-    user: {
-        userId: number | null;
-        username: string | null;
-        email: string | null;
-        role: string | null;
-    };
+    user: User;
     token: string | null;
     isLoggedIn: boolean;
-    login: (userData: any, token: string) => void;
+    login: (userData: User, token: string) => void;
     logout: () => void;
 }
 
@@ -20,12 +24,7 @@ interface UserState {
 export const useUserStore = create(
     persist<UserState>(
         (set) => ({
-            user: {
-                userId: null,
-                username: null,
-                email: null,
-                role: null,
-            },
+            user: null,
             token: null,
             isLoggedIn: false,
 
@@ -37,7 +36,7 @@ export const useUserStore = create(
             }),
 
             logout: () => set({
-                user: {userId: null, username: null, email: null, role: null},
+                user: null,
                 token: null,
                 isLoggedIn: false,
             }),
