@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserResponse {
 
-    private int userId;
+    private Long userId;
     private String username;
     private String loginId;
     private String email;
@@ -19,7 +19,7 @@ public class UserResponse {
     // Entity를 DTO로 변환하는 생성자
     public UserResponse(User user) {
 
-        this.userId = user.getUserId();
+        this.userId = user.getId();
         this.username = user.getUsername();
         this.loginId = user.getLoginId();
         this.email = user.getEmail();

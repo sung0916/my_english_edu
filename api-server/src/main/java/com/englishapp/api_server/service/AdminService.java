@@ -13,14 +13,14 @@ public interface AdminService {
     List<AdminSignupPermitResponse> findPendingUsers();
 
     // 가입 허가
-    UserResponse approveUser(int userId, UserRole role);
+    UserResponse approveUser(Long userId, UserRole role);
 
     // 회원 삭제
-    void deleteUser(int userId);
+    void deleteUser(Long userId);
 
     // 회원 목록
     List<UserResponse> findAllUsers();
 
     // 회원 검색
-    User findUserById(int userId);
+    User findUserById(Long userId);
 }

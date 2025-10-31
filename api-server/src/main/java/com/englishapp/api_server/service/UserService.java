@@ -12,11 +12,11 @@ public interface UserService {
     UserResponse signup(UserRequest request);
 
     // 회원 수정
-    UserResponse updateUser(int userId, UserRequest userRequest);
+    UserResponse updateUser(Long userId, UserRequest userRequest);
 
     // 프로필 조회
-    UserResponse findMyProfile(int userId);
+    UserResponse findMyProfile(Long userId);
 
     // 회원 탈퇴
-    void withdraw(int userId);
+    void withdraw(Long userId);
 }

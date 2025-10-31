@@ -5,21 +5,30 @@ interface CustomButtonProps extends PressableProps {
   title: string;
 }
 
-const RefuseCustomButton = ({ title, onPress, ...props }: CustomButtonProps) => {
-  // 1. 마우스가 위에 있는지 여부를 저장할 state를 만듭니다. (기본값: false)
+const RefuseCustomButton = ({ title, onPress, style, ...props }: CustomButtonProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <Pressable
-      // 2. onHoverIn/onHoverOut 이벤트를 사용하여 isHovered 상태를 변경합니다.
-      onHoverIn={() => setIsHovered(true)} // 마우스가 컴포넌트 안으로 들어오면 true
-      onHoverOut={() => setIsHovered(false)} // 마우스가 컴포넌트 밖으로 나가면 false
+      onHoverIn={() => setIsHovered(true)} 
+      onHoverOut={() => setIsHovered(false)} 
 
-      // 3. style을 배열로 전달하여 isHovered 상태에 따라 조건부 스타일을 적용합니다.
-      style={[
-        styles.button,
-        isHovered && styles.hoveredButton // isHovered가 true일 때만 hoveredButton 스타일 적용
-      ]}
+      // Pressable의 style prop을 배열이 아닌 '함수' 형태로 사용합니다.
+      // 이 함수는 pressableState 객체(pressed, hovered 등의 상태 포함)를 인자로 받습니다.
+      style={(pressableState) => {
+        // 부모로부터 받은 style prop이 함수인지 확인
+        const externalStyle = typeof style === 'function'
+          ? style(pressableState) // style이 함수라면 실행
+          : style;              // style이 객체라면 그대로 사용
+        
+        // 모든 스타일 객체를 하나의 배열에 담아 반환
+        return [
+          styles.button,                      // 기본 버튼 스타일
+          isHovered && styles.hoveredButton,  // Hover 상태일 때의 조건부 스타일
+          externalStyle,                      // 부모로부터 받은 스타일
+        ];
+      }}
+
       onPress={onPress}
       {...props}
     >
@@ -30,7 +39,6 @@ const RefuseCustomButton = ({ title, onPress, ...props }: CustomButtonProps) => 
 
 const styles = StyleSheet.create({
   button: {
-    //width: 150,
     backgroundColor: '#fc8d8dff',
     paddingVertical: 12,
     paddingHorizontal: 25,
@@ -49,10 +57,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  // 4. Hover 상태일 때 적용될 새로운 스타일을 정의합니다.
   hoveredButton: {
-    backgroundColor: '#f75b63ff', // 살짝 더 어두운 파란색
-    transform: [{ scale: 1.01 }], // 살짝 커지는 효과
+    backgroundColor: '#f75b63ff', 
+    transform: [{ scale: 1.01 }], 
   },
 });
 

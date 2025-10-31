@@ -8,18 +8,17 @@ import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.repository.UserRepository;
 import com.englishapp.api_server.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Builder
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -35,14 +34,15 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
 
-        User newUser = new User();
-        newUser.setUsername(request.getUsername());
-        newUser.setLoginId(request.getLoginId());
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setEmail(request.getEmail());
-        newUser.setTel(request.getTel());
-        newUser.setRole(UserRole.STUDENT);
-        newUser.setStatus(UserStatus.PENDING);
+        User newUser = User.builder()
+                .username(request.getUsername())
+                .loginId(request.getLoginId())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .tel(request.getTel())
+                .role(UserRole.STUDENT)
+                .status(UserStatus.PENDING)
+                .build();
 
         User savedUser = userRepository.save(newUser);
         return new UserResponse(savedUser);
@@ -50,18 +50,19 @@ public class UserServiceImpl implements UserService {
 
     // 정보 수정
     @Override
-    public UserResponse updateUser(int userId, UserRequest userRequest) {
+    public UserResponse updateUser(Long userId, UserRequest userRequest) {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다 : " + userId));
 
         if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+            String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+            existingUser.updatePassword(encodedPassword);
         }
         if (userRequest.getEmail() != null) {
-            existingUser.setEmail(userRequest.getEmail());
+            existingUser.updateEmail(userRequest.getEmail());
         }
         if (userRequest.getTel() != null) {
-            existingUser.setTel(userRequest.getTel());
+            existingUser.updateTel(userRequest.getTel());
         }
         return new UserResponse(existingUser);
     }
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
     // 프로필 조회
     @Override
     @Transactional(readOnly = true)
-    public UserResponse findMyProfile(int userId) {
+    public UserResponse findMyProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
     // 회원 탈퇴
     @Override
     @Transactional
-    public void withdraw(int userId) {
+    public void withdraw(Long userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
@@ -87,9 +88,8 @@ public class UserServiceImpl implements UserService {
         if (user.getStatus() == UserStatus.DELETED) {
             throw new IllegalStateException("이미 탈퇴한 사용자입니다.");
         }
-        
-        user.setStatus(UserStatus.DELETED);
-        user.setEmail("삭제된 사용자");
-        user.setTel("삭제된 사용자");
+
+        // User Entity에게 탈퇴 처리를 위임
+        user.withdraw();
     }
 }

@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class AdminSignupPermitResponse {
 
-    private int userId;
+    private Long userId;
     private String username;
     private String loginId;
     private String tel;
@@ -16,7 +16,7 @@ public class AdminSignupPermitResponse {
     private UserStatus status;
 
     public AdminSignupPermitResponse(User user) {
-        this.userId = user.getUserId();
+        this.userId = user.getId();
         this.username = user.getUsername();
         this.loginId = user.getLoginId();
         this.tel = user.getTel();

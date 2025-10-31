@@ -37,7 +37,7 @@ public class AdminController {
     // 가입 승인
     @PatchMapping("/{userId}/approve")
     public ResponseEntity<UserResponse> approveUser(
-            @PathVariable int userId,
+            @PathVariable Long userId,
             @RequestBody ApproveUserRequest request) {
 
         UserResponse approvedUser = adminService.approveUser(userId, request.getRole());
@@ -46,7 +46,7 @@ public class AdminController {
 
     // 회원 삭제
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
 
         adminService.deleteUser(userId);
         return ResponseEntity.noContent().build();
@@ -61,7 +61,7 @@ public class AdminController {
 
     // 특정 회원 검색
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable int userId) {
+    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
         User user = adminService.findUserById(userId);
         try {
             return ResponseEntity.ok(user);

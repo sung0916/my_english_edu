@@ -39,7 +39,7 @@ public class UserController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody UserRequest request) {
 
-        int currentUserId = userDetails.getUserId();
+        Long currentUserId = userDetails.getUserId();
         UserResponse updatedUser = userService.updateUser(currentUserId, request);
         log.info("계정 수정 완료: {}", currentUserId);
         return ResponseEntity.ok(updatedUser);
@@ -50,7 +50,7 @@ public class UserController {
     public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         // userDetails 객체에서 사용자 ID 꺼내기
-        int currentUserId = userDetails.getUserId();
+        Long currentUserId = userDetails.getUserId();
 
         // 서비스 호출
         UserResponse myInfo = userService.findMyProfile(currentUserId);
@@ -61,7 +61,7 @@ public class UserController {
     // 회원 탈퇴
     @DeleteMapping("/me")
     public ResponseEntity<Void> withdraw(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        int currentUserId = userDetails.getUserId();
+        Long currentUserId = userDetails.getUserId();
 
         try {
             // UserDetailsImpl에서 현재 로그인한 사용자의 ID를 꺼냄
