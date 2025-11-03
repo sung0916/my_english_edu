@@ -17,6 +17,7 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     setIsMenuOpen(false);
+    alert("로그아웃되었습니다.");
     router.push('/');
   }
 

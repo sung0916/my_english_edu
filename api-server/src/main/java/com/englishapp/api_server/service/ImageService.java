@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface ImageService {
 
-    // 공지 사항 이미지 업로드
+    // 이미지 업로드
     List<ImageResponse> uploadImages(List<MultipartFile> files, ImageType imageType, Long relatedId);
 }

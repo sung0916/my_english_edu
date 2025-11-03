@@ -20,13 +20,12 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    // 공지사항 이미지 업로드
-    @PostMapping("/announcement/{announcementId}")
-    public ResponseEntity<List<ImageResponse>> uploadForAnnouncement(
-            @PathVariable Long announcementId,
+    // 특정 엔티티에 종속되지 않는 범용 이미지 업로드 API
+    @PostMapping("/upload")
+    public ResponseEntity<List<ImageResponse>> uploadImages(
             @RequestParam("files") List<MultipartFile> files) {
 
-        List<ImageResponse> uploadedImages = imageService.uploadImages(files, ImageType.ANNOUNCEMENT, announcementId);
+        List<ImageResponse> uploadedImages = imageService.uploadImages(files, null, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(uploadedImages);
     }
 }

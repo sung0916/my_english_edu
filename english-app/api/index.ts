@@ -29,6 +29,9 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => { // config �
 
 // 토큰 만료 시 자동 로그아웃을 처리하는 '응답 인터셉터' 함수
 const responseInterceptor = (error: AxiosError) => {
+    // interceptor에 진입해서 서버에서 에러에 대한 응답을 포함하는지 콘솔로 체크
+    // console.log('--- [AXIOS INTERCEPTOR] ERROR DETECTED! ---', 'Status:', error.response?.status);
+
     // 에러 응답이 없으면 그대로 에러를 반환
     if (!error.response) {
         return Promise.reject(error);
@@ -50,7 +53,8 @@ const responseInterceptor = (error: AxiosError) => {
         getState().logout(); 
 
         alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-        router.replace('/login'); // 로그인 페이지로 이동
+
+        router.replace('/auth/login'); // 로그인 페이지로 이동
     }
     // 403 Forbidden (인가 실패 - 권한 없음)
     // 403 에러는 로그인 상태는 유효한 경우이므로 isLoggedIn 체크를 유지하는 것이 좋습니다.

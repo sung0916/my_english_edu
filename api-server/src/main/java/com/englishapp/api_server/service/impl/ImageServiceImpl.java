@@ -51,14 +51,14 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     @Transactional
-    public List<ImageResponse> uploadImages(List<MultipartFile> files, ImageType imageType, Long relatedId) {
+    public List<ImageResponse> uploadImages(List<MultipartFile> files, ImageType type, Long relatedId) {
 
         return files.stream()
-                .map(file -> uploadSingleFile(file, imageType, relatedId))
+                .map(file -> uploadSingleFile(file, type, relatedId))
                 .collect(Collectors.toList());
     }
 
-    private ImageResponse uploadSingleFile(MultipartFile file, ImageType imageType, Long relatedId) {
+    private ImageResponse uploadSingleFile(MultipartFile file, ImageType type, Long relatedId) {
 
         if (file.isEmpty()) {
             throw new IllegalArgumentException("업로드할 파일이 비어있습니다.");
@@ -77,7 +77,7 @@ public class ImageServiceImpl implements ImageService {
                     .imageUrl(filePath.toString())
                     .fileName(originalFileName)
                     .fileSize((int) file.getSize())
-                    .type(imageType)
+                    .type(type)
                     .relatedId(relatedId)
                     .status(ImageStatus.PENDING)
                     .build();

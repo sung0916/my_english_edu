@@ -75,11 +75,7 @@ public class JwtUtil {
     // 토큰 유효성 체크
     public boolean validateToken(String token) {
 
-        try {
-            return !isTokenExpired(token);
-        } catch (Exception e) {
-            log.error("유효하지 않은 토큰입니다. : {}", e.getMessage());
-            return false;
-        }
+        // try-catch 제거
+        return !isTokenExpired(token);
     }
 }

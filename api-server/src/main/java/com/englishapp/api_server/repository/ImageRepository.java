@@ -1,6 +1,7 @@
 package com.englishapp.api_server.repository;
 
 import com.englishapp.api_server.domain.ImageStatus;
+import com.englishapp.api_server.domain.ImageType;
 import com.englishapp.api_server.entity.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     // 스케줄러에서 사용할 쿼리 메서드
     List<Image> findByStatusAndCreatedAtBefore(ImageStatus status, LocalDateTime cutoff);
+
+    // 이미지 등록
+    List<Image> findByTypeAndRelatedIdAndStatus(ImageType imageType, Long id, ImageStatus imageStatus);
 }

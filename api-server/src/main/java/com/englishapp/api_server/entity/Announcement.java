@@ -35,6 +35,7 @@ public class Announcement {
     @Column(name = "view_count", nullable = false)
     private int viewCount = 0;
 
+    @Setter  //게시글 상태 변경을 위해 설정
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BoardStatus status = BoardStatus.ACTIVE;
@@ -46,4 +47,19 @@ public class Announcement {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // 게시글 내용 수정을 위한 메서드 (Dirty Checking)
+    public void update(String title, String content) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+    }
+
+    // 조회수 증가
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
 }

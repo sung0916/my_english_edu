@@ -51,4 +51,23 @@ public class Image {
     @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;
+
+    /**
+     * PENDING 상태의 이미지를 특정 엔티티와 연결하며 ACTIVE 상태로 변경합니다.
+     *
+     * @param relatedType 연결할 엔티티 타입 (e.g., ANNOUNCEMENT)
+     * @param relatedId   연결할 엔티티의 PK ID
+     */
+    public void activate(ImageType relatedType, Long relatedId) {
+        this.relatedId = relatedId;
+        this.type = relatedType;
+        this.status = ImageStatus.ACTIVE;
+    }
+
+    // 연결을 끊고 다시 PENDING 상태로 돌리는 메서드
+    public void deactivate() {
+        this.type = null;
+        this.relatedId = null;
+        this.status = ImageStatus.PENDING;
+    }
 }

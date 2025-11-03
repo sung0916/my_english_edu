@@ -3,7 +3,8 @@ import CustomButton from "../../components/common/PermitButtonProps";
 import { useUserStore } from "../../store/userStore";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Platform, StyleSheet, Text, TextInput, View } from "react-native";
+import { Platform, StyleSheet, Text, TextInput, View } from "react-native";
+import crossPlatformAlert from "../../utils/crossPlatformAlert";
 
 const LoginPage = () => {
   const [loginId, setLoginId] = useState('');
@@ -13,7 +14,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     if (!loginId || !password) {
-      Alert.alert("입력 오류", "아이디와 비밀번호를 모두 입력해주세요.");
+      crossPlatformAlert("입력 오류", "아이디와 비밀번호를 모두 입력해주세요.");
       return;
     }
 
@@ -28,7 +29,7 @@ const LoginPage = () => {
       if (token && user) {
         login(user, token);
 
-        Alert.alert("로그인 성공", `${user.username}님, 환영합니다!`);
+        crossPlatformAlert("로그인 성공", `${user.username}님, 환영합니다!`);
         router.replace('/');
       } else {
         throw new Error("서버 응답 형식이 올바르지 않습니다.");
@@ -38,9 +39,9 @@ const LoginPage = () => {
       console.error("로그인 실패: ", error);
 
       if (error.response) {
-        Alert.alert("로그인 실패: ", error.response.data.message || "아이디 또는 비밀번호를 확인해주세요.");
+        crossPlatformAlert("로그인 실패: ", error.response.data.message || "아이디 또는 비밀번호를 확인해주세요.");
       } else {
-        Alert.alert("로그인 실패", "로그인 중 오류 발생, 네트워크 상태를 확인해주세요.");
+        crossPlatformAlert("로그인 실패", "로그인 중 오류 발생, 네트워크 상태를 확인해주세요.");
       }
     }
   };

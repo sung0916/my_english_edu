@@ -4,6 +4,7 @@ import { StyleSheet, View, FlatList, Text, Alert, TouchableOpacity, ActivityIndi
 import { Pagination } from "../../components/common/Pagination";
 import { Ionicons } from '@expo/vector-icons';
 import apiClient from "../../api";
+import crossPlatformAlert from "../../utils/crossPlatformAlert";
 
 // --- Constants ---
 const ITEMS_PER_PAGE = 10;
@@ -47,7 +48,7 @@ const TeacherList = () => {
 
         } catch (error) {
             console.error("선생님 목록을 불러오는 데 실패했습니다.", error);
-            Alert.alert("오류", "선생님 목록을 불러오는 중 오류가 발생했습니다.");
+            crossPlatformAlert("오류", "선생님 목록을 불러오는 중 오류가 발생했습니다.");
         } finally {
             setIsLoading(false);
         }
@@ -93,10 +94,10 @@ const TeacherList = () => {
                             );
                             setAllTeachers(updatedTeachers);
 
-                            Alert.alert("성공", "선생님이 삭제(비활성화)되었습니다.");
+                            crossPlatformAlert("성공", "선생님이 삭제(비활성화)되었습니다.");
                         } catch (error) {
                             console.error("선생님 삭제 실패:", error);
-                            Alert.alert("오류", "선생님 삭제 처리 중 오류가 발생했습니다.");
+                            crossPlatformAlert("오류", "선생님 삭제 처리 중 오류가 발생했습니다.");
                         }
                     },
                     style: "destructive",
