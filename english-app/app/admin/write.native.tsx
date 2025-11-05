@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { RichEditor, RichToolbar, actions } from "react-native-rich-editor";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { RichEditor, RichToolbar, actions } from "react-native-pell-rich-editor";
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from "@expo/vector-icons";
 import { apiClientWithFile } from "../../api";

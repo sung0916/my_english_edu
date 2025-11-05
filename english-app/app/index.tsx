@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import Footer from "../components/common/Footer";
 
 export default function HomePage() {
@@ -79,6 +79,9 @@ const styles = StyleSheet.create({
     bottom: 0,            // 화면 맨 아래에 고정
     left: 0,
     right: 0,
-    transition: 'opacity 0.3s ease-in-out', // 부드러운 전환 효과 (웹 전용)
+    ...(Platform.OS === 'web' && {
+      // '...' 스프레드 연산자를 사용하여 웹일 경우에만 아래 객체를 여기에 추가
+      transition: 'opacity 0.3s ease-in-out', // 부드러운 전환
+    }),
   },
 });

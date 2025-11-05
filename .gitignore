@@ -24,11 +24,12 @@ api-server/src/main/resources/application.yml
 # =================================================
 # Node.js / Expo (Frontend)
 # =================================================
-english-edu/node_modules/
-english-edu/.expo/
-english-edu/dist/
-english-edu/web-build/
-english-edu/expo-env.d.ts
+english-app/node_modules/
+english-app/.expo/
+english-app/dist/
+english-app/web-build/
+english-app/expo-env.d.ts
+package-lock.json
 npm-debug.*
 yarn-debug.*
 yarn-error.*
