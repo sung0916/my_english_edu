@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import { ActivityIndicator, Alert, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Pagination } from "../../components/common/Pagination";
-import apiClient from "../../api";
 import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import apiClient from "../../api";
+import { Pagination } from "../../components/common/Pagination";
+import { SearchBox, SearchOption } from "../../components/common/SearchBox";
 import crossPlatformAlert from "../../utils/crossPlatformAlert";
 
 const ITEMS_PER_PAGE = 10;

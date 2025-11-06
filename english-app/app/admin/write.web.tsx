@@ -1,17 +1,39 @@
-import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-// react-quill을 import 합니다. 웹에서만 사용되므로 'dynamic' import를 사용할 수도 있습니다.
-import ReactQuill from 'react-quill';
-// import 'react-quill/dist/quill.snow.css'; // 에디터의 기본 스타일
-import crossPlatformAlert from "../../utils/crossPlatformAlert";
-import apiClient from "../../api";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import apiClient from "../../api";
+import crossPlatformAlert from "../../utils/crossPlatformAlert";
+
+const ensureQuillCss = () => {
+
+    if (typeof document === 'undefined') return;
+    if (!document.querySelector('link[data-quill-css]')) {
+        
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/react-quill@2.0.0/dist/quill.snow.css';
+        link.setAttribute('data-quill-css', '1');
+        document.head.appendChild(link);
+    }
+};
 
 // 웹 에디터는 이미지 업로드 처리가 다르지만, 일단 텍스트 저장부터 구현합니다.
 const BoardWrite = () => {
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState(''); // Quill 에디터의 내용은 HTML 문자열입니다.
+    const [ReactQuill, setReactQuill] = useState<any>(null);
+    const [isClient, setIsClient] = useState(false);
+
+    // 클라이언트 사이드에서만 react-quill 로드
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setIsClient(true);
+            import('react-quill').then((module) => {
+                setReactQuill(module.default);
+            });
+        }
+    }, []);
 
     const handleSubmit = async () => {
         if (!title.trim()) {
@@ -44,13 +66,19 @@ const BoardWrite = () => {
                 value={title}
                 onChangeText={setTitle}
             />
-            {/* ReactQuill 컴포넌트는 웹에서만 렌더링됩니다. */}
-            <ReactQuill
-                theme="snow"
-                value={content}
-                onChange={setContent}
-                style={{ height: 300, marginBottom: 50 }} // 웹에서는 스타일링 방식이 조금 다릅니다.
-            />
+            {/* ReactQuill 컴포넌트는 클라이언트에서만 렌더링됩니다. */}
+            {isClient && ReactQuill ? (
+                <ReactQuill
+                    theme="snow"
+                    value={content}
+                    onChange={setContent}
+                    style={{ height: 300, marginBottom: 50 }}
+                />
+            ) : (
+                <View style={{ height: 300, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text>에디터 로딩 중...</Text>
+                </View>
+            )}
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                 <Text style={styles.submitButtonText}>등록</Text>
             </TouchableOpacity>
@@ -58,7 +86,6 @@ const BoardWrite = () => {
     );
 };
 
-// React Native 스타일을 최대한 재사용합니다.
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#fff', padding: 16 },
     titleInput: {

@@ -7,7 +7,7 @@ const menuItems = [
     { name: 'Permit-required List', href: '/admin/permitList' },
     { name: 'Board List', href: '/admin/boardList' },
     { name: 'Chart', href: '/admin/chart' },
-    { name: '', href: '/' },
+    { name: 'Edit Account', href: '/auth/mypage' },
 ];
 
 const AdminSidebar = () => {

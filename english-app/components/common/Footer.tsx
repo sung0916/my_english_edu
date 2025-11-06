@@ -4,7 +4,10 @@ const Footer = () => {
   // 웹에서는 링크를 새 탭에서 열도록 처리할 수 있습니다.
   const openLink = (url: string) => {
     if (Platform.OS === 'web') {
-      window.open(url, '_blank');
+
+      if (typeof window !== 'undefined') {
+        window.open(url, '_blank');
+      }
     } else {
       Linking.openURL(url);
     }

@@ -1,9 +1,9 @@
-import { useUserStore } from "../../store/userStore";
 import { Feather } from '@expo/vector-icons';
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, useWindowDimensions, View, Image } from "react-native";
+import { Image, Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useUserStore } from "../../store/userStore";
 
 const Header = () => {
   // userStore에서 user 객체 전체를 추출
@@ -22,7 +22,7 @@ const Header = () => {
   }
 
   const navigateAndCloseMenu = (path: string) => {
-    router.push(path);
+    router.push(path as any);
     setIsMenuOpen(false);
   }
 
@@ -33,7 +33,7 @@ const Header = () => {
           <Link href="/" asChild>
             <Pressable>
               <Image 
-                source={require('../../assets/favicon.png')} 
+                source={require('../../assets/images/favicon.png')} 
                 style={styles.logo} 
               />
             </Pressable>

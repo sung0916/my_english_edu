@@ -1,6 +1,6 @@
-import { useUIStore } from "../../store/uiStore";
 import { Feather } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useUIStore } from "../../store/uiStore";
 
 const AdminHeader = () => {
     const {width} = useWindowDimensions();

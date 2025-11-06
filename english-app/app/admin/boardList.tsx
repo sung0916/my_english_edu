@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Pagination } from "../../components/common/Pagination";
-import apiClient from "../../api";
 import { Ionicons } from "@expo/vector-icons";
-import crossPlatformAlert from "../../utils/crossPlatformAlert";
 import { useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import apiClient from "../../api";
+import { Pagination } from "../../components/common/Pagination";
+import { SearchBox, SearchOption } from "../../components/common/SearchBox";
+import crossPlatformAlert from "../../utils/crossPlatformAlert";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -150,7 +150,7 @@ const BoardList = () => {
                 <View style={{ flex: 1 }} />
                 <TouchableOpacity 
                     style={styles.writeButton} 
-                    onPress={() => router.push('admin/write')}
+                    onPress={() => router.push('/admin/write')}
                 >
                     <Ionicons name="pencil" size={16} color="white" />
                     <Text style={styles.writeButtonText}>글쓰기</Text>

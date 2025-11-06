@@ -30,9 +30,12 @@ export default function RootLayout() {
     // 경비원 활동 조건: 모든 로딩(수화, 폰트)이 끝나야만 시작
     if (!isHydrated || (!fontsLoaded && !fontError)) return;
 
+    const first = segments[0];
+    const second = segments[1];
+
     // 현재 경로가 어느 구역에 속하는지 정의
-    const inAdminZone = segments[0] === 'admin';
-    const inUserZone = segments[0] === 'cart' || segments[0] === 'mypage';
+    const inAdminZone = first === 'admin';
+    const inUserZone = first === 'auth' && (second=== 'cart' || second === 'mypage');
 
     // 로그인 여부 검사
     if (!isLoggedIn && (inAdminZone || inUserZone)) {
