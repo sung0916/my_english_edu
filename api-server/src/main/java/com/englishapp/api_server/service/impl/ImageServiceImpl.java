@@ -5,6 +5,7 @@ import com.englishapp.api_server.domain.ImageType;
 import com.englishapp.api_server.dto.response.ImageResponse;
 import com.englishapp.api_server.entity.Image;
 import com.englishapp.api_server.repository.ImageRepository;
+import com.englishapp.api_server.service.FileStorageService;
 import com.englishapp.api_server.service.ImageService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -28,26 +29,7 @@ import java.util.stream.Collectors;
 public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
-
-    // application.yml 또는 properties 파일에서 경로를 주입받는 것이 더 유연합니다.
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
-    private Path uploadPath;
-
-    // 서비스가 초기화될 때 업로드 경로를 확인하고 없으면 생성
-    @PostConstruct
-    public void init() {
-
-        try {
-            uploadPath = Paths.get(uploadDir);
-            Files.createDirectories(uploadPath);
-            log.info("업로드 디렉토리 생성/확인 완료 : {}", uploadPath);
-        } catch (IOException e) {
-            log.error("업로드 디렉토리를 생성할 수 없습니다.", e);
-            throw new RuntimeException("Could not initialize upload directory!", e);
-        }
-    }
+    private final FileStorageService fileStorageService;
 
     @Override
     @Transactional
@@ -60,37 +42,20 @@ public class ImageServiceImpl implements ImageService {
 
     private ImageResponse uploadSingleFile(MultipartFile file, ImageType type, Long relatedId) {
 
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("업로드할 파일이 비어있습니다.");
-        }
+        // 물리적 파일 저장은 FileStorageService에 위임
+        // 이미지는 'images' 하위 폴더에 저장하도록 지정
+        String storedFilePath = fileStorageService.storeFile(file, "images");
 
-        try {
-            // 파일 이름 중복 방지를 위한 UUID
-            String originalFileName = file.getOriginalFilename();
-            String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
-            Path filePath = this.uploadPath.resolve(storedFileName);
+        Image image = Image.builder()
+                .imageUrl(storedFilePath) // FileStorageService가 반환한 경로를 저장
+                .fileName(file.getOriginalFilename())
+                .fileSize((int) file.getSize())
+                .type(type)
+                .relatedId(relatedId)
+                .status(ImageStatus.PENDING)
+                .build();
 
-            // 물리적 파일 저장
-            Files.copy(file.getInputStream(), filePath);
-
-            Image image = Image.builder()
-                    .imageUrl(filePath.toString())
-                    .fileName(originalFileName)
-                    .fileSize((int) file.getSize())
-                    .type(type)
-                    .relatedId(relatedId)
-                    .status(ImageStatus.PENDING)
-                    .build();
-
-            Image savedImage = imageRepository.save(image);
-
-            log.info("파일 업로드 성공 : {}", originalFileName);
-
-            return ImageResponse.from(savedImage);
-        } catch (IOException e) {
-            log.error("파일 저장 실패: {}", file.getOriginalFilename());
-
-            throw new RuntimeException("파일 저장에 실패했습니다: " + file.getOriginalFilename(), e);
-        }
+        Image savedImage = imageRepository.save(image);
+        return ImageResponse.from(savedImage);
     }
 }
