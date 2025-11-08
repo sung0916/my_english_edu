@@ -3,12 +3,12 @@
 const createExpoWebpackConfigAsync = require('@expo/webpack-config');
 
 module.exports = async function (env, argv) {
-    
+
     const config = await createExpoWebpackConfigAsync(env, argv);
 
-    // 'import.meta'를 사용하려면 실험적인 기능 활성화 필요할 수 있음
+    // ESM 관련 설정('import.meta'를 사용하려면 실험적인 기능 활성화 필요할 수 있음)
     config.experiments = {
-      
+
         ...config.experiments,
         topLevelAwait: true,  // topLevelAwait도 함께 사용하는 경우가 많아 추가
     };
@@ -22,6 +22,22 @@ module.exports = async function (env, argv) {
             fullySpecified: false,  // 파일 확장자 없이 import할 수 있도록 허용
         },
     });
+
+    // ✅ 개발 환경(HMR)일 때만 React Refresh 활성화
+    if (env.mode === 'development' || argv.mode === 'development') {
+        config.plugins.push(new ReactRefreshWebpackPlugin());
+
+        // babel-loader에 react-refresh 추가 (핵심!)
+        const babelLoaderRule = config.module.rules.find(
+            (rule) => rule.use && rule.use.loader && rule.use.loader.includes('babel-loader')
+        );
+        if (babelLoaderRule) {
+            babelLoaderRule.use.options.plugins = [
+                ...(babelLoaderRule.use.options.plugins || []),
+                require.resolve('react-refresh/babel'),
+            ];
+        }
+    }
 
     return config;
 }
