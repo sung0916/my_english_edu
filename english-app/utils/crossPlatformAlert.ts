@@ -1,4 +1,4 @@
-import { Alert, Platform } from "react-native"
+import { Alert, Platform } from "react-native";
 
 /**
  * 웹과 네이티브 환경 모두에서 동작하는 Alert 함수.

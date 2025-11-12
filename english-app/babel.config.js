@@ -1,18 +1,15 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
-    plugins: [
-      ['expo-router/babel'],
+    presets: [
       [
-        'module-resolver',
+        "babel-preset-expo",
         {
-          alias: {
-            '@': './',
-          },
+          // 'import.meta' 문제 해결을 위한 핵심 옵션은 남겨둡니다.
+          unstable_transformImportMeta: true,
         },
       ],
-      'react-native-reanimated/plugin',
     ],
+    plugins: ["expo-router/babel"],
   };
 };

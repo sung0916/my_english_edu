@@ -1,9 +1,9 @@
-import Header from "../components/common/Header";
+import { useUserStore } from '@/store/userStore';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
-import { useEffect, useState } from "react";
-import { StyleSheet, View, Alert, Platform, ScrollView } from "react-native";
-import { useUserStore } from "../store/userStore";
+import { useEffect, useState } from 'react';
+import { Alert, Platform, StyleSheet, View } from "react-native";
+import Header from "../components/common/Header";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -11,13 +11,13 @@ export default function RootLayout() {
 
   // 폰트 로딩 및 Zustand 수화 로직
   const [fontsLoaded, fontError] = useFonts({
-    'Mulish-Medium': require('../assets/fonts/mulish/Mulish-Medium.ttf'),
-    'Mulish-Semibold': require('../assets/fonts/mulish/Mulish-SemiBold.ttf'),
+    'Mulish-Medium': require('../assets/fonts/Mulish-Medium.ttf'),
+    'Mulish-Semibold': require('../assets/fonts/Mulish-SemiBold.ttf'),
   });
   const [isHydrated, setIsHydrated] = useState(false);
   useEffect(() => {
-    const unsubscribe = useUserStore.persist.onFinishHydration(() => setIsHydrated(true));
-    if (useUserStore.persist.hasHydrated()) setIsHydrated(true);
+    const unsubscribe = (useUserStore as any).persist.onFinishHydration(() => setIsHydrated(true));
+    if ((useUserStore as any).persist.hasHydrated()) setIsHydrated(true);
     return () => unsubscribe();
   }, []);
 

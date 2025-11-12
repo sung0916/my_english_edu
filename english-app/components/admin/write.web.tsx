@@ -18,7 +18,7 @@ const ensureQuillCss = () => {
 };
 
 // 웹 에디터는 이미지 업로드 처리가 다르지만, 일단 텍스트 저장부터 구현합니다.
-const BoardWrite = () => {
+const WriteWeb = () => {
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState(''); // Quill 에디터의 내용은 HTML 문자열입니다.
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
     submitButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
 });
 
-export default BoardWrite;
+export default WriteWeb;

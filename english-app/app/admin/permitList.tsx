@@ -1,8 +1,8 @@
+import { Picker } from "@react-native-picker/picker";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Platform, StyleSheet, Text, View } from "react-native";
-import { Pagination } from "../../components/common/Pagination";
 import apiClient from "../../api";
-import { Picker } from "@react-native-picker/picker";
+import { Pagination } from "../../components/common/Pagination";
 import PermitCustomButton from "../../components/common/PermitButtonProps";
 import RefuseCustomButton from "../../components/common/RefuseButtonProps";
 

@@ -1,9 +1,9 @@
-import apiClient from "../../api";
-import CustomButton from "../../components/common/PermitButtonProps";
-import { isNotEmpty, validateEmail, validatePassword } from "../../utils/validators";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Platform, StyleSheet, Text, TextInput, View } from "react-native";
+import apiClient from "../../api";
+import CustomButton from "../../components/common/PermitButtonProps";
+import { isNotEmpty, validateEmail, validatePassword } from "../../utils/validators";
 
 interface SignUpErrors {
   username?: string;

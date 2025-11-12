@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 // 이 컴포넌트가 부모로부터 받아야 할 정보(Props)의 타입을 정의합니다.
 interface PaginationProps {

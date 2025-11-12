@@ -19,7 +19,8 @@ api-server/.gradle/
 
 # !! SECURITY !!
 # Ignore sensitive application configuration
-api-server/src/main/resources/application.yml
+api-server/src/main/resources/application-local.yml
+api-server/src/main/resources/gcp-credentials.json
 
 # =================================================
 # Node.js / Expo (Frontend)

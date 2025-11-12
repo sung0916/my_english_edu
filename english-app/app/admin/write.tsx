@@ -12,8 +12,8 @@ import { Platform } from 'react-native';
 let mod: any;
 try {
   mod = Platform.OS === 'web'
-    ? require('./write.web')
-    : require('./write.native');
+    ? require('components/admin/write.web')
+    : require('components/admin/write.native');
   console.log('write loader ok:', Platform.OS, Object.keys(mod));
 } catch (e) {
   console.error('write loader fail:', e);

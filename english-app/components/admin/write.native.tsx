@@ -1,12 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { RichEditor, RichToolbar, actions } from "react-native-pell-rich-editor";
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from "@expo/vector-icons";
-import { apiClientWithFile } from "../../api";
+import apiClient, { apiClientWithFile } from "../../api";
 import crossPlatformAlert from "../../utils/crossPlatformAlert";
-import apiClient from "../../api"; // 글 제출용 apiClient
-import { useRouter } from "expo-router";
 
 // 업로드된 이미지의 응답 타입을 정의합니다. (백엔드 ImageResponse DTO 참고)
 interface UploadedImage {
@@ -15,7 +14,7 @@ interface UploadedImage {
     imageUrl: string; // imageUrl 필드가 있다면 그것을 사용
 }
 
-const BoardWrite = () => {
+const WriteNative = () => {
     const editorRef = useRef<RichEditor>(null);
     const router = useRouter();
 
@@ -152,4 +151,4 @@ const styles = StyleSheet.create({
     submitButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
 });
 
-export default BoardWrite;
+export default WriteNative;

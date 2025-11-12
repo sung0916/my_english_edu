@@ -1,7 +1,7 @@
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import create from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // 플래폼 별 스토리지 선택 함수
 const getStorage = () => {
@@ -9,13 +9,13 @@ const getStorage = () => {
     if (Platform.OS === 'web') {
 
         // 웹에서 localStorage 사용 (SSR 안전)
-        if(typeof window === 'undefined') {
+        if (typeof window === 'undefined') {
 
             // SSR 중에는 빈 스토리지 반환(에러 방지)
             return {
                 getItem: () => null,
                 setItem: () => null,
-                removeItem: () => {},
+                removeItem: () => { },
             };
         }
         // 클라이언트에서는 window.localStorage 사용
@@ -33,7 +33,7 @@ interface User {
     username: string;
     email: string;
     tel: string;
-    role: 'STUDENT' | 'TEACHER' | 'ADMIN'; 
+    role: 'STUDENT' | 'TEACHER' | 'ADMIN';
 }
 
 // 스토어에서 관리할 상태의 타입
@@ -43,17 +43,18 @@ interface UserState {
     isLoggedIn: boolean;
     login: (userData: User, token: string) => void;
     logout: () => void;
+    clearPersistedStorage: () => void;  // 스토리지 비우기 함수
 }
 
 // 스토어 생성
-export const useUserStore = create(
+export const useUserStore = create<UserState>(
+    
     persist<UserState>(
-        (set) => ({
+        (set, get, api) => ({
             user: null,
             token: null,
             isLoggedIn: false,
 
-            // 상태 변경하는 함수
             login: (userData, token) => set({
                 user: userData,
                 token: token,
@@ -65,12 +66,16 @@ export const useUserStore = create(
                 token: null,
                 isLoggedIn: false,
             }),
-        }),
 
-        // persist 설정 추가
-        {
-            name: 'user-auth-storage',  // 기기에 저장될 때 사용될 이름(랜덤 가능)
-            storage: createJSONStorage(getStorage),  // 데이터를 저장할 장소로 AsyncStorage를 지정
+            // api를 사용하여 persist의 유틸리티 함수를 호출
+            clearPersistedStorage: () => {
+                return (api as any).persist.clearStorage();
+            },
+        }),
+        { 
+            // persist 설정 (v3 방식)
+            name: 'user-auth-storage', // 1. 스토리지에 저장될 이름
+            getStorage: getStorage,    // 2. v4의 'storage' 대신 'getStorage' 사용
         }
-    )
+    ),
 );

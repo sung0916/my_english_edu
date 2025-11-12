@@ -14,7 +14,7 @@ export default function HomePage() {
       setIsFooterVisible(isAtBottom);
     }
   };
-
+  
   return (
     // [핵심] 최상위 View는 이제 푸터를 포함할 '기준점'이 됩니다.
     <View style={styles.container}>
