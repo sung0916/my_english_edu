@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("승인이 필요하거나 비활성화된 계정입니다.");
         }
 
-        String token = jwtUtil.createToken(user.getLoginId(), user.getRole());
+        String token = jwtUtil.createToken(user.getId(), user.getLoginId(), user.getRole());
         return new LoginResponse(token, new UserResponse(user));
     }
 }

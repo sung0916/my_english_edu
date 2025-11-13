@@ -1,5 +1,8 @@
 package com.englishapp.api_server.config.jwt;
 
+import com.englishapp.api_server.domain.UserRole;
+import com.englishapp.api_server.entity.User;
+import com.englishapp.api_server.service.impl.UserDetailsImpl;
 import com.englishapp.api_server.service.impl.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -11,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -42,20 +44,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(7);
 
         try {
-
             // 토큰의 유효성 검증
             if (jwtUtil.validateToken(token)) {
 
-                // 토큰에서 loginId 추출
+                // 토큰에서 userId, loginId, role 추출
+                Long userId = jwtUtil.getUserIdFromToken(token);
                 String loginId = jwtUtil.getLoginIdFromToken(token);
+                String role = jwtUtil.getRoleFromToken(token);
+                UserRole roleStr = UserRole.valueOf(role);
 
-                // loginId로 UserDetails 객체 조회
-                UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
+                User tempUser = User.builder()
+                        .id(userId)
+                        .loginId(loginId)
+                        .role(roleStr)
+                        .build();
 
-                // SecurityContextHolder에 등록할 Authorization 객체 생성
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                UserDetailsImpl userDetails = new UserDetailsImpl(tempUser);
+
+                // 생성된 권한 정보로 Authentication 객체 생성
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 // 요청에 대한 세부 정보를 Authentication 객체에 설정
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -65,15 +73,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
             // 다음 필터로 요청 전달
-            filterChain.doFilter(request, response);
+            // filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
             log.error("JWT 토큰 만료");
+            setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰 만료");
 
             // 만료 예외 발생 시 401 응답
             setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
 
         }
+        filterChain.doFilter(request, response);
     }
 
     // 에러 응답 설정(헬퍼 메서드)

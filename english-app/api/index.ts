@@ -33,7 +33,7 @@ const responseInterceptor = (error: AxiosError) => {
     // console.log('--- [AXIOS INTERCEPTOR] ERROR DETECTED! ---', 'Status:', error.response?.status);
 
     // 에러 응답이 없으면 그대로 에러를 반환
-    if (!error.response) {
+    if (!error.response || !error.config) {
         return Promise.reject(error);
     }
 
@@ -46,7 +46,7 @@ const responseInterceptor = (error: AxiosError) => {
 
     // isLoggedIn 상태 대신, 스토어에 토큰이 존재하는지 여부로 판단합니다.
     // 401 에러가 발생했고, 스토어에 토큰이 있다면 해당 토큰이 만료된 것이므로 로그아웃 처리합니다.
-    if (status === 401 && getState().token) {
+    if (status === 401 && getState().token && error.config.url !== '/api/auth/confirm-password') {
         console.log('인증 실패(401) 및 토큰 존재. 로그아웃 처리합니다.');
         
         // logout() 함수는 스토어의 상태를 변경하므로, 한 번만 호출하는 것이 안전합니다.

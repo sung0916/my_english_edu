@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
 
     // 정보 수정
     @Override
+    @Transactional
     public UserResponse updateUser(Long userId, UserRequest userRequest) {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다 : " + userId));
@@ -65,6 +66,14 @@ public class UserServiceImpl implements UserService {
             existingUser.updateTel(userRequest.getTel());
         }
         return new UserResponse(existingUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User findUserByLoginId(String loginId) {
+
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저를 찾을 수 없음 : " + loginId));
     }
 
     // 프로필 조회

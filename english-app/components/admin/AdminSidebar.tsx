@@ -7,7 +7,7 @@ const menuItems = [
     { name: 'Permit-required List', href: '/admin/permitList' },
     { name: 'Board List', href: '/admin/boardList' },
     { name: 'Chart', href: '/admin/chart' },
-    { name: 'Edit Account', href: '/auth/mypage' },
+    { name: 'Edit Account', href: 'admin/confirmPassword' },
 ];
 
 const AdminSidebar = () => {
@@ -16,7 +16,8 @@ const AdminSidebar = () => {
     return (
         <View style={styles.sidebarContainer}>
             {menuItems.map((item) => {
-                const isActive = pathname === item.href;
+                // `startsWith`로 하위 경로에서도 활성화되도록 개선
+                const isActive = pathname.startsWith(item.href);
 
                 return (
                     <Link href={item.href as Href} asChild key={item.name}>

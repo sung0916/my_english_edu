@@ -34,8 +34,9 @@ public class JwtUtil {
     }
 
     // 로그인 성공 -> 토큰 생성
-    public String createToken(String loginId, UserRole role) {
+    public String createToken(Long userId, String loginId, UserRole role) {
         Claims claims = Jwts.claims();
+        claims.put("userId", userId);
         claims.put("loginId", loginId);
         claims.put("role", role.name());
 
@@ -56,6 +57,16 @@ public class JwtUtil {
                 .getBody();
     }
 
+    // userId 추출
+    public Long getUserIdFromToken(String token) {
+        try {
+            return extractClaims(token).get("userId", Long.class);
+        } catch (Exception e) {
+            log.error("토큰에서 userId 추출 실패: {}", e.getMessage());
+            return null;
+        }
+    }
+
     // loginId 추출
     public String getLoginIdFromToken(String token) {
 
@@ -63,6 +74,16 @@ public class JwtUtil {
             return extractClaims(token).get("loginId", String.class);
         } catch (Exception e) {
             log.error("토큰에서 loginId 추출 실패 : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    // role 추출
+    public String getRoleFromToken(String token) {
+        try {
+            return extractClaims(token).get("role", String.class);
+        } catch (Exception e) {
+            log.error("토큰에서 role 추출 실패: {}", e.getMessage());
             return null;
         }
     }

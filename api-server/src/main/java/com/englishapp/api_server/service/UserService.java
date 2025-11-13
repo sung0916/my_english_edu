@@ -14,6 +14,9 @@ public interface UserService {
     // 회원 수정
     UserResponse updateUser(Long userId, UserRequest userRequest);
 
+    // 비밀번호 컨펌용
+    User findUserByLoginId(String loginId);
+
     // 프로필 조회
     UserResponse findMyProfile(Long userId);
 

@@ -47,8 +47,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "**").permitAll()  // 관리자페이지 승인대기목록 노출용
                         .requestMatchers("/api/auth/login", "/api/users/signup").permitAll()  // 로그인, 회원가입 허용
+                        .requestMatchers("/api/auth/confirm-password").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/announcements/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/users/me").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
                         .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
                 )
                 // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
