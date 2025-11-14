@@ -60,11 +60,11 @@ const Header = () => {
                   {user?.role === 'ADMIN' ? (
                     <Link href="/admin/studentList" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
                   ) : (
-                    <Link href="/auth/mypage" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
+                    <Link href="/user/place" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
                   )}
 
                   {user?.role !== 'ADMIN' && (
-                    <Link href="/auth/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
+                    <Link href="/user/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
                   )}
                   <Pressable onPress={handleLogout}><Text style={styles.userItem}>로그아웃</Text></Pressable>
                 </>
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
   },
   logo: { 
     width: 70,
+    height: 70,
     resizeMode: 'contain',
   },
   logoContainer: {},

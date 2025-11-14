@@ -1,15 +1,15 @@
+import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import apiClient from "../../api";
 import { Pagination } from "../../components/common/Pagination";
 import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import crossPlatformAlert from "../../utils/crossPlatformAlert";
 
 const ITEMS_PER_PAGE = 10;
 
 interface Student {
-    userId: number;
+    id: number;
     username: string;
     loginId: string;
     tel: string;
@@ -87,7 +87,7 @@ const StudentList = () => {
 
                             // API 호출 성공 시, 클라이언트 상태를 즉시 업데이트
                             const updatedStudents = allStudents.map(student =>
-                                student.userId === userId ? { ...student, status: 'DELETED' as const } : student
+                                student.id === userId ? { ...student, status: 'DELETED' as const } : student
                             );
                             setAllStudents(updatedStudents);
 
@@ -128,7 +128,7 @@ const StudentList = () => {
                     {isDeleted ? (
                         <Text style={styles.deletedText}>삭제됨</Text>
                     ) : (
-                        <TouchableOpacity onPress={() => handleDelete(item.userId, item.username)}>
+                        <TouchableOpacity onPress={() => handleDelete(item.id, item.username)}>
                             <Ionicons name="trash-outline" size={22} color="red" />
                         </TouchableOpacity>
                     )}
@@ -146,6 +146,8 @@ const StudentList = () => {
         );
     }
 
+    // console.log('학생 데이터 확인:', JSON.stringify(displayedStudents, null, 2));
+    
     return (
         <View style={styles.safeArea}>
             <SearchBox
@@ -157,7 +159,7 @@ const StudentList = () => {
                 <FlatList
                     data={displayedStudents}
                     renderItem={renderStudentRow}
-                    keyExtractor={(item) => item.userId.toString()}
+                    keyExtractor={(item) => item?.id?.toString()}
                     ListHeaderComponent={renderTableHeader}
                     ListEmptyComponent={<Text style={styles.emptyText}>표시할 학생이 없습니다.</Text>}
                 />

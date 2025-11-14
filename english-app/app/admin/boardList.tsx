@@ -1,3 +1,4 @@
+import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -5,7 +6,6 @@ import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity,
 import apiClient from "../../api";
 import { Pagination } from "../../components/common/Pagination";
 import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import crossPlatformAlert from "../../utils/crossPlatformAlert";
 
 const ITEMS_PER_PAGE = 10;
 

@@ -1,15 +1,15 @@
 import { useUserStore } from '@/store/userStore';
+import '@toast-ui/editor/toastui-editor.css';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, View } from "react-native";
-import Header from "../components/common/Header";
+import { Alert } from "react-native"; // View, Platform, StyleSheet는 더 이상 필요 없음
+import Header from '../components/common/Header';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
 
-  // 폰트 로딩 및 Zustand 수화 로직
   const [fontsLoaded, fontError] = useFonts({
     'Mulish-Medium': require('../assets/fonts/Mulish-Medium.ttf'),
     'Mulish-Semibold': require('../assets/fonts/Mulish-SemiBold.ttf'),
@@ -21,61 +21,53 @@ export default function RootLayout() {
     return () => unsubscribe();
   }, []);
 
-  // 최종 업그레이드된 '이중 방벽' 페이지 접근 제어 로직
   const { isLoggedIn, user } = useUserStore();
   const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
-    // 경비원 활동 조건: 모든 로딩(수화, 폰트)이 끝나야만 시작
     if (!isHydrated || (!fontsLoaded && !fontError)) return;
-
     const first = segments[0];
     const second = segments[1];
-
-    // 현재 경로가 어느 구역에 속하는지 정의
     const inAdminZone = first === 'admin';
-    const inUserZone = first === 'auth' && (second=== 'cart' || second === 'mypage');
+    const inUserZone = first === 'auth' && (second=== 'cart' || second === 'place');
 
-    // 로그인 여부 검사
     if (!isLoggedIn && (inAdminZone || inUserZone)) {
       router.replace('/auth/login');
       return;
     }
-
-    // 관리자 역할 검사
     if (inAdminZone && user?.role !== 'ADMIN') {
       Alert.alert("접근 불가", "관리자 권한이 없습니다.", [{ text: "확인", onPress: () => router.back() }]);
       return;
     }
-
   }, [isLoggedIn, user, segments, isHydrated, fontsLoaded, fontError]);
 
-  // 스플래시 숨기기 및 최종 렌더링 로직
   useEffect(() => {
     if ((fontsLoaded || fontError) && isHydrated) SplashScreen.hideAsync();
   }, [fontsLoaded, fontError, isHydrated]);
 
   if (!fontsLoaded && !fontError || !isHydrated) return null;
 
+  // --- [핵심 수정] ---
+  // Stack이 최상위 컴포넌트가 되어야 합니다.
   return (
-    <View style={styles.layoutContainer}>
-      <Header />
-      {/* 이제 Stack이 직접 View의 자식이 됩니다. */}
-      <Stack screenOptions={{ headerShown: false }} />
-    </View>
+    <Stack
+      screenOptions={{
+        // 모든 스크린에 공통 헤더를 적용합니다.
+        // 이것이 Expo Router에서 공통 레이아웃을 만드는 표준 방식입니다.
+        header: () => <Header />,
+        
+        // Stack 자체의 그림자 등을 제거하여 깔끔하게 만듭니다.
+        headerShadowVisible: false,
+        
+        // 필요하다면 여기서 헤더의 높이 등을 조절할 수 있습니다.
+        // headerStyle: { height: 80 }, 
+      }}
+    >
+      {/* 
+        특정 페이지만 헤더를 다르게 하고 싶다면, 여기서 screenOptions을 개별적으로 설정할 수 있습니다.
+        예: <Stack.Screen name="index" options={{ headerShown: false }} /> 
+      */}
+    </Stack>
   );
 }
-
-const styles = StyleSheet.create({
-  layoutContainer: {
-    flex: 1, // 화면 전체를 차지하도록 설정
-    backgroundColor: '#fff',
-    // 웹에서만 적용
-    ...Platform.select({
-      web: {
-        userSelect: 'none',
-      }
-    }),
-  },
-});

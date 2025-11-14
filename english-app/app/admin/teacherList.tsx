@@ -4,7 +4,7 @@ import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity,
 import apiClient from "../../api";
 import { Pagination } from "../../components/common/Pagination";
 import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import crossPlatformAlert from "../../utils/crossPlatformAlert";
+import { crossPlatformAlert } from "../../utils/crossPlatformAlert";
 
 // --- Constants ---
 const ITEMS_PER_PAGE = 10;

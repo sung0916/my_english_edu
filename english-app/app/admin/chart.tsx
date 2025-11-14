@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SearchBox, SearchOption } from "../../components/common/SearchBox";
-import crossPlatformAlert from '../../utils/crossPlatformAlert';
+import { crossPlatformAlert } from '../../utils/crossPlatformAlert';
 
 // 나중에 설치할 차트 라이브러리 (예: react-native-chart-kit)
 // import { BarChart, LineChart } from 'react-native-chart-kit';

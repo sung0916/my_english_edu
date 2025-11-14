@@ -3,8 +3,8 @@ show databases;
 use monster;
 show tables; 
 
-desc user;
-select * from user;
+desc users;
+select * from users;
 
 desc announcement;
 select * from announcement;

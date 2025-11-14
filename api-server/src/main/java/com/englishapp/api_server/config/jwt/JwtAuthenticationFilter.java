@@ -79,9 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("JWT 토큰 만료");
             setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰 만료");
 
-            // 만료 예외 발생 시 401 응답
-            setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
-
+            return;
         }
         filterChain.doFilter(request, response);
     }

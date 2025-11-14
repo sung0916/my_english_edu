@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { RichEditor, RichToolbar, actions } from "react-native-pell-rich-editor";
 import apiClient, { apiClientWithFile } from "../../api";
-import crossPlatformAlert from "../../utils/crossPlatformAlert";
+import { crossPlatformAlert } from "../../utils/crossPlatformAlert";
 
 // 업로드된 이미지의 응답 타입을 정의합니다. (백엔드 ImageResponse DTO 참고)
 interface UploadedImage {
@@ -70,12 +70,12 @@ const WriteNative = () => {
 
     const handleSubmit = async () => {
         if (!title.trim()) {
-            crossPlatformAlert("입력 필요", "제목을 입력해주세요.");
+            crossPlatformAlert("", "제목을 입력해주세요.");
             return;
         }
         const htmlContent = await editorRef.current?.getContentHtml() || '';
         if (!htmlContent.trim() || htmlContent === '<br>') {
-            crossPlatformAlert("입력 필요", "내용을 입력해주세요.");
+            crossPlatformAlert("", "내용을 입력해주세요.");
             return;
         }
 

@@ -37,6 +37,14 @@ const responseInterceptor = (error: AxiosError) => {
         return Promise.reject(error);
     }
 
+    // 토큰 만료 시 로그아웃이 안되어있는 문제로 interceptor함수가 호출되는지 체크용
+    // const status2 = error.response.status;
+    // const currentToken = useUserStore.getState().token;
+    // const requestUrl = error.config.url;
+    // console.log(`[Interceptor Check] Status: ${status2}`);
+    // console.log(`[Interceptor Check] Token in Store: ${currentToken}`);
+    // console.log(`[Interceptor Check] Request URL: ${requestUrl}`);
+
     const { status } = error.response;
     const { getState } = useUserStore; // getState 함수 자체를 가져옵니다.
 

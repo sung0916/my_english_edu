@@ -4,7 +4,7 @@ import { Alert, Platform, StyleSheet, Text, TextInput, View } from 'react-native
 import apiClient from '../../api'; // 기존 apiClient 사용
 import CustomButton from '../../components/common/PermitButtonProps';
 
-const ConfirmPassword = () => {
+const ConfirmPasswordForEdit = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ConfirmPassword;
+export default ConfirmPasswordForEdit;
