@@ -6,7 +6,7 @@ const menuItems = [
     { name: 'Results', href: '/user/result' },
     { name: 'Payment History', href: '/user/payment' },
     { name: 'Edit Profile', href: '/auth/confirmPasswordForEdit' },
-    { name: 'Withdraw', href: '/auth/confirmPasswordForWithdraw', isDanger: true },
+    { name: 'Withdraw Account', href: '/auth/confirmPasswordForWithdraw', isDanger: true },
 ];
 
 const UserSidebar = () => {

@@ -39,7 +39,7 @@ const BoardList = () => {
     const fetchAnnouncements = useCallback(async (page: number) => {
         setIsLoading(true);
         try {
-            const response = await apiClient.get<Page<Announcement>>('/api/announcements', {
+            const response = await apiClient.get<Page<Announcement>>('/api/announcements/list', {
                 params: {
                     page: page - 1,
                     size: ITEMS_PER_PAGE,

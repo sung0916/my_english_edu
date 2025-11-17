@@ -40,7 +40,7 @@ const Board = () => {
         setIsLoading(true);
         try {
             // API 엔드포인트는 기존의 공지사항 목록을 그대로 사용
-            const response = await apiClient.get<Page<Post>>('/api/announcements', {
+            const response = await apiClient.get<Page<Post>>('/api/announcements/list', {
                 params: {
                     page: page - 1,
                     size: ITEMS_PER_PAGE,

@@ -33,8 +33,8 @@ CREATE TABLE products (
     product_name VARCHAR(255) NOT NULL COMMENT '제품명',
     price        INT          NOT NULL COMMENT '가격',
     amount       INT          NOT NULL DEFAULT -1 COMMENT '제품수량(-1 = 무한)',
-    type         VARCHAR(50)  NOT NULL COMMENT '상품 유형(SUBSCRIPTION, ITEM)',
-    status       VARCHAR(20)  NOT NULL COMMENT '판매 상태 (FOR_SALE, SOLD_OUT)',
+    product_type         VARCHAR(50)  NOT NULL COMMENT '상품 유형(SUBSCRIPTION, ITEM)',
+    product_status       VARCHAR(20)  NOT NULL COMMENT '판매 상태 (FOR_SALE, SOLD_OUT)',
     PRIMARY KEY (product_id)
 ) COMMENT '제품';
 

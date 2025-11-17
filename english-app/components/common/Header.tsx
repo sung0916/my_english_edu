@@ -93,8 +93,9 @@ const Header = () => {
 
           <View style={styles.modalContent}>
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/about')}><Text style={styles.modalLinkText}>About</Text></Pressable>
-            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/test')}><Text style={styles.modalLinkText}>Study</Text></Pressable>
+            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/english')}><Text style={styles.modalLinkText}>English</Text></Pressable>
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/games')}><Text style={styles.modalLinkText}>Games</Text></Pressable>
+            <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/store')}><Text style={styles.modalLinkText}>Store</Text></Pressable>
             <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/main/board')}><Text style={styles.modalLinkText}>Board</Text></Pressable>
 
             <View style={styles.separator} />
@@ -105,11 +106,11 @@ const Header = () => {
                 {user?.role === 'ADMIN' ? (
                   <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/admin/studentList')}><Text style={styles.modalLinkText}>관리자 페이지</Text></Pressable>
                 ) : (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/mypage')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/user/place')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
                 )}
 
                 {user?.role !== 'ADMIN' && (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/user/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
                 )}
                 <Pressable style={styles.modalLink} onPress={handleLogout}><Text style={styles.modalLinkText}>로그아웃</Text></Pressable>
               </>

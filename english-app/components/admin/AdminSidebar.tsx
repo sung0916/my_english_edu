@@ -5,9 +5,11 @@ const menuItems = [
     { name: 'Student List', href: '/admin/studentList' },
     { name: 'Teacher List', href: '/admin/teacherList' },
     { name: 'Permit-required List', href: '/admin/permitList' },
+    { name: 'Product List', href: '/admin/productList' },
     { name: 'Board List', href: '/admin/boardList' },
     { name: 'Chart', href: '/admin/chart' },
     { name: 'Edit Account', href: 'auth/confirmPasswordForEdit' },
+    { name: 'Withdraw Account', href: 'auth/confirmPasswordForWithdraw', isDanger: true },
 ];
 
 const AdminSidebar = () => {
@@ -22,7 +24,11 @@ const AdminSidebar = () => {
                 return (
                     <Link href={item.href as Href} asChild key={item.name}>
                         <Pressable>
-                            <Text style={[styles.menuItem, isActive && styles.activeMenuItem]}>
+                            <Text style={[
+                                styles.menuItem, 
+                                isActive && styles.activeMenuItem,
+                                item.isDanger && styles.dangerText]}
+                            >
                                 {item.name}
                             </Text>
                         </Pressable>
@@ -51,6 +57,9 @@ const styles = StyleSheet.create({
     activeMenuItem: {
         color: '#007bff', 
         fontWeight: 'bold',
+    },
+    dangerText: {
+        color: '#dc3545', // 빨간색
     },
 });
 

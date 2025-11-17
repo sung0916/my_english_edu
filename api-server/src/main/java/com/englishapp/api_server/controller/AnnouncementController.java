@@ -34,7 +34,7 @@ public class AnnouncementController {
     }
 
     // 공지사항 목록
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<Page<AnnouncementListResponse>> getAllAnnouncements(Pageable pageable) {
 
         Page<AnnouncementListResponse> response = announcementService.findAll(pageable);
