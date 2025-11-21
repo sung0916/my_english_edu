@@ -1,10 +1,12 @@
 package com.englishapp.api_server.controller;
 
 import com.englishapp.api_server.dto.request.ProductRequest;
+import com.englishapp.api_server.dto.response.ProductListResponse;
 import com.englishapp.api_server.dto.response.ProductResponse;
 import com.englishapp.api_server.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -36,12 +38,22 @@ public class ProductController {
      *  @param pageable (예: /api/products/list?page=0&size=10&sort=id,desc)
      *  @return 상품 목록 페이지와 200 OK 상태 코드 */
     @GetMapping("/list")
-    public ResponseEntity<Page<ProductResponse>> getAllProducts(Pageable pageable) {
+    public ResponseEntity<Page<ProductListResponse>> getAllProducts(Pageable pageable) {
 
         log.info("상품 목록 조회 요청 페이지: {}, 사이즈: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<ProductResponse> productPage = productService.getAllProducts(pageable);
+        Page<ProductListResponse> productPage = productService.getAllProducts(pageable);
 
         return ResponseEntity.ok(productPage);
+    }
+
+    /** 상품 상세 조회
+     * @param id 조회할 상품의 ID
+     * @return 상품 상세 정보와 200 OK 상태 코드 */
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getProductDetail(@PathVariable Long id) {
+        log.info("상품 상제 조회 요청: ID {}", id);
+        ProductResponse response = productService.getProductDetail(id);
+        return ResponseEntity.ok(response);
     }
 
     /** 상품 수정

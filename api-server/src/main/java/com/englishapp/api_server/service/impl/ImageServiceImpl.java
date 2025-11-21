@@ -46,9 +46,13 @@ public class ImageServiceImpl implements ImageService {
         // 이미지는 'images' 하위 폴더에 저장하도록 지정
         String storedFilePath = fileStorageService.storeFile(file, "images");
 
+        // storedFilePath에서 순수 파일명(UUID 포함)만 추출
+        // File.separator는 OS에 따라 다르므로 안전하게 "/"를 기준으로 마지막 부분을 가져옴
+        String storedFileName = storedFilePath.substring(storedFilePath.lastIndexOf('/') + 1);
+
         Image image = Image.builder()
                 .imageUrl(storedFilePath) // FileStorageService가 반환한 경로를 저장
-                .fileName(file.getOriginalFilename())
+                .fileName(storedFileName)
                 .fileSize((int) file.getSize())
                 .type(type)
                 .relatedId(relatedId)

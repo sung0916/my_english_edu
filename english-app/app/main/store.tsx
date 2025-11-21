@@ -1,16 +1,17 @@
 import apiClient from "@/api";
 import { Pagination } from "@/components/common/Pagination";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 // 한 페이지에 표시할 아이템 개수
 const ITEMS_PER_PAGE = 8; 
 
 // 상품 데이터 인터페이스
 interface Item {
-    id: string; // 또는 number, API 응답에 맞춰주세요.
-    title: string;
+    id: number; // 또는 number, API 응답에 맞춰주세요.
+    productName: string;
     price: number;
     imageUrl: string;
 }
@@ -24,7 +25,7 @@ interface Page<T> {
 
 const Store = () => {
     const { width } = useWindowDimensions(); // 화면 크기 변경에 실시간으로 반응하는 hook
-
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [items, setItems] = useState<Item[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -69,22 +70,26 @@ const Store = () => {
         fetchItems(currentPage);
     }, [currentPage, fetchItems]);
 
+    const handleItemPress = (id: number) => {
+        router.push(`/main/store/${id}`);
+    };
+
     // 각 상품 아이템을 렌더링하는 함수
     const renderItem = ({ item }: { item: Item }) => {
         // 아이템 너비 계산 (전체 너비 - 총 여백) / 열 개수
         const itemWidth = (width - 10 * (numColumns + 1)) / numColumns;
         return (
-            <View style={[styles.itemContainer, { width: itemWidth }]}>
+            <TouchableOpacity onPress={() => handleItemPress(item.id)} style={[styles.itemContainer, { width: itemWidth }]}>
                 <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
                 <View style={styles.itemTextContainer}>
                     <Text style={styles.itemTitle} numberOfLines={2}>
-                        {item.title}
+                        {item.productName}
                     </Text>
                     <Text style={styles.itemPrice}>
                         {item.price.toLocaleString('ko-KR')}원
                     </Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     };
 
@@ -144,7 +149,7 @@ const styles = StyleSheet.create({
     itemContainer: {
         margin: 5,
         backgroundColor: '#fff',
-        borderRadius: 8,
+        borderRadius: 10,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#eee',

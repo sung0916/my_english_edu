@@ -2,6 +2,9 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { router } from 'expo-router';
 import { useUserStore } from '../store/userStore';
 
+// addProduct, EditProduct, write 등에서 URL 조립과정에 사용할 api 주소
+export const API_BASE_URL = 'http://localhost:8080';
+
 // JSON 데이터를 위한 기본 API 클라이언트
 const apiClient = axios.create({
     baseURL: 'http://localhost:8080',
@@ -69,7 +72,8 @@ const responseInterceptor = (error: AxiosError) => {
     else if (status === 403 && getState().isLoggedIn) {
         console.log('권한 없음(403). 홈페이지로 이동합니다.');
         alert('해당 페이지에 접근할 권한이 없습니다.');
-        router.replace('/'); // 홈페이지로 이동
+        //router.replace('/'); // 홈페이지로 이동
+        router.back(); // 뒤로 가기
     }
 
     // 처리한 에러 외의 다른 에러들은 그대로 반환하여 다음 로직에서 처리

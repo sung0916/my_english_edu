@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)  // 날짜 제대로 들어오도록 설정
 public class Announcement {
 
     @Id
@@ -38,6 +40,7 @@ public class Announcement {
     @Setter  //게시글 상태 변경을 위해 설정
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private BoardStatus status = BoardStatus.ACTIVE;
 
     @CreatedDate

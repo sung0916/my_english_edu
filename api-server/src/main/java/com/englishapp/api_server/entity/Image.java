@@ -40,11 +40,11 @@ public class Image {
     private ImageStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "related_type", nullable = false, length = 20)
+    @Column(name = "related_type", length = 20, nullable = true)
     private ImageType type;
 
     // 어느 Entity와 관계인지 명확하지 않아 id만 저장
-    @Column(name = "related_id", nullable = false)
+    @Column(name = "related_id", nullable = true)
     private Long relatedId;
     
     // 스케줄러에 사용할 컬럼

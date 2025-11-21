@@ -28,7 +28,12 @@ public class Product {
     private int amount;
 
     @Column(name = "sales_volume", nullable = false)
+    @Builder.Default
     private int salesVolume = 0;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_type", nullable = false)
@@ -36,11 +41,13 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_status", nullable = false)
+    @Builder.Default
     private ProductStatus status = ProductStatus.ONSALE;
 
     public void update(String productName,
                        Integer price,
                        Integer amount,
+                       String description,
                        ProductType type,
                        ProductStatus status) {
         if (productName != null) {
@@ -51,6 +58,9 @@ public class Product {
         }
         if (amount != null) {
             this.amount = amount;
+        }
+        if (description != null) {
+            this.description = description;
         }
         if (type != null) {
             this.type = type;

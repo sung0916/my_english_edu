@@ -5,6 +5,7 @@ import com.englishapp.api_server.dto.response.AnnouncementListResponse;
 import com.englishapp.api_server.dto.response.AnnouncementResponse;
 import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.service.AnnouncementService;
+import com.englishapp.api_server.service.impl.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,8 +27,10 @@ public class AnnouncementController {
     @PostMapping("/write")
     public ResponseEntity<AnnouncementResponse> createAnnouncement(
             @RequestBody AnnouncementRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetailsImpl userDetails
             ) {
+
+        User user = userDetails.getUser();
 
         AnnouncementResponse response = announcementService.create(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

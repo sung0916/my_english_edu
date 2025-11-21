@@ -27,6 +27,11 @@ spring:
     date-format: yyyy-MM-dd'T'HH:mm
     time-zone: Asia/Seoul
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
   # --- GCP 클라우드 기본 설정 (프로덕션 환경을 위한 기본값) ---
   cloud:
     gcp:
@@ -39,6 +44,10 @@ spring:
 file:
   # 기본 업로드 경로는 프로젝트 내부의 임시 폴더로 지정 (프로덕션에서는 외부 경로 사용)
   upload-dir: ./uploads
+
+# (개발용)서버 기본 주소 설정
+app:
+  base-url: http://localhost:8080
 
 # --- 로깅 설정 ---
 logging:

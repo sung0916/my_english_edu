@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -92,35 +92,45 @@ const ProductList = () => {
             crossPlatformAlert('오류', '상태 변경 중 오류 발생');
         }
     };
+    
+    const handleRowPress = (id: number) => {
+        // 상품 수정 버튼은 관리자일 때 보이도록 상세페이지에서 지정
+        router.push(`/main/store/${id}`);
+    };
 
     const renderTableHeader = () => (
         <View style={styles.tableHeader}>
             <Text style={[styles.headerCell, { flex: 1 }]}>번호</Text>
-            <Text style={[styles.headerCell, { flex: 4 }]}>상품명</Text>
+            <Text style={[styles.headerCell, { flex: 3.5 }]}>상품명</Text>
             <Text style={[styles.headerCell, { flex: 1.5 }]}>판매량</Text>
-            <Text style={[styles.headerCell, { flex: 2.5 }]}>관리</Text>
+            <Text style={[styles.headerCell, { flex: 1.5 }]}>관리</Text>
         </View>
     );
 
     const renderProductRow = ({ item }: { item: Product }) => (
-        <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 1 }]}></Text>
-            <Text style={[styles.tableCell, { flex: 4, textAlign: 'left', paddingLeft: 10 }]}>
+        <TouchableOpacity onPress={() => handleRowPress(item.id)} style={styles.tableRow}>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{item.id}</Text>
+            <Text style={[styles.tableCell, { flex: 3.5, textAlign: 'left', paddingLeft: 10 }]}>
                 {item.productName}
             </Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.salesVolume}</Text>
-            <View style={[styles.tableCell, { flex: 2.5, paddingVertical: 0 }]}>
-                <Picker
-                    selectedValue={item.status}
-                    onValueChange={(itemValue) => handleStatusChange(item.id, itemValue)}
-                    style={styles.picker}
-                    itemStyle={styles.pickerItem}  // IOS 스타일링
+            <View style={[styles.tableCell, { flex: 1.5, paddingVertical: 0 }]}>
+                <Pressable
+                    onPress={(event) => event.stopPropagation()}
+                    style={[styles.tableCell, { flex: 1.5, paddingVertical: 0 }]}
                 >
-                    <Picker.Item label="판매 중" value="ONSALE" />
-                    <Picker.Item label="판매 중지" value="NOTONSALE" />
-                </Picker>
+                    <Picker
+                        selectedValue={item.status}
+                        onValueChange={(itemValue) => handleStatusChange(item.id, itemValue)}
+                        style={styles.picker}
+                        itemStyle={styles.pickerItem}  // IOS 스타일링
+                    >
+                        <Picker.Item label="판매 중" value="ONSALE" />
+                        <Picker.Item label="판매 중지" value="NOTONSALE" />
+                    </Picker>
+                </Pressable>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     if (isLoading) {
@@ -248,7 +258,8 @@ const styles = StyleSheet.create({
     // Picker 스타일
     picker: {
         width: '100%',
-        height: 50, // Android에서는 높이가 없으면 보이지 않을 수 있음
+        height: 35, // Android에서는 높이가 없으면 보이지 않을 수 있음
+        textAlign: 'center',
     },
     pickerItem: {
         height: 50, // iOS에서는 itemStyle로 높이 조절
