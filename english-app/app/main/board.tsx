@@ -1,6 +1,7 @@
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import apiClient from "../../api";
 import { Pagination } from "../../components/common/Pagination";
 import { SearchBox, SearchOption } from "../../components/common/SearchBox";
@@ -23,6 +24,7 @@ interface Page<T> {
 }
 
 const Board = () => {
+    const router = useRouter();
     // 검색 옵션은 그대로 유지
     const boardSearchOptions: SearchOption[] = [
         { value: 'title', label: '제목' },
@@ -44,6 +46,7 @@ const Board = () => {
                 params: {
                     page: page - 1,
                     size: ITEMS_PER_PAGE,
+                    sort: 'id,desc',
                 }
             });
             
@@ -67,6 +70,10 @@ const Board = () => {
         // TODO: 검색 API 연동 로직 구현
     };
 
+    const handleRowPress = (id: number) => {
+        router.push(`/main/board/${id}`);
+    };
+
     // --- 삭제된 부분 ---
     // handleDelete 함수 제거
 
@@ -75,7 +82,7 @@ const Board = () => {
         <View style={styles.tableHeader}>
             <Text style={[styles.headerCell, { flex: 1 }]}>번호</Text>
             <Text style={[styles.headerCell, { flex: 4 }]}>제목</Text>
-            <Text style={[styles.headerCell, { flex: 1.5 }]}>작성자</Text>
+            {/* <Text style={[styles.headerCell, { flex: 1.5 }]}>작성자</Text> */}
             <Text style={[styles.headerCell, { flex: 2 }]}>작성일</Text>
             <Text style={[styles.headerCell, { flex: 1 }]}>조회수</Text>
             {/* '관리' 헤더 셀 제거 */}
@@ -84,16 +91,15 @@ const Board = () => {
 
     // 테이블 행 렌더링 함수 ('관리' 아이콘 제거)
     const renderBoardRow = ({ item }: { item: Post }) => (
-        <View style={styles.tableRow}>
+        <TouchableOpacity style={styles.tableRow} onPress={() => handleRowPress(item.announcementId)}>
             <Text style={[styles.tableCell, { flex: 1 }]}>{item.announcementId}</Text>
             <Text style={[styles.tableCell, { flex: 4, textAlign: 'left', paddingLeft: 10 }]}>{item.title}</Text>
-            <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.authorName}</Text>
+            {/* <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.authorName}</Text> */}
             <Text style={[styles.tableCell, { flex: 2 }]}>{new Date(item.createdAt).toLocaleDateString()}</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>{item.viewCount}</Text>
-            {/* '관리' 아이콘 View 제거 */}
-        </View>
+        </TouchableOpacity>
     );
-
+    
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>

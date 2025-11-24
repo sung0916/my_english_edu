@@ -1,9 +1,10 @@
 import apiClient from "@/api";
+import PermitCustomButton from "@/components/common/PermitButtonProps";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import WebView from "react-native-webview";
 
 // 백엔드의 ProductResponse DTO 구조와 이름 통일한 인터페이스
@@ -134,9 +135,9 @@ const ProductDetailPage = () => {
 
     return (
         <ScrollView style={styles.container}>
-            {product.images?.length > 0 && (
+            {/* {product.images?.length > 0 && (
                 <Image source={{ uri: product.images[0].imageUrl }} style={styles.mainImage} />
-            )}
+            )} */}
 
             <View style={styles.infoContainer}>
                 <Text style={styles.title}>{product.productName}</Text>
@@ -144,14 +145,16 @@ const ProductDetailPage = () => {
 
                 <View style={styles.divider} />
 
+                {user?.role === 'ADMIN' && (
+                    <PermitCustomButton
+                        title= "상품 수정하기"
+                        style={styles.editButton} 
+                        onPress={handleEditPress}
+                    />
+                )}
+
                 {/* [수정] 조건부 렌더링 컴포넌트 호출 */}
                 <DescriptionRenderer htmlContent={product.description || ""} />
-
-                {user?.role === 'ADMIN' && (
-                    <TouchableOpacity style={styles.editButton} onPress={handleEditPress}>
-                        <Text style={styles.editButtonText}>상품 수정하기</Text>
-                    </TouchableOpacity>
-                )}
             </View>
         </ScrollView>
     );
@@ -191,12 +194,11 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     editButton: {
-        backgroundColor: '#007bff',
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 5,
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 10,
     },
     editButtonText: {
         color: '#fff',

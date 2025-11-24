@@ -66,6 +66,10 @@ const BoardList = () => {
         console.log(`게시글 검색 실행 >> 조건: ${type}, 검색어: ${query}`);
     };
 
+    const handleRowPress = (id: number) => {
+        router.push(`/main/board/${id}`);
+    };
+
     const handleDelete = (id: number, title: string) => {
         // 1. '확인/취소' 버튼이 있는 확인(Confirm) 창 -> React Native의 Alert.alert 사용 (정상)
         Alert.alert(
@@ -107,20 +111,21 @@ const BoardList = () => {
     );
 
     const renderBoardRow = ({ item }: { item: Announcement }) => (
-        <View style={styles.tableRow}>
+        <TouchableOpacity style={styles.tableRow} onPress={() => handleRowPress(item.announcementId)}>
             <Text style={[styles.tableCell, { flex: 1 }]}>{item.announcementId}</Text>
             <Text style={[styles.tableCell, { flex: 4, textAlign: 'left', paddingLeft: 10 }]}>{item.title}</Text>
             <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.authorName}</Text>
             <Text style={[styles.tableCell, { flex: 2 }]}>{new Date(item.createdAt).toLocaleDateString()}</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>{item.viewCount}</Text>
             <View style={[styles.tableCell, { flex: 1.5, flexDirection: 'row', justifyContent: 'center' }]}>
+                {/* 삭제 버튼은 자체 TouchableOpacity가 있어 독립적으로 동작 */}
                 <TouchableOpacity onPress={() => handleDelete(item.announcementId, item.title)}>
                     <Ionicons name="trash-outline" size={22} color="red" />
                 </TouchableOpacity>
             </View>
-        </View>
+        </TouchableOpacity>
     );
-
+    
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>

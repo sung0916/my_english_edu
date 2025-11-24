@@ -7,6 +7,7 @@ import com.englishapp.api_server.dto.response.ProductListResponse;
 import com.englishapp.api_server.dto.response.ProductResponse;
 import com.englishapp.api_server.entity.Image;
 import com.englishapp.api_server.entity.Product;
+import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.repository.ImageRepository;
 import com.englishapp.api_server.repository.ProductRepository;
 import com.englishapp.api_server.service.ProductService;
@@ -37,15 +38,28 @@ public class ProductServiceImpl implements ProductService {
     // 상품 생성
     @Transactional
     public ProductResponse createProduct(ProductRequest.CreateRequest request) {
+
+        // 넘어온 imageIds 로깅
+        log.info("상품 생성 productName: {}, received imageIds: {}",
+                request.getProductName(), request.getImageIds());
+
         Product product = request.toEntity();
         Product savedProduct = productRepository.save(product);
 
         // image의 relatedId 지정 로직
         if (request.getImageIds() != null && !request.getImageIds().isEmpty()) {
-            List<Image> images = imageRepository.findAllById(request.getImageIds());
+            List<Long> imageIds = request.getImageIds();
 
-            for (Image image : images) {
-                image.activate(ImageType.PRODUCT, savedProduct.getId());
+            for (int i = 0; i < imageIds.size(); i++) {
+                final int sortOrder = i;
+                Long imageId = imageIds.get(i);
+
+                imageRepository.findById(imageId).ifPresent(image -> {
+                    if (image.getStatus() == ImageStatus.PENDING) {
+                        image.activate(ImageType.PRODUCT, savedProduct.getId());
+                        image.setSortOrder(sortOrder);
+                    }
+                });
             }
         }
 

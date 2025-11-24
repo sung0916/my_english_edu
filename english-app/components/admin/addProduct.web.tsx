@@ -1,4 +1,4 @@
-import apiClient, { API_BASE_URL, apiClientWithFile } from "@/api";
+import apiClient, { apiClientWithFile } from "@/api";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import '@toast-ui/editor/toastui-editor.css';
 import { Editor } from "@toast-ui/react-editor";
@@ -8,7 +8,7 @@ import { useRef, useState } from "react";
 type ProductType = 'SUBSCRIPTION' | 'ITEM';
 
 interface UploadedImage {
-    id: number;
+    imageId: number;
     url: string;
     imageUrl: string;
 }
@@ -137,12 +137,13 @@ const AddProductWeb = () => {
                                         if (response.data && response.data.length > 0) {
                                             const imageInfo = response.data[0];
                                             const imageUrl = imageInfo.imageUrl || imageInfo.url;
-                                            const fullImageUrl = `${API_BASE_URL}/${imageUrl}`;
+                                            // const fullImageUrl = `${API_BASE_URL}/${imageUrl}`;
+                                            const fullImageUrl = imageUrl;
 
                                             callback(fullImageUrl, 'image');
 
                                             // 업로드된 이미지 ID는 상태에 저장
-                                            setUploadedImageIds(prevIds => [...prevIds, imageInfo.id]);
+                                            setUploadedImageIds(prevIds => [...prevIds, imageInfo.imageId]);
                                         }
                                     } catch (error) {
                                         console.error('이미지 업로드 실패: ', error);

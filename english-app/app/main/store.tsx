@@ -13,7 +13,7 @@ interface Item {
     id: number; // 또는 number, API 응답에 맞춰주세요.
     productName: string;
     price: number;
-    imageUrl: string;
+    imageUrl: string | null;
 }
 
 // API 응답 페이지 구조 인터페이스
@@ -49,6 +49,7 @@ const Store = () => {
                 params: {
                     page: page - 1, // 서버 API가 0-based 페이지네이션을 사용한다고 가정
                     size: ITEMS_PER_PAGE,
+                    sort: 'id,desc',
                 },
             });
 
@@ -78,9 +79,17 @@ const Store = () => {
     const renderItem = ({ item }: { item: Item }) => {
         // 아이템 너비 계산 (전체 너비 - 총 여백) / 열 개수
         const itemWidth = (width - 10 * (numColumns + 1)) / numColumns;
+        const thumbnailUrl = item.imageUrl;
+
         return (
             <TouchableOpacity onPress={() => handleItemPress(item.id)} style={[styles.itemContainer, { width: itemWidth }]}>
-                <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
+                {   
+                    thumbnailUrl ? (
+                        <Image source={{ uri: thumbnailUrl }} style={styles.itemImage} />
+                    ) : (
+                        <View style={[styles.itemImage, styles.imagePlaceholder]} />
+                    )
+                }
                 <View style={styles.itemTextContainer}>
                     <Text style={styles.itemTitle} numberOfLines={2}>
                         {item.productName}
@@ -158,6 +167,11 @@ const styles = StyleSheet.create({
         width: '100%',
         aspectRatio: 1, // 1:1 비율의 정사각형 이미지
         resizeMode: 'cover',
+    },
+    imagePlaceholder: {
+        backgroundColor: '#e9ecef',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     itemTextContainer: {
         padding: 10,

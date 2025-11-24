@@ -77,19 +77,26 @@ const ProductList = () => {
 
     // 상품 상태 변경 핸들러
     const handleStatusChange = async (productId: number, newStatus: ProductStatus) => {
+        const originalProducts = [...products];
+        const updatedProducts = products.map(product =>
+            product.id === productId ? {...product, status: newStatus} : product
+        );
+        setProducts(updatedProducts);
+
         try {
             await apiClient.patch('/api/products/edit', {
                 id: productId,
                 status: newStatus,
             });
-            crossPlatformAlert('성공', '상품 상태가 변경됨');
+            // crossPlatformAlert('성공', '상품 상태가 변경됨');
 
-            // 상태 변경 후 즉시 새로고침하여 목록 반영
-            fetchProducts(currentPage);
+            // // 상태 변경 후 즉시 새로고침하여 목록 반영
+            // fetchProducts(currentPage);
 
         } catch (error) {
             console.error('상품 상태 변경 실패: ', error);
             crossPlatformAlert('오류', '상태 변경 중 오류 발생');
+            setProducts(originalProducts);
         }
     };
     

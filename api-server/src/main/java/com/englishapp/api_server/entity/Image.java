@@ -70,4 +70,9 @@ public class Image {
         this.relatedId = null;
         this.status = ImageStatus.PENDING;
     }
+
+    // Service 레이어에서 sortOrder를 쉽게 업데이트하기 위한 메소드
+    public void setSortOrder(int sortOrder) {
+        this.sortOrder = sortOrder;
+    }
 }
