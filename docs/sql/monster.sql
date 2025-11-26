@@ -138,16 +138,16 @@ CREATE TABLE test_results (
 ) COMMENT '테스트 결과';
 
 CREATE TABLE games (
-    game_id   INT          NOT NULL AUTO_INCREMENT COMMENT 'pk',
+    game_id   bigint          NOT NULL AUTO_INCREMENT COMMENT 'pk',
     game_name VARCHAR(255) NOT NULL COMMENT '게임이름',
     PRIMARY KEY (game_id)
 ) COMMENT '게임 정보';
 
-CREATE TABLE game_results (
-    result_id INT      NOT NULL AUTO_INCREMENT COMMENT 'pk',
+CREATE TABLE game_scores (
+    score_id bigint      NOT NULL AUTO_INCREMENT COMMENT 'pk',
     user_id   INT      NOT NULL COMMENT 'fk',
     game_id   INT      NOT NULL COMMENT 'fk',
-    score     INT      NOT NULL COMMENT '점수',
+    high_score     INT      NOT NULL COMMENT '점수',
     played_at DATETIME NOT NULL COMMENT '플레이 날짜',
     PRIMARY KEY (result_id)
 ) COMMENT '게임 결과';
