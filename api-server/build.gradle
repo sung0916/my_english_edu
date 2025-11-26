@@ -1,33 +1,19 @@
-plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.6'
-	id 'io.spring.dependency-management' version '1.1.7'
-}
+description = 'API Server for English App'
 
-group = 'com.englishapp'
-version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+/*plugins {
+	root에서 apply함
+}*/
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-repositories {
+/*repositories {
+    root에서 apply함
 	mavenCentral()
 	maven { url "https://maven.google.com" }
 	maven { url 'https://repo.spring.io/milestone' }
 	maven { url 'https://repo.spring.io/snapshot' }
-}
+}*/
 
 dependencies {
+    // 버전은 root에서 자동 관리
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -39,20 +25,16 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	//
+	// Google Cloud
 	implementation platform('org.springframework.cloud:spring-cloud-dependencies:2025.0.0')
-
-	//
-	implementation platform("com.google.cloud:spring-cloud-gcp-starter:7.4.1")
-
-	// 실행 시 최초 1회 구동되어 구글 TTS의 url을 DB에 담기 위해 설정  
-	runtimeOnly("com.google.cloud:spring-cloud-gcp-starter-storage:2.0.0")
-
-	//
+    implementation platform("com.google.cloud:spring-cloud-gcp-starter:7.4.1")
+	runtimeOnly("com.google.cloud:spring-cloud-gcp-starter-storage:2.0.0")  // 실행 시 최초 1회 구동되어 구글 TTS의 url을 DB에 담기 위해 설정
 	implementation("com.google.cloud:google-cloud-texttospeech:2.79.0")
 }
 

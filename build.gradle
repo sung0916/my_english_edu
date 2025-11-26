@@ -1,0 +1,60 @@
+buildscript {  // root의 build.gradle 파일 실행 설정
+    // 사용할 변수 선언
+    ext {
+        springBootVersion = '3.5.6'
+    }
+
+    // 플러그인 다운로드 받을 저장소
+    repositories {
+        mavenCentral()
+    }
+
+    // 의존성 등록
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.spring.dependency-management:io.spring.dependency-management.gradle.plugin:1.1.5")
+    }
+}
+
+// 모든 하위 프로젝트에 공통 적용
+subprojects {
+    group = 'com.englishapp'
+    version = '0.0.1-SNAPSHOT'
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        toolchain{
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        maven {url "https://maven.google.com"}  // api-server 용
+        maven {url "https://repo.spring.io/milestone"}  // api-server 용
+    }
+
+    // 의존성 관리 (모든 모듈이 사용할 라이브러리들 통일)
+    dependencyManagement {
+        imports {
+            // Spring Boot 3.5.6 버전을 기준으로 라이브러리 버전 자동 관리
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+
+            // Spring Cloud 버전을 Spring Boot 3.5.6과 호환되는 버전 설정
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.0.0"
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}

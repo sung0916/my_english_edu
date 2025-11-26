@@ -4,12 +4,38 @@
 .DS_Store
 *.log
 
+# Build 결과물
+build/
+out/
+
+# Gradle 캐시 및 설정
+.gradle/
+
+# STS (Eclipse)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
 # =================================================
 # IDEs - IntelliJ IDEA / VSCode
 # =================================================
 .idea/
 .vscode/
 *.iml
+*.iws
+*.ipr
 
 # =================================================
 # Java / Spring Boot / Gradle (Backend)
@@ -19,21 +45,57 @@ api-server/.gradle/
 
 # !! SECURITY !!
 # Ignore sensitive application configuration
-api-server/src/main/resources/application-local.yml
-api-server/src/main/resources/gcp-credentials.json
+# api-server/src/main/resources/application-local.yml
+# api-server/src/main/resources/gcp-credentials.json
+application-local.yml
+gcp-credentials.json
 
 # =================================================
 # Node.js / Expo (Frontend)
 # =================================================
-english-app/node_modules/
-english-app/.expo/
-english-app/dist/
-english-app/web-build/
-english-app/expo-env.d.ts
+
+# 의존성 폴더
+node_modules/
 package-lock.json
+
+# Expo & Metro 관련 파일
+.expo/
+.metro-health-check*
+
+# 빌드 결과물
+dist/
+web-build/
+
+# 타입스크립트 빌드 정보
+*.tsbuildinfo
+expo-env.d.ts
+
+# 생성된 네이티브 폴더 (필요시 직접 생성해서 사용)
+/ios
+/android
+
+# -----------------------------------------
+# Sensitive & OS specific
+# -----------------------------------------
+# 로컬 환경 변수 파일 (비밀번호, API 키 등)
+.env*.local
+gcp-credentials.json
+
+# 인증서 및 키 파일
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+
+# 디버그 로그 파일
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+
+# macOS 시스템 파일
+.DS_Store
 
 # local env files
 .env*.local
