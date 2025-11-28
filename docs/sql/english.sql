@@ -15,6 +15,15 @@ select * from images;
 desc product;
 select * from product;
 
+desc places;
+select * from places;
+
+desc sentences;
+select * from sentences;
+
+desc words;
+select * from words;
+
 alter table user change column user_id user_id bigint;
 -- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
