@@ -42,7 +42,35 @@ const FallingWordsGame = () => {
 };
 
 const styles = StyleSheet.create({
-
+    container: { flex: 1, backgroundColor: '#E8F6F3' },
+    gameArea: { flex: 1, position: 'relative', overflow: 'hidden' },
+    hud: {
+        position: 'absolute',
+        top: 70, // 헤더 아래
+        right: 20,
+        alignItems: 'flex-end',
+    },
+    hudText: { 
+        fontSize: 18, 
+        fontWeight: 'bold', 
+        color: '#2C3E50', 
+        marginBottom: 4 
+    },
+    inputContainer: {
+        padding: 10,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+    },
+    input: {
+        height: 50,
+        borderColor: '#3498DB',
+        borderWidth: 2,
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        fontSize: 18,
+        backgroundColor: '#fff',
+    },
 });
 
 export default FallingWordsGame;

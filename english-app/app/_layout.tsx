@@ -15,6 +15,7 @@ export default function RootLayout() {
     'Mulish-Semibold': require('../assets/fonts/Mulish-SemiBold.ttf'),
   });
   const [isHydrated, setIsHydrated] = useState(false);
+
   useEffect(() => {
     const unsubscribe = (useUserStore as any).persist.onFinishHydration(() => setIsHydrated(true));
     if ((useUserStore as any).persist.hasHydrated()) setIsHydrated(true);
@@ -24,6 +25,7 @@ export default function RootLayout() {
   const { isLoggedIn, user } = useUserStore();
   const router = useRouter();
   const segments = useSegments();
+  const isGameRoute = segments[0] === 'game'; // 경로가 game 폴더에 있는지 확인(0으로 명시적 적용)
 
   useEffect(() => {
     if (!isHydrated || (!fontsLoaded && !fontError)) return;
@@ -48,26 +50,22 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !fontError || !isHydrated) return null;
 
-  // --- [핵심 수정] ---
-  // Stack이 최상위 컴포넌트가 되어야 합니다.
   return (
-    <Stack
+    <Stack  // Stack이 최상위 컴포넌트
       screenOptions={{
-        // 모든 스크린에 공통 헤더를 적용합니다.
-        // 이것이 Expo Router에서 공통 레이아웃을 만드는 표준 방식입니다.
-        header: () => <Header />,
-        
-        // Stack 자체의 그림자 등을 제거하여 깔끔하게 만듭니다.
-        headerShadowVisible: false,
-        
-        // 필요하다면 여기서 헤더의 높이 등을 조절할 수 있습니다.
-        // headerStyle: { height: 80 }, 
+        header: isGameRoute ? undefined : () => <Header />,    // 모든 스크린에 공통 헤더를 적용(game 폴더 경로 제외)
+        headerShadowVisible: false,  // Stack 자체의 그림자 등을 제거
+        // 필요하다면 여기서 헤더의 높이 등을 조절 (headerStyle: { height: 80 })
       }}
     >
-      {/* 
-        특정 페이지만 헤더를 다르게 하고 싶다면, 여기서 screenOptions을 개별적으로 설정할 수 있습니다.
-        예: <Stack.Screen name="index" options={{ headerShown: false }} /> 
-      */}
+      {/* 특정 페이지만 헤더를 다르게 하기 위해, screenOptions을 개별적으로 설정 */}
+      <Stack.Screen
+        name="game"
+        options={{
+          headerShown: false,  // 헤더 영역 제거
+          header: () => null   // 만의 하나 커스텀 헤더가 남지 않도록 null 처리
+        }}
+      />
     </Stack>
   );
 }
