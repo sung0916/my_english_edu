@@ -79,7 +79,7 @@ public class GameContentServiceImpl implements GameContentService {
     }
 
     // [로직 분리] 레벨별 제한시간 설정 (DB 없이 코드로 관리)
-    private int getTimeLimitByLevel(GameLevel level) {
+    /*private int getTimeLimitByLevel(GameLevel level) {
         switch (level) {
             case FIRST:  return 60; // 1단계는 60초
             case SECOND: return 50;
@@ -88,7 +88,7 @@ public class GameContentServiceImpl implements GameContentService {
             case FIFTH:  return 30; // 5단계는 30초
             default:     return 60;
         }
-    }
+    }*/
 
     // FallingWords 게임 전용 데이터 로직
     /*private List<Word> getFallingWordsData() {

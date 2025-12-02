@@ -45,16 +45,36 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.OPTIONS, "**").permitAll()  // 모든 OPTIONS 요청은 인증/인가 없이 항상 허용 (가장 먼저 처리)
+                        // 1. OPTIONS 요청 허용 (CORS Preflight) - 모든 OPTIONS 요청은 인증/인가 없이 항상 허용 (가장 먼저 처리)
+                        .requestMatchers(HttpMethod.OPTIONS, "**").permitAll()
+
+                        // 2. 정적 리소스 (이미지) 조회는 누구나, 수정/삭제는 ADMIN만
                         .requestMatchers(HttpMethod.GET, "/api/images/**").permitAll()
                         .requestMatchers("/api/images/**").hasAuthority("ADMIN")
-                        .requestMatchers("/api/auth/login", "/api/users/signup").permitAll()  // 로그인, 회원가입 허용
+
+                        // 3. 인증/회원가입은 누구나
+                        .requestMatchers("/api/auth/login", "/api/users/signup").permitAll()
+
+                        // 4. 게시판/상품 조회는 누구나
                         .requestMatchers(HttpMethod.GET, "/api/announcements/**", "/api/products/**").permitAll()
+
+                        // 5. 게시글 작성: ADMIN, TEACHER 가능
                         .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")
+
+                        // 6. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 @PreAuthorize로 구독 상태 체크 로직 작성 후 추후 추가)
+                        .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER")
+
+                        // 7. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
                         .requestMatchers("/api/announcements/**", "/api/products/**").hasAuthority("ADMIN")
+
+                        // 8. 관리자 페이지
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+
+                        // 9. 내 정보 확인 등 인증된 유저 공통 기능
                         .requestMatchers("/api/users/me", "/api/auth/confirm-password").authenticated() // 인증된 모든 유저가 접근 가능
-                        .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
+
+                        // 10. 그 외 모든 요청은 인증 필요
+                        .anyRequest().authenticated()
                 )
                 // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
