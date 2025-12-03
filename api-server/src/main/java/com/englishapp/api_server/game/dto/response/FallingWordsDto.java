@@ -1,11 +1,11 @@
-package com.englishapp.api_server.dto;
+package com.englishapp.api_server.game.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class WordDto {
+public class FallingWordsDto {
     private Long id;
     private String content;
     private String meaning;

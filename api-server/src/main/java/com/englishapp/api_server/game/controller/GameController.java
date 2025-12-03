@@ -1,6 +1,6 @@
 package com.englishapp.api_server.game.controller;
 
-import com.englishapp.api_server.game.dto.GameLevel;
+import com.englishapp.api_server.game.domain.GameLevel;
 import com.englishapp.api_server.game.dto.request.GameScoreRequest;
 import com.englishapp.api_server.game.dto.response.GameContentResponse;
 import com.englishapp.api_server.game.service.GameContentService;

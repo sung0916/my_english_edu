@@ -29,11 +29,11 @@ const MOCK_GAMES: GameItem[] = [
     },
     {
         id: 2,
-        title: "Sentence Maker",
-        description: "문장 만들기 (준비중)",
+        title: "Mystery Word Cards",
+        description: "미스테리 카드 뒤집기",
         imageUrl: null,
-        route: "/game/sentence-maker",
-        isReady: false
+        route: "/game/mysteryCards",
+        isReady: true
     },
     {
         id: 3,
@@ -45,10 +45,10 @@ const MOCK_GAMES: GameItem[] = [
     },
     {
         id: 4,
-        title: "Listening Test",
-        description: "듣기 평가 (준비중)",
+        title: "Sentence Maker",
+        description: "문장 만들기 (준비중)",
         imageUrl: null,
-        route: "/game/listening",
+        route: "/game/sentence-maker",
         isReady: false
     }
 ];

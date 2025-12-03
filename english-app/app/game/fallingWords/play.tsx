@@ -14,11 +14,11 @@ const GAME_ID = 1;  // DB 상 FallingWords의 ID
 
 // 단어 속도 정의 (ms단위)
 const LEVEL_CONFIG: Record<string, { dropSpeed: number; spawnInterval: number }> = {
-    'FIRST': { dropSpeed: 6000, spawnInterval: 2500 },
-    'SECOND': { dropSpeed: 5000, spawnInterval: 2000 },
-    'THIRD': { dropSpeed: 4500, spawnInterval: 1800 },
-    'FOURTH': { dropSpeed: 4000, spawnInterval: 1500 },
-    'FIFTH': { dropSpeed: 3000, spawnInterval: 1000 },
+    'FIRST': { dropSpeed: 10000, spawnInterval: 2500 },
+    'SECOND': { dropSpeed: 9000, spawnInterval: 2000 },
+    'THIRD': { dropSpeed: 8000, spawnInterval: 1800 },
+    'FOURTH': { dropSpeed: 8000, spawnInterval: 1500 },
+    'FIFTH': { dropSpeed: 7000, spawnInterval: 1000 },
 };
 
 const LEVEL_MAP: Record<string, string> = {

@@ -21,7 +21,13 @@ select * from places;
 desc sentences;
 select * from sentences;
 
+desc games;
+select * from games;
+
 desc words;
+select * from words;
+
+desc word_details;
 select * from words;
 
 alter table user change column user_id user_id bigint;

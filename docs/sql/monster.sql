@@ -360,4 +360,18 @@ INSERT INTO words (word_id, audio_url, content, meaning, type, place_id) VALUES
 -- games에 게임 정보 넣기
 -- ======================================================================
 
+ALTER TABLE games MODIFY game_name ENUM('FALLINGWORDS', 'MYSTERYCARDS');
 INSERT INTO games (game_id, game_name) VALUES (1, 'FALLINGWORDS');
+INSERT INTO games (game_id, game_name) VALUES (2, 'MYSTERYCARDS');
+
+-- ======================================================================
+-- words와 관련된 설명 테이블 생성
+-- ======================================================================
+
+CREATE TABLE word_details (
+    detail_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    word_id BIGINT NOT NULL,
+    description_en VARCHAR(500),
+    image_url VARCHAR(500),
+    CONSTRAINT fk_word_detail_word FOREIGN KEY (word_id) REFERENCES words(word_id)
+);

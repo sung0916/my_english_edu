@@ -1,6 +1,6 @@
 package com.englishapp.api_server.game.entity;
 
-import com.englishapp.api_server.game.dto.GameName;
+import com.englishapp.api_server.game.domain.GameName;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -17,7 +17,7 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     setIsMenuOpen(false);
-    alert("로그아웃되었습니다.");
+    alert("You logged out");
     router.push('/');
   }
 
@@ -58,20 +58,20 @@ const Header = () => {
               {isLoggedIn ? (
                 <>
                   {user?.role === 'ADMIN' ? (
-                    <Link href="/admin/studentList" asChild><Pressable><Text style={styles.userItem}>관리자페이지</Text></Pressable></Link>
+                    <Link href="/admin/studentList" asChild><Pressable><Text style={styles.userItem}>ManagerPage</Text></Pressable></Link>
                   ) : (
-                    <Link href="/user/place" asChild><Pressable><Text style={styles.userItem}>마이페이지</Text></Pressable></Link>
+                    <Link href="/user/place" asChild><Pressable><Text style={styles.userItem}>MyPage</Text></Pressable></Link>
                   )}
 
                   {user?.role !== 'ADMIN' && (
-                    <Link href="/user/cart" asChild><Pressable><Text style={styles.userItem}>장바구니</Text></Pressable></Link>
+                    <Link href="/user/cart" asChild><Pressable><Text style={styles.userItem}>Cart</Text></Pressable></Link>
                   )}
-                  <Pressable onPress={handleLogout}><Text style={styles.userItem}>로그아웃</Text></Pressable>
+                  <Pressable onPress={handleLogout}><Text style={styles.userItem}>Logout</Text></Pressable>
                 </>
               ) : (
                 <>
-                  <Link href="/auth/login" asChild><Pressable><Text style={styles.userItem}>로그인</Text></Pressable></Link>
-                  <Link href="/auth/signup" asChild><Pressable><Text style={styles.userItem}>회원가입</Text></Pressable></Link>
+                  <Link href="/auth/login" asChild><Pressable><Text style={styles.userItem}>Login</Text></Pressable></Link>
+                  <Link href="/auth/signup" asChild><Pressable><Text style={styles.userItem}>SignUp</Text></Pressable></Link>
                 </>
               )}
             </View>
@@ -104,20 +104,20 @@ const Header = () => {
               <>
                 {/* 모바일 */}
                 {user?.role === 'ADMIN' ? (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/admin/studentList')}><Text style={styles.modalLinkText}>관리자 페이지</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/admin/studentList')}><Text style={styles.modalLinkText}>ManagerPage</Text></Pressable>
                 ) : (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/user/place')}><Text style={styles.modalLinkText}>마이페이지</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/user/place')}><Text style={styles.modalLinkText}>MyPage</Text></Pressable>
                 )}
 
                 {user?.role !== 'ADMIN' && (
-                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/user/cart')}><Text style={styles.modalLinkText}>장바구니</Text></Pressable>
+                  <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/user/cart')}><Text style={styles.modalLinkText}>Cart</Text></Pressable>
                 )}
-                <Pressable style={styles.modalLink} onPress={handleLogout}><Text style={styles.modalLinkText}>로그아웃</Text></Pressable>
+                <Pressable style={styles.modalLink} onPress={handleLogout}><Text style={styles.modalLinkText}>Logout</Text></Pressable>
               </>
             ) : (
               <>
-                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/login')}><Text style={styles.modalLinkText}>로그인</Text></Pressable>
-                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/signup')}><Text style={styles.modalLinkText}>회원가입</Text></Pressable>
+                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/login')}><Text style={styles.modalLinkText}>Login</Text></Pressable>
+                <Pressable style={styles.modalLink} onPress={() => navigateAndCloseMenu('/auth/signup')}><Text style={styles.modalLinkText}>Signup</Text></Pressable>
               </>
             )}
           </View>
