@@ -28,7 +28,7 @@ desc words;
 select * from words;
 
 desc word_details;
-select * from words;
+select * from word_details;
 
 alter table user change column user_id user_id bigint;
 -- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ

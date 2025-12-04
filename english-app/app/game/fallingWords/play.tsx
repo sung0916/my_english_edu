@@ -86,8 +86,17 @@ export default function FallingWordsGame() {
 
     const loadSound = async () => {
         try {
-            // 사운드 파일 추가
+            // 1. 오디오 파일 로드 (require 경로 체크 필요)
+            const { sound } = await Audio.Sound.createAsync(
+                require('@/assets/audio/game/waterdrop.mp3')
+            );
 
+            // 2. Ref에 저장 (checkInput 등에서 replayAsync로 사용하기 위함)
+            soundObject.current = sound;
+
+            // 3. (옵션) 로드 확인을 위해 즉시 한번 재생
+            // await sound.playAsync();
+            
         } catch (e) {
             console.log(e);
         }
@@ -96,7 +105,7 @@ export default function FallingWordsGame() {
     const loadGameData = async () => {
         try {
             setIsLoading(true);
-            const data = await fetchGameContent(1, gameLevelKey);  // 개발 때 game_id = 1 고정
+            const data = await fetchGameContent<WordDto>(1, gameLevelKey);  // 개발 때 game_id = 1 고정
 
             if (data.items && data.items.length > 0) {
                 wordsQueue.current = [...data.items];  // 큐에 담기
@@ -238,7 +247,7 @@ export default function FallingWordsGame() {
         } else {  // 오답
             if (soundObject.current) {
                 try {
-                    await soundObject.current.replayAsync();
+                    await soundObject.current.replayAsync();  // 소리를 처음부터 재생(겹쳐서 재생 가능)
                 } catch (e) {
                     console.error(e);
                 }

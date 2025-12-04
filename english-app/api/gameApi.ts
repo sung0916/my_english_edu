@@ -1,6 +1,13 @@
 import apiClient from ".";
 
-// 데이터 타입 정의
+// 공통 응답 구조
+export interface GameContentResponse<T> {
+    gameType: string;
+    level: string;
+    items: T[];  // 백엔드에선 List<Object>로 주지만, 여기선 WordDto[]로 확정
+}
+
+// Falling Words 데이터 타입 정의
 export interface WordDto {
     id: number;
     content: string;
@@ -8,20 +15,31 @@ export interface WordDto {
     audioUrl?: string;
 }
 
-export interface GameContentResponse {
-    gameType: string;
-    level: string;
-    items: WordDto[];  // 백엔드에선 List<Object>로 주지만, 여기선 WordDto[]로 확정
+// Mystery Cards 데이터 타입 정의
+export interface CardOption {
+    wordId: number;
+    word: string;
+    imageUrl: string;
+    isAnswer: boolean;
+}
+
+export interface MysteryCardData {
+    questionId: number;
+    sentence: string;
+    answerWord: string;
+    answerImageUrl: string;
+    options: CardOption[];  // 4지 선다
 }
 
 // ============== API 함수 ==============
 /** 게임 시작 전 데이터 가져오기
  * GET /api/games/1/playGame?level={level}
  */
-export const fetchGameContent = async (gameId: number, level: string): Promise<GameContentResponse> => {
+export const fetchGameContent = async <T>(gameId: number, level: string): 
+    Promise<GameContentResponse<T>> => {
         // 백엔드 Enum은 'FIRST', 'SECOND' 형태이므로 변환 필요
         // 프론트에서 FIRST 등으로 관리하면 그대로 보냄
-        const response = await apiClient.get<GameContentResponse>(`/api/games/${gameId}/playGame`, {
+        const response = await apiClient.get<GameContentResponse<T>>(`/api/games/${gameId}/playGame`, {
             params: { level }
         });
         return response.data;
