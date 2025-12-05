@@ -4,7 +4,6 @@ import com.englishapp.api_server.entity.WordDetail;
 import com.englishapp.api_server.game.dto.response.FallingWordsDto;
 import com.englishapp.api_server.entity.Word;
 import com.englishapp.api_server.game.domain.GameLevel;
-import com.englishapp.api_server.game.domain.GameName;
 import com.englishapp.api_server.game.dto.response.GameContentResponse;
 import com.englishapp.api_server.game.dto.response.MysteryCardsDto;
 import com.englishapp.api_server.game.entity.Game;
@@ -18,9 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,12 +41,16 @@ public class GameContentServiceImpl implements GameContentService {
 
         List<Object> dataItems;
 
+        int timeLimit = 0;  // 게임별, 레벨별 시간 제한 담을 변수
+
         // 2. 게임 종류에 따른 데이터 조회
         switch (game.getGameName()) {
             case FALLINGWORDS:
                 dataItems = getFallingWordsData(level);
+                // timeLimit = 0;  // 프론트에서 속도 제어
                 break;
             case MYSTERYCARDS:
+                timeLimit = getMysteryTimeLimit(level);
                 dataItems = getMysteryCardsData(level);
                 break;
             default:
@@ -60,7 +61,7 @@ public class GameContentServiceImpl implements GameContentService {
         return GameContentResponse.builder()
                 .gameType(game.getGameName().name())
                 .level(level.name())
-                // .timeLimit(60)
+                .timeLimit(timeLimit)
                 .items(dataItems)
                 .build();
     }
@@ -94,58 +95,98 @@ public class GameContentServiceImpl implements GameContentService {
         }
     }
 
+    // MysteryCards 레벨별 시간 설정
+    private int getMysteryTimeLimit(GameLevel level) {
+        switch (level) {
+            case FIRST: return 10;
+            case SECOND: return 10;
+            case THIRD: return 7;
+            default: return 10;
+        }
+    }
+
     // MysteryCards 전용 로직
     private List<Object> getMysteryCardsData(GameLevel level) {
-        int questionCount = 5;  // 레벨에 따라 조정
+        int questionCount;  // 레벨에 따라 조정
 
-        // 1. 문제(정답) 데이터 조회
-        List<WordDetail> questions = wordDetailRepository.findRandomQuestions(questionCount);
+        // 레벨 별 문제 수 설정
+        switch (level) {
+            case FIRST: questionCount = 10; break;
+            case SECOND: questionCount = 15; break;
+            case THIRD: questionCount = 20; break;
+            default: questionCount = 10;
+        }
+
+        // 1. 문제(정답) 데이터 조회 - 중복 제거를 위해 3배수 조회
+        List<WordDetail> questions = wordDetailRepository.findRandomQuestions(questionCount * 3);
 
         // 2. 오답(보기) 데이터 조회 (넉넉하게 문제 수 * 3)
-        List<WordDetail> distractors = wordDetailRepository.findRandomDistractors(questionCount);
+        List<WordDetail> distractors = wordDetailRepository.findRandomDistractors(questionCount * 5);
 
+        // 3. 문제 중복 제거 로직 (Set 활용)
+        List<WordDetail> uniqueQuestions = new ArrayList<>();
+        Set<String> usedContents = new HashSet<>();
+
+        for (WordDetail wd : questions) {
+            String content = wd.getWord().getContent();
+            if (usedContents.contains(content)) continue;  // 이미 뽑은 단어면 패스
+            uniqueQuestions.add(wd);
+            usedContents.add(content);
+            if (uniqueQuestions.size() == questionCount) break;  // 목표 갯수 달성 시 중단
+        }
+
+        // 4. 최종 DTO 생성
         List<Object> resultList = new ArrayList<>();
         int distIndex = 0;
 
-        for (WordDetail question : questions) {
-
+        for (WordDetail question : uniqueQuestions) {
             // A. 보기 리스트 구성 (정답 1개 + 오답 3개)
             List<MysteryCardsDto.CardOption> options = new ArrayList<>();
+            String answerContent = question.getWord().getContent();
 
-            // 정답 추가
+            // 정답 보기 추가
             options.add(MysteryCardsDto.CardOption.builder()
                     .wordId(question.getWord().getId())
-                    .word(question.getWord().getContent())
+                    .word(answerContent)
                     .imageUrl(question.getImageUrl())
                     .isAnswer(true)
                     .build());
 
-            // 오답 3개 추가
-            for (int i = 0; i < 3; i++) {
-                if (distIndex >= distractors.size()) distIndex = 0;  // 인덱스 순환
+            // B. 오답 3개 추가
+            int addedDistractors = 0;
+            while (addedDistractors < 3) {
+                if (distIndex >= distractors.size()) distIndex = 0;
                 WordDetail wrong = distractors.get(distIndex++);
+                String wrongContent = wrong.getWord().getContent();
 
-                // TODO: 추후 오답과 정답이 겹치는 경우 제외 로직 추가
+                // 정답과 같거나, 이미 보기에 있는 단어면 패스
+                boolean isDuplicate =
+                        wrongContent.equals(answerContent) || options.stream().anyMatch(opt -> opt.getWord().equals(wrongContent));
+
+                if (isDuplicate) continue;
 
                 options.add(MysteryCardsDto.CardOption.builder()
-                        .wordId(wrong.getWord().getId())
-                        .word(wrong.getWord().getContent())
-                        .imageUrl(wrong.getImageUrl())
-                        .isAnswer(false)
+                                .wordId(wrong.getWord().getId())
+                                .word(wrongContent)
+                                .imageUrl(wrong.getImageUrl())
+                                .isAnswer(false)
                         .build());
 
-                // 보기 섞기
-                Collections.shuffle(options);
-
-                // B. 문제 DTO 생성
-                resultList.add(MysteryCardsDto.builder()
-                        .questionId(question.getWord().getId())
-                        .sentence(question.getDescription())
-                        .answerWord(question.getWord().getContent())
-                        .answerImageUrl(question.getImageUrl())
-                        .options(options)
-                        .build());
+                addedDistractors++;
             }
+
+            // 보기 섞기
+            Collections.shuffle(options);
+
+            // C. DTO 생성 및 추가
+            // 주의: resultList.add는 반복문(오답생성) 밖에서 한번만 해야함
+            resultList.add(MysteryCardsDto.builder()
+                            .questionId(question.getWord().getId())
+                            .sentence(question.getDescription())
+                            .answerWord(answerContent)
+                            .answerImageUrl(question.getImageUrl())
+                            .options(options)
+                    .build());
         }
         return resultList;
     }

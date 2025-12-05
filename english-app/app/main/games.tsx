@@ -21,18 +21,18 @@ interface GameItem {
 const MOCK_GAMES: GameItem[] = [
     {
         id: 1,
-        title: "Falling Words",
+        title: "Mystery Word Cards",
         description: "단어 맞추기 게임",
         imageUrl: null, // 나중에 썸네일 URL 넣으세요
-        route: "/game/fallingWords",
+        route: "/game/mysteryCards",
         isReady: true
     },
     {
         id: 2,
-        title: "Mystery Word Cards",
+        title: "Falling Words",
         description: "미스테리 카드 뒤집기",
         imageUrl: null,
-        route: "/game/mysteryCards",
+        route: "/game/fallingWords",
         isReady: true
     },
     {

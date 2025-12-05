@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MysteryCardsLobby() {
     const router = useRouter();
-    const GAME_ID = 2;  // DB에 저장된 MYSTERYCARDS 게임 ㅑㅇ
+    const GAME_ID = 2;  // DB에 저장된 MYSTERYCARDS 게임 ID
     const handleLevelSelect = (level: string) => {
         router.push({
             pathname: '/game/mysteryCards/play',

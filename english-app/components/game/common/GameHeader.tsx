@@ -17,6 +17,24 @@ export default function GameHeader() {
         { gameName: 'Falling Words', highScore: 1200, updatedAt: '2025-12-01' },
     ];
 
+    // 홈으로 가기
+    // const handleBack = () => {
+    //     crossPlatformAlert(
+    //         '', 
+    //         '홈으로 이동하시겠습니까?', 
+    //         () => {
+    //             resetGame();
+                
+    //             if (Platform.OS === 'web') {
+    //                 router.replace(`/main/games/${gameId}`);
+                
+    //             } else {
+    //                 router.back();
+    //             }
+    //         }
+    //     )
+    // };
+
     // 나가기
     const handleExit = () => {
         crossPlatformConfirm(

@@ -14,7 +14,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     if (!loginId || !password) {
-      crossPlatformAlert("입력 오류", "아이디와 비밀번호를 모두 입력해주세요.");
+      crossPlatformAlert("", "Please Enter your ID and Password");
       return;
     }
 
@@ -29,19 +29,19 @@ const LoginPage = () => {
       if (token && user) {
         login(user, token);
 
-        crossPlatformAlert("로그인 성공", `${user.username}님, 환영합니다!`);
+        crossPlatformAlert("Logged In", `Welcome, ${user.username}`);
         router.replace('/');
       } else {
-        throw new Error("서버 응답 형식이 올바르지 않습니다.");
+        throw new Error("Not Correct Server");
       }
 
     } catch (error: any) {
-      console.error("로그인 실패: ", error);
+      console.error("Failed Login: ", error);
 
       if (error.response) {
-        crossPlatformAlert("로그인 실패: ", error.response.data.message || "아이디 또는 비밀번호를 확인해주세요.");
+        crossPlatformAlert("Failed Login: ", error.response.data.message || "Please check your ID and Password.");
       } else {
-        crossPlatformAlert("로그인 실패", "로그인 중 오류 발생, 네트워크 상태를 확인해주세요.");
+        crossPlatformAlert("Failed Login", "Please Check your Network.");
       }
     }
   };
@@ -52,7 +52,7 @@ const LoginPage = () => {
         <Text style={styles.title}>Login</Text>
         <TextInput
           style={styles.input}
-          placeholder="아이디를 입력하세요."
+          placeholder="Enter ID"
           value={loginId}
           onChangeText={setLoginId}
           autoCapitalize="none"
@@ -60,13 +60,13 @@ const LoginPage = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="비밀번호를 입력하세요."
+          placeholder="Enter Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry // 비밀번호 가리기
         />
 
-        <CustomButton title="로그인" onPress={handleLogin} />
+        <CustomButton title="Login" onPress={handleLogin} />
       </View>
     </View>
   );

@@ -1,5 +1,6 @@
 package com.englishapp.api_server.game.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,6 +24,7 @@ public class MysteryCardsDto {
         private Long wordId;
         private String word;        // 카드 앞면 (텍스트)
         private String imageUrl;    // 카드 뒷면 (이미지)
+        @JsonProperty("isAnswer")   // 프론트에서 is가 생략되지 않고, isAnswer로 받기위해 적용
         private boolean isAnswer;   // 정답여부
     }
 }

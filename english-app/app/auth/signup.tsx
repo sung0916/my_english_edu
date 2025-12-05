@@ -49,16 +49,16 @@ const SignUpPage = () => {
     setErrors({}); // 이전 에러 초기화
     const newErrors: SignUpErrors = {};
 
-    if (!isNotEmpty(username)) newErrors.username = "이름을 입력해주세요.";
-    if (!isNotEmpty(loginId)) newErrors.loginId = "아이디를 입력해주세요.";
-    if (!validatePassword(password)) newErrors.password = "비밀번호는 8자 이상, 15자 이하로 영문과 숫자를 포함해야 합니다.";
-    if (password !== passwordConfirm) newErrors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
-    if (!validateEmail(email)) newErrors.email = "올바른 이메일 형식이 아닙니다.";
+    if (!isNotEmpty(username)) newErrors.username = "Please enter your name";
+    if (!isNotEmpty(loginId)) newErrors.loginId = "Please enter your ID";
+    if (!validatePassword(password)) newErrors.password = "Password must be at least 8 to 15 characters include letters and numbers";
+    if (password !== passwordConfirm) newErrors.passwordConfirm = "The passwords doesn't match";
+    if (!validateEmail(email)) newErrors.email = "Not correct Email form";
     
     // 전화번호 유효성 검사
     const telDigitsOnly = tel.replace(/[^0-9]/g, '');
     if (telDigitsOnly.length < 10) { // 최소 10자리 이상 (예: 02-123-4567)
-      newErrors.tel = "올바른 전화번호를 입력해주세요.";
+      newErrors.tel = "Check your contact number form";
     }
 
     // 유효성 검사 실패 시
@@ -79,23 +79,23 @@ const SignUpPage = () => {
           
       if (response.status === 201) {
         if (Platform.OS === 'web') {
-          alert("요청이 완료되었습니다.\n관리자 승인 후 로그인이 가능합니다.");
+          alert("Request has been completed.\nPlease wait for Administrator approval.");
           router.replace('/');
         } else {
           Alert.alert(
-            "요청 완료",
-            "관리자 승인 후 이용이 가능합니다.",
-            [{ text: "확인", onPress: () => router.replace('/') }]
+            "Request has been completed",
+            "You can use this website after approval.",
+            [{ text: "Ok", onPress: () => router.replace('/') }]
           );
         }
       }
     } catch (error: any) {
-      console.error("회원가입 실패: ", error);
+      console.error("Failed Signup: ", error);
       if (error.response) {
         // 백엔드에서 구체적인 에러 메시지를 보낼 경우 (예: "이미 존재하는 아이디입니다.")
-        Alert.alert("회원가입 실패", error.response.data.message || "입력한 정보를 다시 확인해주세요.");
+        Alert.alert("Failed Signup", error.response.data.message || "입력한 정보를 다시 확인해주세요.");
       } else {
-        Alert.alert("오류", "회원가입 중 오류가 발생했습니다.");
+        Alert.alert("Error", "Server error occurred.");
       }
     }
   };
@@ -108,34 +108,34 @@ const SignUpPage = () => {
         
         {/* === JSX 구조 변경 부분 === */}
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="이름을 입력하세요." value={username} onChangeText={setUsername} />
+          <TextInput style={styles.input} placeholder="Enter your name" value={username} onChangeText={setUsername} />
           <Text style={styles.errorText}>{errors.username || ''}</Text>
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="아이디를 입력하세요." value={loginId} onChangeText={setLoginId} autoCapitalize="none" />
+          <TextInput style={styles.input} placeholder="Enter your ID" value={loginId} onChangeText={setLoginId} autoCapitalize="none" />
           <Text style={styles.errorText}>{errors.loginId || ''}</Text>
         </View>
         
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="비밀번호를 입력하세요." value={password} onChangeText={setPassword} secureTextEntry />
+          <TextInput style={styles.input} placeholder="Enter your password" value={password} onChangeText={setPassword} secureTextEntry />
           <Text style={styles.errorText}>{errors.password || ''}</Text>
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="비밀번호를 확인해주세요." value={passwordConfirm} onChangeText={setPasswordConfirm} secureTextEntry />
+          <TextInput style={styles.input} placeholder="Password check" value={passwordConfirm} onChangeText={setPasswordConfirm} secureTextEntry />
           <Text style={styles.errorText}>{errors.passwordConfirm || ''}</Text>
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="이메일을 입력하세요." value={email} onChangeText={setEmail} keyboardType="email-address" />
+          <TextInput style={styles.input} placeholder="Enter your email" value={email} onChangeText={setEmail} keyboardType="email-address" />
           <Text style={styles.errorText}>{errors.email || ''}</Text>
         </View>
         
         <View style={styles.inputContainer}>
           <TextInput 
             style={styles.input} 
-            placeholder="전화번호를 입력하세요." 
+            placeholder="Enter your contact number" 
             value={tel} 
             onChangeText={handleTelChange} // 여기를 수정!
             keyboardType="number-pad" // 숫자 키패드를 사용하도록
@@ -144,7 +144,7 @@ const SignUpPage = () => {
           <Text style={styles.errorText}>{errors.tel || ''}</Text>
         </View>
         
-        <CustomButton title="가입하기" onPress={handleSignUp} />
+        <CustomButton title="Signup" onPress={handleSignUp} />
       </View>
     </View>
   );

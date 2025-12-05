@@ -31,6 +31,7 @@ desc word_details;
 select * from word_details;
 
 alter table user change column user_id user_id bigint;
+
 -- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 drop database monster;
@@ -43,3 +44,23 @@ drop database monster;
 -- alter table ANNOUNCEMENTS rename announcements;
 -- truncate table images;
 -- truncate table product;
+
+-- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 확인 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+-- 1. 중복 데이터 확인 (count가 1보다 크면 중복임)
+SELECT word_id, COUNT(*) 
+FROM word_details 
+GROUP BY word_id 
+HAVING COUNT(*) > 1
+
+-- 2. (만약 중복이 있다면) 중복 데이터 삭제 쿼리
+-- 안전 모드 해제
+SET SQL_SAFE_UPDATES = 0;
+
+-- word_id가 같은데 detail_id가 더 큰(나중에 들어간) 데이터 삭제
+DELETE t1 FROM word_details t1
+INNER JOIN word_details t2 
+WHERE t1.detail_id > t2.detail_id AND t1.word_id = t2.word_id;
+
+-- 안전 모드 복구
+SET SQL_SAFE_UPDATES = 1;
+

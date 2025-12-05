@@ -4,6 +4,7 @@ import apiClient from ".";
 export interface GameContentResponse<T> {
     gameType: string;
     level: string;
+    timeLimit: number;  // 초단위
     items: T[];  // 백엔드에선 List<Object>로 주지만, 여기선 WordDto[]로 확정
 }
 
