@@ -14,19 +14,19 @@ const GAME_ID = 1;  // DB 상 FallingWords의 ID
 
 // 단어 속도 정의 (ms단위)
 const LEVEL_CONFIG: Record<string, { dropSpeed: number; spawnInterval: number }> = {
-    'FIRST': { dropSpeed: 10000, spawnInterval: 2500 },
-    'SECOND': { dropSpeed: 9000, spawnInterval: 2000 },
-    'THIRD': { dropSpeed: 8000, spawnInterval: 1800 },
-    'FOURTH': { dropSpeed: 8000, spawnInterval: 1500 },
-    'FIFTH': { dropSpeed: 7000, spawnInterval: 1000 },
+    'FIRST': { dropSpeed: 18000, spawnInterval: 2500 },
+    'SECOND': { dropSpeed: 15000, spawnInterval: 2000 },
+    'THIRD': { dropSpeed: 12000, spawnInterval: 1800 },
+    'FOURTH': { dropSpeed: 10000, spawnInterval: 1500 },
+    'FIFTH': { dropSpeed: 8000, spawnInterval: 1000 },
 };
 
 const LEVEL_MAP: Record<string, string> = {
-  '1': 'FIRST',
-  '2': 'SECOND',
-  '3': 'THIRD',
-  '4': 'FOURTH',
-  '5': 'FIFTH',  
+    '1': 'FIRST',
+    '2': 'SECOND',
+    '3': 'THIRD',
+    '4': 'FOURTH',
+    '5': 'FIFTH',
 };
 
 interface FallingWord extends WordDto {
@@ -64,11 +64,14 @@ export default function FallingWordsGame() {
     const totalWordsCount = useRef<number>(1);  // 0으로 나누기 방지용으로 1로 초기화
     const soundObject = useRef<Audio.Sound | null>(null);
 
+    const scoreRef = useRef(0.0);  // 점수 동기화
+
     // 1. 게임 데이터 로드 or 초기화
     useEffect(() => {
         resetGame();
         setLives(5);
         setCurrentScore(0.0);
+        scoreRef.current = 0.0;
         setScore(0);
 
         // 오답 사운드 로드
@@ -96,7 +99,7 @@ export default function FallingWordsGame() {
 
             // 3. (옵션) 로드 확인을 위해 즉시 한번 재생
             // await sound.playAsync();
-            
+
         } catch (e) {
             console.log(e);
         }
@@ -225,10 +228,12 @@ export default function FallingWordsGame() {
 
             // a. 점수 계산 (100점 만점 / 총 단어 수)
             const pointsPerWord = 100 / totalWordsCount.current;
-            const nextScore = currentScore + pointsPerWord;
+            const nextScore = parseFloat((currentScore + pointsPerWord).toFixed(1));
 
+            // 점수 업데이트
             setCurrentScore(nextScore);
-            setScore(parseFloat(nextScore.toFixed(1)));  // Store에는 소수점 1자리로 저장
+            scoreRef.current = nextScore;
+            setScore(nextScore);  // Zustand 업데이트
 
             // b. TTS 재생
             Speech.speak(matchedWord.content, { language: 'en' });
@@ -245,6 +250,8 @@ export default function FallingWordsGame() {
             }, 500);
 
         } else {  // 오답
+            setInputText('');  // 오답 시 입력창 초기화
+
             if (soundObject.current) {
                 try {
                     await soundObject.current.replayAsync();  // 소리를 처음부터 재생(겹쳐서 재생 가능)
@@ -259,7 +266,7 @@ export default function FallingWordsGame() {
 
     const gameOver = async (isClear: boolean) => {
         setIsPlaying(false);
-        const finalScore = parseFloat(currentScore.toFixed(1));
+        const finalScore = scoreRef.current;
         const title = isClear ? "🏆 Stage Clear! 🏆" : "💔 Game Over 💔";
 
         if (user && user.userId) {  // 서버로 점수 전송 (로그인 된 경우)
@@ -290,6 +297,7 @@ export default function FallingWordsGame() {
 
             {/* 게임 영역 */}
             <View style={styles.gameArea}>
+                {/* 단어들 */}
                 {activeWords.map(word => (
                     <WordBubble
                         key={word.uid}
@@ -300,6 +308,15 @@ export default function FallingWordsGame() {
                         isMatched={word.isMatched}
                     />
                 ))}
+
+                {/* 일시정지 시 화면 가리는 오버레이 */}
+                {isPaused && (
+                    <View style={[styles.gameArea, styles.pauseOverlay]}>
+                        <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#555' }}>
+                            PAUSED
+                        </Text>
+                    </View>
+                )}
             </View>
 
             {/* 정보 표시 (점수, 레벨, 기회) */}
@@ -307,7 +324,7 @@ export default function FallingWordsGame() {
                 <Text style={styles.hudLevel}>{gameLevelKey}</Text>
                 <Text style={styles.hudScore}>{currentScore.toFixed(1)}</Text>
                 <View style={styles.livesRow}>
-                    {Array.from({length: 5}).map((_, i) => (
+                    {Array.from({ length: 5 }).map((_, i) => (
                         <Text key={i} style={styles.heart}>{i < lives ? '❤️' : '💔'}</Text>
                     ))}
                 </View>
@@ -327,6 +344,7 @@ export default function FallingWordsGame() {
                     autoFocus={Platform.OS === 'web'}
                     autoCorrect={false}
                     autoCapitalize="none"
+                    editable={!isPaused}
                     blurOnSubmit={false}  // 엔터쳐도 키보드 유지
                 />
             </KeyboardAvoidingView>
@@ -362,5 +380,18 @@ const styles = StyleSheet.create({
         borderColor: '#3498DB', borderWidth: 2, borderRadius: 10,
         paddingHorizontal: 16, fontSize: 18,
         backgroundColor: '#fff',
+    },
+
+    pauseOverlay: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(255,255,255,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 20,
+    },
+    disabledInput: {
+        backgroundColor: '#f0f0f0',
+        color: '#999'
     },
 });

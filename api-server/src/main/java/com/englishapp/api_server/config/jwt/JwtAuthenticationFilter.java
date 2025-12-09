@@ -5,6 +5,7 @@ import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.service.impl.UserDetailsImpl;
 import com.englishapp.api_server.service.impl.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Bearer 접두사를 제거하여 순수 토큰 값 추출
         String token = authorizationHeader.substring(7);
 
-        try {
+        try {  // validateToken 내부에서 만료 시 ExpiredJwtException을 던지게 되어 있다면 여기서 잡힘
             // 토큰의 유효성 검증
             if (jwtUtil.validateToken(token)) {
 
@@ -75,12 +76,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 다음 필터로 요청 전달
             // filterChain.doFilter(request, response);
 
-        } catch (ExpiredJwtException e) {
-            log.error("JWT 토큰 만료");
+        } catch (ExpiredJwtException e) {  // 토큰 만료 시 명확한 401 응답
+            log.warn("JWT 토큰 만료 : {}", e.getMessage());
             setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰 만료");
+
+            return;  // 여기서 return 해야 filterChain 중단됨
+
+        } catch (JwtException | IllegalArgumentException e) {  // 그 외 JWT 오류 (위변조, 깨진 토큰 등)
+            log.warn("JWT 유효하지 않음: {}", e.getMessage());
+            setErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
+
+            return;  // 여기서도 리턴
+
+        } catch (Exception e) {
+            log.error("JWT 토큰 에러", e);
+            setErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "서버 에러");
 
             return;
         }
+        // 문제 없을 때만 다음 필터로 진행
         filterChain.doFilter(request, response);
     }
 
@@ -90,6 +104,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setStatus(status);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
+        response.getWriter().write("{\"error\": \"" + message + "\", \"status\": " + status + "}");
     }
 }

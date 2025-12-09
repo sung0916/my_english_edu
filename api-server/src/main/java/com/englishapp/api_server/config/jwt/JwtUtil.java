@@ -23,8 +23,8 @@ public class JwtUtil {
 
     private Key key;
 
-    // 토큰 만료 시간(3시간)
-    private final long expireMs = 1000 * 60 * 60 * 3;
+    // 토큰 만료 시간(10시간)
+    private final long expireMs = 1000 * 60 * 60 * 10;
 
     // 서버 시작 시 SecretKey를 안전한 Key 객체로 변환
     @PostConstruct

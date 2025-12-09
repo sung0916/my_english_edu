@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 // 한 페이지에 표시할 아이템 개수 (요청하신 대로 4개)
-const ITEMS_PER_PAGE = 4; 
+const ITEMS_PER_PAGE = 4;
 
 // 게임 데이터 인터페이스
 interface GameItem {
@@ -37,24 +37,24 @@ const MOCK_GAMES: GameItem[] = [
     },
     {
         id: 3,
+        title: "Maze Adventure",
+        description: "미로 탐험가",
+        imageUrl: null,
+        route: "/game/mazeAdventure",
+        isReady: true
+    },
+    {
+        id: 4,
         title: "Word Puzzle",
         description: "가로세로 낱말퀴즈 (준비중)",
         imageUrl: null,
         route: "/game/word-puzzle",
         isReady: false
     },
-    {
-        id: 4,
-        title: "Sentence Maker",
-        description: "문장 만들기 (준비중)",
-        imageUrl: null,
-        route: "/game/sentence-maker",
-        isReady: false
-    }
 ];
 
 const Games = () => {
-    const { width } = useWindowDimensions(); 
+    const { width } = useWindowDimensions();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [items, setItems] = useState<GameItem[]>([]);
@@ -75,7 +75,7 @@ const Games = () => {
         try {
             // 실제 API가 있다면 여기서 axios/apiClient 호출
             // 지금은 MOCK_GAMES 배열을 잘라서 페이지네이션 흉내
-            
+
             // 0.5초 딜레이 (로딩 UI 확인용)
             await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -103,8 +103,8 @@ const Games = () => {
         if (!game.isReady) {
             crossPlatformAlert("알림", "아직 준비 중인 게임입니다.");
             return;
-        } 
-        
+        }
+
         if (Platform.OS === 'web') {  // 웹 환경에서 새 창으로 열기
             // 창 크기 및 위치 설정
             const width = 1200;  // 게임 창 너비
@@ -117,11 +117,11 @@ const Games = () => {
 
             // window.open 실행, 두번째 인자(`game_${game.id}로 설정하면 같은 게임은 중복해서 열리지 않고 포커스만 이동됨)
             window.open(
-                url,    
+                url,
                 `game_window_${game.id}`,  // 창 이름 (고유 ID를 써야 게임 별로 새창이 열림)
                 `width=${width}, height=${height}, top=${top}, left=${left}, resizable=yes, scrollbars=no, status=no, menubar=no`
             );
-        
+
         } else {  // 모바일 환경에서는 페이지 이동
             router.push(game.route as any);
         }
@@ -134,13 +134,13 @@ const Games = () => {
 
         return (
             <TouchableOpacity onPress={() => handleItemPress(item)} style={[styles.itemContainer, { width: itemWidth }]}>
-                {   
+                {
                     thumbnailUrl ? (
                         <Image source={{ uri: thumbnailUrl }} style={styles.itemImage} />
                     ) : (
                         // 이미지가 없을 때 보여줄 플레이스홀더 (아이콘 등 추가 가능)
                         <View style={[styles.itemImage, styles.imagePlaceholder]}>
-                            <Text style={{color: '#aaa', fontSize: 20}}>GAME</Text>
+                            <Text style={{ color: '#aaa', fontSize: 20 }}>GAME</Text>
                         </View>
                     )
                 }
@@ -172,7 +172,7 @@ const Games = () => {
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={numColumns}
-                key={numColumns} 
+                key={numColumns}
                 contentContainerStyle={styles.listContainer}
                 ListEmptyComponent={
                     !isLoading ? (
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#eee',
         // 그림자 효과 살짝 추가 (Store에 없었다면 제거해도 됨)
-        elevation: 2, 
+        elevation: 2,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     },
     itemImage: {
         width: '100%',
-        aspectRatio: 1, 
+        aspectRatio: 1,
         resizeMode: 'cover',
     },
     imagePlaceholder: {
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
         marginBottom: 5,
-        minHeight: 24, 
+        minHeight: 24,
     },
     itemDesc: { // 가격 스타일 대체
         fontSize: 14,

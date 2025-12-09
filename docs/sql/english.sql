@@ -30,6 +30,9 @@ select * from words;
 desc word_details;
 select * from word_details;
 
+desc game_scores;
+select * from game_scores;
+
 alter table user change column user_id user_id bigint;
 
 -- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ

@@ -98,10 +98,10 @@ public class GameContentServiceImpl implements GameContentService {
     // MysteryCards 레벨별 시간 설정
     private int getMysteryTimeLimit(GameLevel level) {
         switch (level) {
-            case FIRST: return 10;
-            case SECOND: return 10;
-            case THIRD: return 7;
-            default: return 10;
+            case FIRST: return 20;
+            case SECOND: return 15;
+            case THIRD: return 10;
+            default: return 20;
         }
     }
 

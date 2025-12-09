@@ -28,7 +28,8 @@ export const crossPlatformAlert = (title: string, message: string) => {
 export const crossPlatformConfirm = (
     title: string, 
     message: string, 
-    onConfirm: () => void // 확인 시 실행할 함수를 파라미터로 받음
+    onConfirm: () => void, // 확인 시 실행할 함수를 파라미터로 받음
+    onCancel?: () => void  // '?'를 붙여서 선택적 파라미터로 설정
 ) => {
     if (Platform.OS === 'web') {
         // 웹에서는 window.confirm 사용
@@ -36,6 +37,8 @@ export const crossPlatformConfirm = (
         if (result) {
             // 사용자가 '확인'을 누르면 onConfirm 콜백 실행
             onConfirm();
+        } else {
+            onCancel?.();
         }
     } else {
         // 네이티브에서는 기존 Alert.alert의 버튼 배열 사용
@@ -46,6 +49,7 @@ export const crossPlatformConfirm = (
                 {
                     text: "취소",
                     style: "cancel",
+                    onPress: onCancel, 
                 },
                 {
                     text: "확인", // 버튼 텍스트는 '확인'으로 통일 (상황에 따라 변경 가능)
