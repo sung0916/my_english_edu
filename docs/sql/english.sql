@@ -33,6 +33,9 @@ select * from word_details;
 desc game_scores;
 select * from game_scores;
 
+desc maze_maps;
+select * from maze_maps;
+
 alter table user change column user_id user_id bigint;
 
 -- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ

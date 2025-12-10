@@ -5,13 +5,20 @@ import com.englishapp.api_server.game.dto.response.FallingWordsDto;
 import com.englishapp.api_server.entity.Word;
 import com.englishapp.api_server.game.domain.GameLevel;
 import com.englishapp.api_server.game.dto.response.GameContentResponse;
+import com.englishapp.api_server.game.dto.response.MazeAdventureResponse;
 import com.englishapp.api_server.game.dto.response.MysteryCardsDto;
 import com.englishapp.api_server.game.entity.Game;
+import com.englishapp.api_server.game.entity.MazeMap;
 import com.englishapp.api_server.game.repository.GameRepository;
+import com.englishapp.api_server.game.repository.MazeRepository;
 import com.englishapp.api_server.game.repository.WordDetailRepository;
 import com.englishapp.api_server.game.service.GameContentService;
 import com.englishapp.api_server.repository.SentenceRepository;
 import com.englishapp.api_server.repository.WordRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +36,8 @@ public class GameContentServiceImpl implements GameContentService {
     private final WordRepository wordRepository;
     private final SentenceRepository sentenceRepository;
     private final WordDetailRepository wordDetailRepository;
+    private final MazeRepository mazeRepository;
+    private final ObjectMapper objectMapper;  // DB의 JSON 파싱용
 
     // 메인 컨트롤 메서드 - 게임 ID에 따라 다른 데이터 리턴 (Factory 패턴과 유사)
     @Override
@@ -52,6 +61,9 @@ public class GameContentServiceImpl implements GameContentService {
             case MYSTERYCARDS:
                 timeLimit = getMysteryTimeLimit(level);
                 dataItems = getMysteryCardsData(level);
+                break;
+            case MAZEADVENTURE:
+                dataItems = getMazeData(level);
                 break;
             default:
                 throw new IllegalArgumentException("지원하지 않는 게임: " + game.getGameName());
@@ -189,5 +201,50 @@ public class GameContentServiceImpl implements GameContentService {
                     .build());
         }
         return resultList;
+    }
+
+    private List<Object> getMazeData(GameLevel level) {
+
+        // DB에서 해당 레벨의 맵 정보 조회
+        MazeMap map = mazeRepository.findByLevel(level)
+                .orElseThrow(() -> new IllegalArgumentException("해당 레벨(" + level + ")의 맵이 존재하지 않음"));
+
+        try {
+            // JSON String 파싱 (DB String -> Java List)
+            // 1. 그리드 데이터 파싱 : String -> List<List<Integer>>
+            List<List<Integer>> grid = objectMapper.readValue(
+                    map.getGridData(),
+                    new TypeReference<List<List<Integer>>>() {
+                    }
+            );
+
+            // 2. 아이템 데이터 파싱 : String -> List<MazeAdventureResponse.Item>
+            // DB의 JSON 키값(row, col, type)이 DTO 필드명과 일치해야함
+            List<MazeAdventureResponse.Item> items = objectMapper.readValue(
+                    map.getItemData(),
+                    new TypeReference<List<MazeAdventureResponse.Item>>() {
+                    }
+            );
+
+            // 3. Response DTO 필드
+            MazeAdventureResponse response = MazeAdventureResponse.builder()
+                    .width(map.getWidth())
+                    .height(map.getHeight())
+                    .startPosition(MazeAdventureResponse.Position.builder()
+                            .row(map.getStartRow())
+                            .col(map.getStartCol())
+                            .build())
+                    .grid(grid)
+                    .items(items)
+                    .build();
+
+            // 4. 리스트에 담아 반환 (Factory 패턴의 리턴 타입 맞춤)
+            return Collections.singletonList(response);
+
+        } catch (JsonProcessingException e) {
+            // DB데이터가 JSON형식이 아닐 경우 예외 처리
+            log.error("맵 파싱 실패, gameid:{}, error:{}", map.getId(), e.getMessage());
+            throw new RuntimeException("맵 데이터 불러오기 실패: ", e);
+        }
     }
 }

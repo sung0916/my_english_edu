@@ -375,3 +375,66 @@ CREATE TABLE word_details (
     image_url VARCHAR(500),
     CONSTRAINT fk_word_detail_word FOREIGN KEY (word_id) REFERENCES words(word_id)
 );
+
+-- ======================================================================
+-- maze_map 더미데이터 정보 넣기
+-- ======================================================================
+
+-- LEVEL 1: 5x5, 단순 경로, 열쇠 1개
+INSERT INTO maze_maps (level, width, height, start_row, start_col, grid_data, item_data)
+VALUES (
+  'FIRST', 
+  5, 5, 0, 0,
+  -- Grid: ㄹ자 형태로 꼬아놓음
+  '[[2,0,0,1,1], [1,1,0,1,1], [1,0,0,0,1], [1,0,1,0,1], [1,0,0,0,3]]',
+  -- Items: 중간 지점(2,2)에 열쇠 배치
+  '[{"row":2, "col":2, "type":"KEY"}]'
+);
+
+-- LEVEL 2: 7x7, 조금 멂, 유령 함정(Ghost) 등장
+INSERT INTO maze_maps (level, width, height, start_row, start_col, grid_data, item_data)
+VALUES (
+  'SECOND', 
+  7, 7, 0, 0,
+  -- Grid: 7x7 미로
+  '[
+    [2,0,1,0,0,0,1],
+    [1,0,1,0,1,0,1],
+    [1,0,0,0,1,0,1],
+    [1,1,1,1,1,0,1],
+    [0,0,0,0,0,0,1],
+    [0,1,1,1,1,1,1],
+    [0,0,0,0,0,0,3]
+   ]',
+  -- Items: 열쇠(4,2), 유령 함정(2,2) - 지나가면 RUN 쳐야 함
+  '[
+    {"row":4, "col":2, "type":"KEY"},
+    {"row":2, "col":2, "type":"TRAP_GHOST"}
+   ]'
+);
+
+-- LEVEL 3: 10x10, 복잡함, 구멍 함정(Hole) + 유령
+INSERT INTO maze_maps (level, width, height, start_row, start_col, grid_data, item_data)
+VALUES (
+  'THIRD', 
+  10, 10, 0, 0,
+  -- Grid: 10x10 미로 (복잡)
+  '[
+    [2,0,0,0,1,1,1,1,1,1],
+    [1,1,1,0,1,0,0,0,0,1],
+    [1,0,0,0,0,0,1,1,0,1],
+    [1,0,1,1,1,1,1,0,0,1],
+    [1,0,0,0,0,0,1,0,1,1],
+    [1,1,1,1,1,0,1,0,0,1],
+    [1,0,0,0,1,0,1,1,0,1],
+    [1,0,1,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,0,3],
+    [1,0,0,0,0,0,0,0,0,1]
+   ]',
+  -- Items: 열쇠 1개, 함정 2개 (Ghost, Hole)
+  '[
+    {"row":2, "col":4, "type":"TRAP_HOLE"},
+    {"row":6, "col":8, "type":"TRAP_GHOST"},
+    {"row":7, "col":2, "type":"KEY"}
+   ]'
+);
