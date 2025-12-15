@@ -26,6 +26,7 @@ export default function GameHeader() {
     const dummyRecords: GameRecord[] = [
         { gameName: 'Falling Words', highScore: 1200, updatedAt: '2025-12-01' },
         { gameName: 'Mystery Cards', highScore: 1000, updatedAt: '2025-12-08' },
+        { gameName: 'Maze Adventure', highScore: 2, updatedAt: '2025-12-08' },
     ];
 
     // 홈으로 가기
