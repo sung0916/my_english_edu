@@ -45,11 +45,11 @@ const MOCK_GAMES: GameItem[] = [
     },
     {
         id: 4,
-        title: "Word Puzzle",
-        description: "가로세로 낱말퀴즈 (준비중)",
+        title: "Cross Word Puzzle",
+        description: "가로세로 낱말퀴즈",
         imageUrl: null,
-        route: "/game/word-puzzle",
-        isReady: false
+        route: "/game/crossWordPuzzle",
+        isReady: true
     },
 ];
 

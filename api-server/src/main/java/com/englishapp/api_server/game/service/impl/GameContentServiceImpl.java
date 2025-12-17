@@ -37,6 +37,7 @@ public class GameContentServiceImpl implements GameContentService {
     private final WordDetailRepository wordDetailRepository;
     private final MazeRepository mazeRepository;
     private final ObjectMapper objectMapper;  // DB의 JSON 파싱용
+    private final CrosswordServiceImpl crosswordService;
 
     // 메인 컨트롤 메서드 - 게임 ID에 따라 다른 데이터 리턴 (Factory 패턴과 유사)
     @Override
@@ -64,6 +65,9 @@ public class GameContentServiceImpl implements GameContentService {
             case MAZEADVENTURE:
                 dataItems = getMazeData(level);
                 break;
+            case CROSSWORDPUZZLE:
+                // 이미 완성되어 나오므로 'dataItems'에 담지 않고, 바로 'return' 함
+                return crosswordService.getCrosswordData(level);
             default:
                 throw new IllegalArgumentException("지원하지 않는 게임: " + game.getGameName());
         }
@@ -177,10 +181,10 @@ public class GameContentServiceImpl implements GameContentService {
                 if (isDuplicate) continue;
 
                 options.add(MysteryCardsDto.CardOption.builder()
-                                .wordId(wrong.getWord().getId())
-                                .word(wrongContent)
-                                .imageUrl(wrong.getImageUrl())
-                                .isAnswer(false)
+                        .wordId(wrong.getWord().getId())
+                        .word(wrongContent)
+                        .imageUrl(wrong.getImageUrl())
+                        .isAnswer(false)
                         .build());
 
                 addedDistractors++;
@@ -192,11 +196,11 @@ public class GameContentServiceImpl implements GameContentService {
             // C. DTO 생성 및 추가
             // 주의: resultList.add는 반복문(오답생성) 밖에서 한번만 해야함
             resultList.add(MysteryCardsDto.builder()
-                            .questionId(question.getWord().getId())
-                            .sentence(question.getDescription())
-                            .answerWord(answerContent)
-                            .answerImageUrl(question.getImageUrl())
-                            .options(options)
+                    .questionId(question.getWord().getId())
+                    .sentence(question.getDescription())
+                    .answerWord(answerContent)
+                    .answerImageUrl(question.getImageUrl())
+                    .options(options)
                     .build());
         }
         return resultList;
@@ -247,3 +251,4 @@ public class GameContentServiceImpl implements GameContentService {
         }
     }
 }
+

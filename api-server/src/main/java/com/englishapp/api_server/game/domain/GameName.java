@@ -4,4 +4,5 @@ public enum GameName {
     FALLINGWORDS,
     MYSTERYCARDS,
     MAZEADVENTURE,
+    CROSSWORDPUZZLE,
 }

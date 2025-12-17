@@ -53,3 +53,20 @@ export const submitGameScore = async (gameId: number, userId: number, score: num
     const response = await apiClient.post(`/api/games/${gameId}/updateScore`, {userId, score});
     return response.data;  // double형도 json에선 숫자로 전송됨
 };
+
+// CrossWordPuzzle 타입 정의
+export interface CrosswordDto {
+    wordId: number;
+    word: string;
+    clue: string;
+    startRow: number;
+    startCol: number;
+    direction: 'ACROSS' | 'DOWN';
+}
+
+export interface CrosswordData {
+    level: number;
+    gridSize: number;
+    words: CrosswordDto[];
+    grid: (string | null)[][];  // 디버깅 용(빈칸/채울칸 용으로 사용)
+}

@@ -18,4 +18,13 @@ public interface WordDetailRepository extends JpaRepository<WordDetail, Long> {
     // 2. 오답용 보기 데이터 M개 랜덤 조회 (정답과 겹치지 않게 로직 처리 필요하지만, 일단 랜덤으로 가져옴)
     @Query(value = "SELECT DISTINCT wd FROM WordDetail wd JOIN FETCH wd.word ORDER BY RAND() LIMIT :limit")
     List<WordDetail> findRandomDistractors(@Param("limit") int limit);
+
+    /* CrossWordPuzzle 용 */
+    @Query(value = "SELECT wd FROM WordDetail wd " +
+                  "JOIN FETCH wd.word w " +
+                  "WHERE CHAR_LENGTH(w.content) <= :maxLength " +
+                  "AND w.content NOT LIKE '% %' " +
+                  "ORDER BY RAND() LIMIT :limit")
+    List<WordDetail> findRandomWordsForCrossword(@Param("maxLength") int maxLength,
+                                                 @Param("limit") int limit);
 }
