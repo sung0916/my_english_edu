@@ -70,3 +70,15 @@ export interface CrosswordData {
     words: CrosswordDto[];
     grid: (string | null)[][];  // 디버깅 용(빈칸/채울칸 용으로 사용)
 }
+
+export interface GameRecordDto {
+    gameId: number;
+    gameName: string;
+    highScore: number;
+    updatedAt: string
+}
+
+export const fetchUserRecords = async (userId: number): Promise<GameRecordDto[]> => {
+    const response = await apiClient.get<GameRecordDto[]>(`api/games/scores/${userId}`);
+    return response.data;
+};

@@ -1,13 +1,15 @@
 import { CardOption, fetchGameContent, MysteryCardData, submitGameScore } from "@/api/gameApi";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
 export const useMysteryCardGame = () => {
     const router = useRouter();
     const {gameId, level} = useLocalSearchParams();
     const {user} = useUserStore();
+    const navigation = useNavigation();
+    const pathname = usePathname();
 
     // 게임 데이터 상태
     const [questions, setQuestions] = useState<MysteryCardData[]>([]);
@@ -81,7 +83,11 @@ export const useMysteryCardGame = () => {
                 await submitGameScore(Number(gameId), user.userId, finalScore);
             }
             crossPlatformAlert('Game Over', `Final Score: ${finalScore}`);
-            router.back();
+            if (navigation.canGoBack()) router.back();
+            else {
+                const lobbyPath = pathname.replace('/play', '');
+                router.replace(lobbyPath as any);
+            }
 
         } catch (e) {
             console.error(e);

@@ -5,7 +5,7 @@ import { useGameStore } from "@/store/gameStore";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Audio } from 'expo-av'; // 효과음
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
 import * as Speech from 'expo-speech'; // TTS
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, useWindowDimensions, View } from "react-native";
@@ -41,6 +41,8 @@ export default function FallingWordsGame() {
     const { height, width } = useWindowDimensions();
     const { level } = useLocalSearchParams<{ level: string }>();
     const router = useRouter();
+    const navigation = useNavigation();
+    const pathname = usePathname();
 
     // Stores
     const { setScore, resetGame, isPaused, isPlaying, setIsPlaying } = useGameStore();
@@ -61,6 +63,7 @@ export default function FallingWordsGame() {
     const activeWordsRef = useRef<FallingWord[]>([]);
     const frameRef = useRef<number>(0);
     const lastSpawnTime = useRef<number>(0);
+    const matchedCountRef = useRef(0);  // 점수 계산을 위한 Ref
     const totalWordsCount = useRef<number>(1);  // 0으로 나누기 방지용으로 1로 초기화
     const soundObject = useRef<Audio.Sound | null>(null);
 
@@ -73,6 +76,7 @@ export default function FallingWordsGame() {
         setCurrentScore(0.0);
         scoreRef.current = 0.0;
         setScore(0);
+        matchedCountRef.current = 0;
 
         // 오답 사운드 로드
         loadSound();
@@ -226,14 +230,14 @@ export default function FallingWordsGame() {
             const matchedWord = activeWordsRef.current[matchIndex];
             matchedWord.isMatched = true;  // 해당 단어 ui 변경
 
-            // a. 점수 계산 (100점 만점 / 총 단어 수)
-            const pointsPerWord = 100 / totalWordsCount.current;
-            const nextScore = parseFloat((currentScore + pointsPerWord).toFixed(1));
+            matchedCountRef.current += 1;  // 점수 계산 로직 : (맞춘 갯수 / 전체 갯수) * 100
+            const rawScore = (matchedCountRef.current / totalWordsCount.current) * 100;
+            const displayScore = Math.min(100, parseFloat(rawScore.toFixed(1)));
 
             // 점수 업데이트
-            setCurrentScore(nextScore);
-            scoreRef.current = nextScore;
-            setScore(nextScore);  // Zustand 업데이트
+            setCurrentScore(displayScore);
+            scoreRef.current = displayScore;
+            setScore(displayScore);  // Zustand 업데이트
 
             // b. TTS 재생
             Speech.speak(matchedWord.content, { language: 'en' });
@@ -266,19 +270,29 @@ export default function FallingWordsGame() {
 
     const gameOver = async (isClear: boolean) => {
         setIsPlaying(false);
-        const finalScore = scoreRef.current;
+        const finalIntScore = Math.round(scoreRef.current);
+        const displayScore = finalIntScore >= 100 ? 100 : scoreRef.current;
         const title = isClear ? "🏆 Stage Clear! 🏆" : "💔 Game Over 💔";
+
+        console.log("Saving score...", {userId: user?.userId, score: finalIntScore});
 
         if (user && user.userId) {  // 서버로 점수 전송 (로그인 된 경우)
             try {
-                await submitGameScore(1, user.userId, finalScore);
+                await submitGameScore(1, user.userId, finalIntScore);
             } catch (error) {
                 console.error(error);
             }
+
+        } else {
+            console.warn("User not logged in, score not saved");
         }
 
-        crossPlatformAlert('', `최종 점수 : ${finalScore}`);
-        router.back();  // 게임 메인 화면으로 이동
+        crossPlatformAlert('', `최종 점수 : ${displayScore}`);
+        if (navigation.canGoBack()) router.back();
+        else {
+            const lobbyPath = pathname.replace('/play', '');
+            router.replace(lobbyPath as any);
+        }
     };
 
     // Render
@@ -322,7 +336,9 @@ export default function FallingWordsGame() {
             {/* 정보 표시 (점수, 레벨, 기회) */}
             <View style={styles.hud}>
                 <Text style={styles.hudLevel}>{gameLevelKey}</Text>
-                <Text style={styles.hudScore}>{currentScore.toFixed(1)}</Text>
+                <Text style={styles.hudScore}>
+                    {Number.isInteger(currentScore) ? currentScore : currentScore.toFixed(1)}
+                </Text>
                 <View style={styles.livesRow}>
                     {Array.from({ length: 5 }).map((_, i) => (
                         <Text key={i} style={styles.heart}>{i < lives ? '❤️' : '💔'}</Text>

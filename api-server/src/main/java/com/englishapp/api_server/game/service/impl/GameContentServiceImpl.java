@@ -8,15 +8,12 @@ import com.englishapp.api_server.game.dto.response.GameContentResponse;
 import com.englishapp.api_server.game.dto.response.MazeAdventureResponse;
 import com.englishapp.api_server.game.dto.response.MysteryCardsDto;
 import com.englishapp.api_server.game.entity.Game;
-import com.englishapp.api_server.game.entity.MazeMap;
 import com.englishapp.api_server.game.repository.GameRepository;
-import com.englishapp.api_server.game.repository.MazeRepository;
 import com.englishapp.api_server.game.repository.WordDetailRepository;
 import com.englishapp.api_server.game.service.GameContentService;
 import com.englishapp.api_server.repository.SentenceRepository;
 import com.englishapp.api_server.repository.WordRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.englishapp.api_server.util.MazeGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +32,6 @@ public class GameContentServiceImpl implements GameContentService {
     private final WordRepository wordRepository;
     private final SentenceRepository sentenceRepository;
     private final WordDetailRepository wordDetailRepository;
-    private final MazeRepository mazeRepository;
     private final ObjectMapper objectMapper;  // DB의 JSON 파싱용
     private final CrosswordServiceImpl crosswordService;
 
@@ -208,47 +204,40 @@ public class GameContentServiceImpl implements GameContentService {
 
     private List<Object> getMazeData(GameLevel level) {
 
-        // DB에서 해당 레벨의 맵 정보 조회
-        MazeMap map = mazeRepository.findByLevel(level)
-                .orElseThrow(() -> new IllegalArgumentException("해당 레벨(" + level + ")의 맵이 존재하지 않음"));
+        // 1. 난이도 별 설정값 정의(크기, 함정 수)
+        int size;
+        int trapCount;
 
-        try {
-            // JSON String 파싱 (DB String -> Java List)
-            // 1. 그리드 데이터 파싱 : String -> List<List<Integer>>
-            List<List<Integer>> grid = objectMapper.readValue(
-                    map.getGridData(),
-                    new TypeReference<List<List<Integer>>>() {
-                    }
-            );
-
-            // 2. 아이템 데이터 파싱 : String -> List<MazeAdventureResponse.Item>
-            // DB의 JSON 키값(row, col, type)이 DTO 필드명과 일치해야함
-            List<MazeAdventureResponse.Item> items = objectMapper.readValue(
-                    map.getItemData(),
-                    new TypeReference<List<MazeAdventureResponse.Item>>() {
-                    }
-            );
-
-            // 3. Response DTO 필드
-            MazeAdventureResponse response = MazeAdventureResponse.builder()
-                    .width(map.getWidth())
-                    .height(map.getHeight())
-                    .startPosition(MazeAdventureResponse.Position.builder()
-                            .row(map.getStartRow())
-                            .col(map.getStartCol())
-                            .build())
-                    .grid(grid)
-                    .items(items)
-                    .build();
-
-            // 4. 리스트에 담아 반환 (Factory 패턴의 리턴 타입 맞춤)
-            return Collections.singletonList(response);
-
-        } catch (JsonProcessingException e) {
-            // DB데이터가 JSON형식이 아닐 경우 예외 처리
-            log.error("맵 파싱 실패, gameid:{}, error:{}", map.getId(), e.getMessage());
-            throw new RuntimeException("맵 데이터 불러오기 실패: ", e);
+        switch (level) {
+            case FIRST:
+                size = 5;
+                trapCount = 2;
+                break;
+            case SECOND:
+                size = 7;
+                trapCount = 3;
+                break;
+            case THIRD:
+                size = 9;
+                trapCount = 4;
+                break;
+            /* case FOURTH:
+                size = 10;
+                trapCount = 4;
+                break;
+            case FIFTH:
+                size = 12;
+                trapCount = 5;
+                break; */
+            default:
+                size = 6;
+                trapCount = 2;
         }
+
+        // 2. 알고리즘을 통한 즉석 생성
+        MazeAdventureResponse generatedMaze = MazeGenerator.generate(size, size, trapCount);
+
+        // 3. 리스트에 담아 반환
+        return Collections.singletonList(generatedMaze);
     }
 }
-

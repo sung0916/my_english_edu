@@ -4,7 +4,7 @@ import { useGameStore } from "@/store/gameStore";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Audio } from "expo-av";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, DimensionValue, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
@@ -19,6 +19,8 @@ export default function CrosswordPuzzleGame() {
     const { user } = useUserStore();
     const { isPaused, setIsPlaying, resetGame } = useGameStore();
     const { width: windowWidth } = useWindowDimensions();
+    const navigation = useNavigation();
+    const pathname = usePathname();
 
     // === State ===
     const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +28,7 @@ export default function CrosswordPuzzleGame() {
     const [foundWordIds, setFoundWordIds] = useState<number[]>([]);
     const [inputText, setInputText] = useState("");
     const [activeHint, setActiveHint] = useState<string>("Find the hidden words!");
-    const [hintCount, setHintCount] = useState(5);
+    const [hintCount, setHintCount] = useState(10);
     const [hasTyped, setHasTyped] = useState(false); // ✨ 플레이스홀더 제어용
 
     // === Audio Refs ===
@@ -144,7 +146,11 @@ export default function CrosswordPuzzleGame() {
             await submitGameScore(GAME_ID, user.userId, levelScore);
         }
         crossPlatformAlert("🎉 Cleared!", "All words found!");
-        router.back();
+        if (navigation.canGoBack()) router.back();
+        else {
+            const lobbyPath = pathname.replace('/play', '');
+            router.replace(lobbyPath as any);
+        }
     };
 
     const getCellStatus = (r: number, c: number) => {

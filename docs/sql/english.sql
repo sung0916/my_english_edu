@@ -35,8 +35,13 @@ select * from game_scores;
 
 desc maze_maps;
 select * from maze_maps;
+drop table maze_maps;
 
 alter table user change column user_id user_id bigint;
+
+select * from word_details where description_en like '%A general medical examination%';
+-- select * from word where word_id 340;
+
 
 -- ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ 수정 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 

@@ -2,8 +2,9 @@ import { fetchGameContent, submitGameScore } from "@/api/gameApi";
 import { useGameStore } from "@/store/gameStore";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformConfirm } from "@/utils/crossPlatformAlert";
-import { useRouter } from "expo-router";
+import { useNavigation, usePathname, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
+import { TextInput } from "react-native";
 
 // Types
 export type CellType = 0 | 1 | 2 | 3;
@@ -26,7 +27,7 @@ export interface Log {
 }
 
 // 백엔드 응답 DTO 구조
-interface MazeResponse {
+export interface MazeResponse {
     width: number;
     height: number;
     startPosition: Position;
@@ -38,13 +39,15 @@ interface MazeResponse {
 export default function useMazeGame(gameId: number, level: string) {
     const router = useRouter();
     const { user } = useUserStore();
-    const { isPaused, addScore, setIsPlaying } = useGameStore();
+    const { setIsPlaying } = useGameStore();
+    const navigation = useNavigation();
+    const pathname = usePathname();
 
     // 상태 관리
     const [loading, setLoading] = useState(true);
     const [grid, setGrid] = useState<number[][] | null>(null);
     const [items, setItems] = useState<MazeItem[]>([]);
-    const [playerPos, setPlayerPos] = useState<Position>({ row: 0, col: 0 });
+    const [playerPos, setPlayerPos] = useState<Position>({ row: 1, col: 1 });
     const [inventory, setInventory] = useState({ hasKey: false, flashlightLevel: 0 });
     const [logs, setLogs] = useState<Log[]>([]);
     const [inputText, setInputText] = useState('');
@@ -53,30 +56,37 @@ export default function useMazeGame(gameId: number, level: string) {
     const [trapState, setTrapState] = useState<'TRAP_GHOST' | 'TRAP_HOLE' | null>(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const startPosRef = useRef<Position>({ row: 0, col: 0 });  // 리셋용 시작점 저장
+    const startPosRef = useRef<Position>({ row: 1, col: 1 });  // 리셋용 시작점 저장
+    const inputRef = useRef<TextInput>(null);
 
     // 초기 데이터 로드
     useEffect(() => {
         const fetchMazeData = async () => {
+            if (!user) return;
 
             try {
                 setLoading(true);
-                
+
                 // API 호출 : level 파라미터를 백엔드 Enum에 맞춤
-                const response = await fetchGameContent(gameId, level);  // API 호출
+                const response = await fetchGameContent<MazeResponse>(gameId, level);  // API 호출
 
-                // 백엔드에서 리스트 형태로 오므로 첫번째 요소 사용
-                const data = response.items[0] as MazeResponse;
+                if (response.items && response.items.length > 0) {
+                    // 백엔드에서 리스트 형태로 오므로 첫번째 요소 사용
+                    const data = response.items[0];
 
-                setGrid(data.grid);
-                setItems(data.items);
-                setPlayerPos(data.startPosition);
-                startPosRef.current = data.startPosition;  // 시작점 저장
+                    setGrid(data.grid);
+                    setItems(data.items);
+                    setPlayerPos(data.startPosition);
+                    startPosRef.current = data.startPosition;  // 시작점 저장
 
-                addLog(`Wecomle to Level ${level}`, 'info');
-                addLog('Type "help" for Commands', 'info');
+                    setLogs([]);  // 로그 초기화
+                    addLog(`Wecomle to Level ${level}`, 'info');
+                    addLog('Type "help" for Commands', 'info');
 
-                setIsPlaying(true);
+                    setIsPlaying(true);
+                } else {
+                    throw new Error("No maze data found");
+                }
 
             } catch (error) {
                 console.error('Maze load Error: ', error);
@@ -87,9 +97,7 @@ export default function useMazeGame(gameId: number, level: string) {
             }
         };
 
-        if (user && gameId) {
-            fetchMazeData();
-        }
+        fetchMazeData();
     }, [gameId, level]);
 
     useEffect(() => {
@@ -109,7 +117,7 @@ export default function useMazeGame(gameId: number, level: string) {
 
     // 로그 추가 헬퍼
     const addLog = (text: string, type: Log['type'] = 'info') => {
-        setLogs((prev) => [...prev, {text, type}]);
+        setLogs((prev) => [...prev, { text, type }]);
     };
 
     // 커맨드 처리
@@ -136,6 +144,10 @@ export default function useMazeGame(gameId: number, level: string) {
         else if (['help', '?', 'info'].includes(cmd)) showHelp();
         // else if (['look', 'map'].includes(cmd)) addLog('You look around', 'info');
         else { addLog('Unknown command. Type "help"', 'error'); }
+
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 10);
     };
 
     // 이동 로직
@@ -200,7 +212,7 @@ export default function useMazeGame(gameId: number, level: string) {
         const keyItem = items.find(i => i.row === playerPos.row && i.col === playerPos.col && i.type === 'KEY');
 
         if (keyItem) {
-            setInventory(prev => ({...prev, hasKey: true}));
+            setInventory(prev => ({ ...prev, hasKey: true }));
             setItems(prev => prev.filter(i => i !== keyItem))  // 맵에서 제거
             addLog('You got a shiny Key 🔑', 'success');
 
@@ -213,7 +225,7 @@ export default function useMazeGame(gameId: number, level: string) {
         const lightItem = items.find(i => i.row === playerPos.row && i.col === playerPos.col && i.type === 'FLASHLIGHT');
 
         if (lightItem) {
-            setInventory(prev => ({...prev, flashlightLevel: prev.flashlightLevel + 1}));
+            setInventory(prev => ({ ...prev, flashlightLevel: prev.flashlightLevel + 1 }));
             setItems(prev => prev.filter(i => i !== lightItem));
             addLog('Flashlight ON! 🔦', 'success');
 
@@ -227,10 +239,10 @@ export default function useMazeGame(gameId: number, level: string) {
         // 혹은 문 앞까지 이동해서 부딪힌 상태에서만 열게 할 수도 있음
         // 지금은 편의상 플레이어 위치 혹은 이동하려는 방향을 감지해야 하는데, 단순화를 위해 주변 1칸 내에 문이 있으면 연다로 구현
         const neighbors = [
-            {r: playerPos.row-1, c: playerPos.col},
-            {r: playerPos.row+1, c: playerPos.col},
-            {r: playerPos.row, c: playerPos.col-1},
-            {r: playerPos.row, c: playerPos.col+1},
+            { r: playerPos.row - 1, c: playerPos.col },
+            { r: playerPos.row + 1, c: playerPos.col },
+            { r: playerPos.row, c: playerPos.col - 1 },
+            { r: playerPos.row, c: playerPos.col + 1 },
         ];
 
         const doorItem = items.find(i => i.type === 'DOOR' && neighbors.some(n => n.r === i.row && n.c === i.col));
@@ -239,7 +251,7 @@ export default function useMazeGame(gameId: number, level: string) {
             if (inventory.hasKey) {
                 setItems(prev => prev.filter(i => i !== doorItem));  // 문제거(열림)
                 addLog('Clack..! The door is open', 'success');
-            
+
             } else {
                 addLog("It's locked. You need a Key", 'warning');
             }
@@ -301,7 +313,13 @@ export default function useMazeGame(gameId: number, level: string) {
             await submitGameScore(gameId, user.userId, score);
             crossPlatformConfirm(
                 '', `You cleared Level ${score}`,
-                () => router.back()
+                () => {
+                    if (navigation.canGoBack()) router.back();
+                    else {
+                        const lobbyPath = pathname.replace('/play', '');
+                        router.replace(lobbyPath as any);
+                    }
+                }
             );
 
         } catch (e) {
@@ -319,14 +337,22 @@ export default function useMazeGame(gameId: number, level: string) {
         loading,
         grid,
         items,
+        setItems,  // 아이템 상태 변경을 위해 export
         playerPos,
+        setPlayerPos,  // 함정 등에서 위치 변경 위해 export
         inventory,
+        setInventory,  // 아이템 획득 위해 export
         logs,
+        addLog,  // 외부에서 로그 추가 가능하도록
         inputText,
         setInputText,
+        inputRef,
         submitCommand,
         trapState,
+        setTrapState,  
         timeLeft,
-        mapConfig: grid ? {width: grid[0].length, height: grid.length} : {width: 0, height: 0}
+        setTimeLeft,
+        startPosRef,  // 시작점 참조
+        handleWin,
     };
 }

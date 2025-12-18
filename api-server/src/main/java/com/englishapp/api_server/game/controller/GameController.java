@@ -3,11 +3,14 @@ package com.englishapp.api_server.game.controller;
 import com.englishapp.api_server.game.domain.GameLevel;
 import com.englishapp.api_server.game.dto.request.GameScoreRequest;
 import com.englishapp.api_server.game.dto.response.GameContentResponse;
+import com.englishapp.api_server.game.dto.response.GameScoreResponse;
 import com.englishapp.api_server.game.service.GameContentService;
 import com.englishapp.api_server.game.service.GameScoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/games")
@@ -37,5 +40,13 @@ public class GameController {
         // 여기서는 명확성을 위해 PathVariable의 gameId를 서비스에 넘김
         gameScoreService.submitScore(request.getUserId(), gameId, request.getScore());
         return ResponseEntity.ok().build();
+    }
+
+    // 게임 점수 목록 조회
+    @GetMapping("/scores/{userId}")
+    public ResponseEntity<List<GameScoreResponse>> getUserScores(@PathVariable Long userId) {
+
+        List<GameScoreResponse> scores = gameScoreService.getUserGameScores(userId);
+        return ResponseEntity.ok(scores);
     }
 }

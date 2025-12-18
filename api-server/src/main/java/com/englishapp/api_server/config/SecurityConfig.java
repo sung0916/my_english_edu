@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")
 
                         // 6. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 @PreAuthorize로 구독 상태 체크 로직 작성 후 추후 추가)
-                        .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER")
+                        .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
 
                         // 7. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
                         .requestMatchers("/api/announcements/**", "/api/products/**").hasAuthority("ADMIN")

@@ -1,6 +1,6 @@
-package com.englishapp.api_server.game.domain;
+package com.englishapp.api_server.domain;
 
-public enum GamePlace {
+public enum PlaceType {
     CLASSROOM,
     SCHOOL,
     HOME,

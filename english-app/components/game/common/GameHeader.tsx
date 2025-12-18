@@ -1,19 +1,24 @@
+import { fetchUserRecords, GameRecordDto } from "@/api/gameApi";
 import { useGameRecorder } from "@/hooks/game/useGameRecorder";
-import { GameRecord, useGameStore } from "@/store/gameStore";
+import { useGameStore } from "@/store/gameStore";
+import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert, crossPlatformConfirm } from "@/utils/crossPlatformAlert";
 import { Ionicons } from "@expo/vector-icons";
-import { usePathname, useRouter } from "expo-router";
-import { useState } from "react";
+import { useNavigation, usePathname, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import GameRecordsModal from "./GameRecords";
-
+    
 export default function GameHeader() {
     const router = useRouter();
     const pathname = usePathname();  // 현재 경로 파악용
     const isAtLobby = !pathname.includes('/play');
-    
+    const navigation = useNavigation();
+
     // gameStore 상태 및 액션
     const { isMuted, toggleMute, isPaused, setIsPaused, resetGame } = useGameStore();
+    const { user } = useUserStore();
+    const [records, setRecords] = useState<GameRecordDto[]>([]);
 
     // 로컬 상태
     const [modalVisible, setModalVisible] = useState(false);
@@ -22,12 +27,37 @@ export default function GameHeader() {
     // 녹음 훅
     const { isRecording, startRecording, stopRecording } = useGameRecorder();
 
-    // 더미 데이터 (추후 API 연동)
-    const dummyRecords: GameRecord[] = [
-        { gameName: 'Falling Words', highScore: 1200, updatedAt: '2025-12-01' },
-        { gameName: 'Mystery Cards', highScore: 1000, updatedAt: '2025-12-08' },
-        { gameName: 'Maze Adventure', highScore: 2, updatedAt: '2025-12-08' },
-    ];
+    useEffect(() => {
+        if (modalVisible && user?.userId) {
+            loadRecords();
+        }
+    }, [modalVisible]);
+
+    const loadRecords = async () => {
+        if (!user?.userId) return;
+        try {
+            const data = await fetchUserRecords(user.userId);
+            const mappedData = data.map(r => ({
+                ...r,
+                gameName: getGameNameById(r.gameId)
+            }));
+
+            setRecords(mappedData);
+
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const getGameNameById = (id: number) => {
+        switch (id) {
+            case 1: return 'Falling Words';
+            case 2: return 'Mystery Cards';
+            case 3: return 'Maze Adventure';
+            case 4: return 'Crossword Puzzle';
+            default: return `Game ${id}`;
+        }
+    };
 
     // 홈으로 가기
     const handleGoLobby = () => {
@@ -35,14 +65,14 @@ export default function GameHeader() {
         setIsPaused(true);
 
         crossPlatformConfirm(
-            '홈으로 이동', 
-            '진행 상황은 저장되지 않습니다.', 
+            'Move to lobby',
+            'Your game will not be saved',
             () => {
                 resetGame();
 
                 // 정규식으로 마지막 세그먼트(/play 등) 제거
                 const lobbyPath = pathname.replace(/\/[^/]+$/, '');
-                
+
                 // 만약 경로 파싱이 꼬이면 기본 게임 목록으로 이동
                 if (lobbyPath && lobbyPath !== '/game') {
                     router.replace(lobbyPath as any);
@@ -67,7 +97,7 @@ export default function GameHeader() {
     const handleExit = () => {
         crossPlatformConfirm(
             '',
-            '게임을 종료하고 나가시겠습니까?',
+            'Do you want to quit this game?',
             () => {
                 resetGame();
 
@@ -96,7 +126,7 @@ export default function GameHeader() {
                 setIsFullscreen(false);
             }
         } else {
-            crossPlatformAlert('info', '모바일 전체화면은 기기 설정에서 제어됩니다.');
+            crossPlatformAlert('info', "Doesn't work in mobile");
         }
     };
 
@@ -113,10 +143,10 @@ export default function GameHeader() {
         <>
             <View style={styles.container}>
                 {/* 뒤로가기 | 나가기 */}
-                <TouchableOpacity 
-                    onPress={handleGoLobby} 
-                    style={[styles.iconButton, {opacity: isAtLobby ? 0.3 : 1}]}
-                    disabled={isAtLobby}    
+                <TouchableOpacity
+                    onPress={handleGoLobby}
+                    style={[styles.iconButton, { opacity: isAtLobby ? 0.3 : 1 }]}
+                    disabled={isAtLobby}
                 >
                     <Ionicons name="home" size={24} color="#333" />
                 </TouchableOpacity>
@@ -170,7 +200,7 @@ export default function GameHeader() {
             <GameRecordsModal
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
-                records={dummyRecords}
+                records={records}
             />
         </>
     );

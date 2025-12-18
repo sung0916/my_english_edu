@@ -1,6 +1,7 @@
 package com.englishapp.api_server.game.service.impl;
 
 import com.englishapp.api_server.entity.User;
+import com.englishapp.api_server.game.dto.response.GameScoreResponse;
 import com.englishapp.api_server.game.entity.Game;
 import com.englishapp.api_server.game.entity.GameScore;
 import com.englishapp.api_server.game.repository.GameRepository;
@@ -10,8 +11,11 @@ import com.englishapp.api_server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,6 +28,7 @@ public class GameScoreServiceImpl implements GameScoreService {
 
     // 게임 점수 비교 및 저장
     @Override
+    @Transactional
     public void submitScore(Long userId, Long gameId, int newScore) {
 
         // 엔티티 조회 (프록시 객체 조회가 성능 상 유리할 수 있으나, 안전하게 조회)
@@ -55,5 +60,21 @@ public class GameScoreServiceImpl implements GameScoreService {
 
             gameScoreRepository.save(newGameScore);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GameScoreResponse> getUserGameScores(Long userId) {
+
+        List<GameScore> scores = gameScoreRepository.findAllByUser_Id(userId);
+
+        return scores.stream()
+                .map(score -> GameScoreResponse.builder()
+                        .gameId(score.getGame().getId())
+                        .gameName(String.valueOf(score.getGame().getGameName()))
+                        .highScore(score.getHighScore())
+                        .updatedAt(score.getPlayedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

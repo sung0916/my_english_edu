@@ -32,17 +32,17 @@ public class CrosswordServiceImpl {  // Factory Pattern에서 호출될 구현�
         int targetWordCount;  // 배치 중 탈라하는 단어들이 있으므로 약 3배수로 조회
 
         switch (level) {
-            case FIRST: gridSize = 5; maxLength = 5; targetWordCount = 5; break;
-            case SECOND: gridSize = 7;  maxLength = 7;  targetWordCount = 7; break;
-            case THIRD:  gridSize = 9;  maxLength = 7;  targetWordCount = 8; break;
-            case FOURTH: gridSize = 11; maxLength = 9;  targetWordCount = 9; break;
-            case FIFTH:  gridSize = 13; maxLength = 10; targetWordCount = 10; break;
-            default:     gridSize = 7;  maxLength = 7;  targetWordCount = 5;
+            case FIRST: gridSize = 7; maxLength = 5; targetWordCount = 5; break;
+            case SECOND: gridSize = 9;  maxLength = 7;  targetWordCount = 7; break;
+            case THIRD:  gridSize = 11;  maxLength = 7;  targetWordCount = 8; break;
+            case FOURTH: gridSize = 13; maxLength = 9;  targetWordCount = 9; break;
+            case FIFTH:  gridSize = 15; maxLength = 9; targetWordCount = 10; break;
+            default:     gridSize = 7;  maxLength = 6;  targetWordCount = 5;
         }
 
-        // 2. 단어 후보 조회 (생성 실패 확률 대비 3배수 조회)
+        // 2. 단어 후보 조회 (생성 실패 확률 대비 4배수 조회)
         List<WordDetail> candidates =
-                wordDetailRepository.findRandomWordsForCrossword(maxLength, targetWordCount * 3);
+                wordDetailRepository.findRandomWordsForCrossword(maxLength, targetWordCount * 4);
 
         if (candidates.size() < 2) {
             throw new RuntimeException("단어 수 부족");

@@ -6,7 +6,9 @@ export default function GameRootLayout() {
     return (
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="fallingWords" />
-            {/* 다른 게임들 추후 적용 */}
+            <Stack.Screen name="mysteryCards" />
+            <Stack.Screen name="mazeAdventure" />
+            <Stack.Screen name="crossWordPuzzle" />
         </Stack>
     );
 }

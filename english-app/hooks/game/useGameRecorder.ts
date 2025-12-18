@@ -13,7 +13,7 @@ export const useGameRecorder = () => {
             // 권한 요청
             const perm = await Audio.requestPermissionsAsync();
             if (perm.status !== 'granted') {
-                crossPlatformAlert('', '마이크 권한이 필요합니다.');
+                crossPlatformAlert('', 'Microphone permission is required');
                 return;
             }
 
@@ -34,7 +34,7 @@ export const useGameRecorder = () => {
 
         } catch (err) {
             console.error('녹음 실패 : ', err);
-            crossPlatformAlert('', '녹음을 할 수 없습니다.');
+            crossPlatformAlert('', "Recording doesn't work");
         }
     };
 
