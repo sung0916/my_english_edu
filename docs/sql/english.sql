@@ -39,6 +39,18 @@ drop table maze_maps;
 
 alter table user change column user_id user_id bigint;
 
+-- 1. 외래 키 검사 끄기 (잠시 눈 감아줘!)
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 2. 부모 테이블(places) 변경: INT -> BIGINT
+ALTER TABLE places MODIFY COLUMN place_id BIGINT AUTO_INCREMENT;
+
+-- 3. 자식 테이블(sentences) 변경: INT -> BIGINT (여기도 맞춰줘야 함)
+ALTER TABLE sentences MODIFY COLUMN place_id BIGINT;
+
+-- 4. 외래 키 검사 켜기 (이제 다시 감시해!)
+SET FOREIGN_KEY_CHECKS = 1;
+
 select * from word_details where description_en like '%A general medical examination%';
 -- select * from word where word_id 340;
 

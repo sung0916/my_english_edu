@@ -100,8 +100,8 @@ export default function CrosswordPuzzleGame() {
 
         if (!gameData) return;
         const text = inputText.toUpperCase().trim();
-        
-        const isAlreadyFound = gameData.words.some(w => 
+
+        const isAlreadyFound = gameData.words.some(w =>
             w.word === text && foundWordIds.includes(w.wordId)
         );
 
@@ -117,15 +117,15 @@ export default function CrosswordPuzzleGame() {
             playSound('correct'); // ✨ 효과음
             setFoundWordIds(prev => [...prev, matchedWord.wordId]);
             setInputText("");
-            setActiveHint(`Found: ${matchedWord.word}`); 
-            
+            setActiveHint(`Found: ${matchedWord.word}`);
+
             if (foundWordIds.length + 1 === gameData.words.length) {
                 handleGameClear();
             }
         } else {
             // ❌ 오답
             playSound('wrong'); // ✨ 효과음
-            setInputText(""); 
+            setInputText("");
         }
     };
 
@@ -177,8 +177,8 @@ export default function CrosswordPuzzleGame() {
 
     // 웹에서 최대 600, 최소 500 적용 (헤더 제외한 게임 영역 너비)
     // padding 30 고려
-    const MAX_BOARD_WIDTH = 600; 
-    
+    const MAX_BOARD_WIDTH = 600;
+
     // 화면 너비와 MAX 중 작은 것 선택, 단 웹이면 최소 500 보장
     let wrapperWidth: DimensionValue = '100%';
     let boardSize = windowWidth - 30;
@@ -191,7 +191,7 @@ export default function CrosswordPuzzleGame() {
         // 앱: 그냥 화면 꽉 차게
         boardSize = Math.min(windowWidth, MAX_BOARD_WIDTH) - 30;
     }
-    
+
     const cellSize = boardSize / gameData.gridSize;
     const fontSize = Math.floor(cellSize * 0.6);
 
@@ -202,7 +202,7 @@ export default function CrosswordPuzzleGame() {
 
             {/* 2. 게임 영역 래퍼 (웹에서 너비 제한) */}
             <View style={[styles.contentWrapper, Platform.OS === 'web' && { width: wrapperWidth }]}>
-                
+
                 <View style={styles.infoBar}>
                     <Text style={styles.infoText}>
                         Found: {foundWordIds.length} / {gameData.words.length}
@@ -210,32 +210,37 @@ export default function CrosswordPuzzleGame() {
                 </View>
 
                 {/* 그리드 */}
-                <View style={[styles.gridContainer, { width: boardSize, height: boardSize }]}>
-                    {gameData.grid.map((row, r) => (
-                        <View key={r} style={styles.row}>
-                            {row.map((char, c) => {
-                                const isHighlighted = getCellStatus(r, c);
-                                return (
-                                    <View
-                                        key={c}
-                                        style={[
-                                            styles.cell,
-                                            { width: cellSize, height: cellSize },
-                                            isHighlighted && styles.cellFound
-                                        ]}
-                                    >
-                                        <Text style={[
-                                            styles.cellText, 
-                                            { fontSize: fontSize },
-                                            isHighlighted && styles.cellTextFound
-                                        ]}>
-                                            {char}
-                                        </Text>
-                                    </View>
-                                );
-                            })}
-                        </View>
-                    ))}
+                {/* 1. 바깥쪽: 그림자 담당 */}
+                <View style={[styles.gridShadowWrapper, { width: boardSize, height: boardSize }]}>
+
+                    {/* 2. 안쪽: 보더 & 라운드 & overflow 담당 */}
+                    <View style={styles.gridContainer}>
+                        {gameData.grid.map((row, r) => (
+                            <View key={r} style={styles.row}>
+                                {row.map((char, c) => {
+                                    const isHighlighted = getCellStatus(r, c);
+                                    return (
+                                        <View
+                                            key={c}
+                                            style={[
+                                                styles.cell,
+                                                { width: cellSize, height: cellSize },
+                                                isHighlighted && styles.cellFound
+                                            ]}
+                                        >
+                                            <Text style={[
+                                                styles.cellText,
+                                                { fontSize: fontSize },
+                                                isHighlighted && styles.cellTextFound
+                                            ]}>
+                                                {char}
+                                            </Text>
+                                        </View>
+                                    );
+                                })}
+                            </View>
+                        ))}
+                    </View>
                 </View>
 
                 {/* 하단 컨트롤 */}
@@ -249,8 +254,8 @@ export default function CrosswordPuzzleGame() {
                     </View>
 
                     <View style={styles.inputRow}>
-                        <TouchableOpacity 
-                            style={[styles.hintBtn, hintCount === 0 && styles.disabledBtn]} 
+                        <TouchableOpacity
+                            style={[styles.hintBtn, hintCount === 0 && styles.disabledBtn]}
                             onPress={useHint}
                             disabled={hintCount === 0}
                         >
@@ -267,9 +272,9 @@ export default function CrosswordPuzzleGame() {
                             autoCorrect={false}
                             autoCapitalize="characters"
                             returnKeyType="search"
-                            blurOnSubmit={false} 
+                            blurOnSubmit={false}
                         />
-                        
+
                         <TouchableOpacity style={styles.enterBtn} onPress={handleSubmit}>
                             <Text style={styles.enterBtnText}>⏎</Text>
                         </TouchableOpacity>
@@ -281,9 +286,9 @@ export default function CrosswordPuzzleGame() {
 }
 
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        backgroundColor: '#F4F6F7',
+    container: {
+        flex: 1,
+        backgroundColor: '#F9EBEA',
         width: '100%', // 전체 너비 사용
     },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -300,18 +305,38 @@ const styles = StyleSheet.create({
     infoBar: { padding: 15, alignItems: 'center' },
     infoText: { fontSize: 18, fontWeight: 'bold', color: '#34495E' },
 
+    gridShadowWrapper: {
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        
+        // 그림자 설정
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 9,
+        elevation: 5, // 안드로이드 그림자
+        
+        backgroundColor: 'transparent', // 그림자 렌더링을 위해 투명 배경 권장
+        marginBottom: 20, // 필요 시 여백
+
+        borderRadius: 10,
+    },
+
     gridContainer: {
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center', // 래퍼 안에서 그리드 중앙 정렬
+        overflow: 'hidden',
     },
     row: { flexDirection: 'row' },
     cell: {
-        borderWidth: 0.5,
+        borderWidth: 1,
         borderColor: '#BDC3C7',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
+        borderRadius: 8,
     },
     cellFound: { backgroundColor: '#F1C40F', borderColor: '#F39C12' },
     cellText: { fontWeight: 'bold', color: '#7F8C8D' },
@@ -325,9 +350,9 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         elevation: 5,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
         marginBottom: Platform.OS === 'web' ? 20 : 0,
     },
     hintDisplay: {

@@ -10,13 +10,14 @@ import java.util.List;
 @Table(name = "places")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Builder
 public class Place {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "place_id")
-    private int placeId;
+    private Long Id;
 
     @Column(name = "place_name", nullable = false)
     private String placeName;

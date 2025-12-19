@@ -229,6 +229,7 @@ const styles = StyleSheet.create({
     gameContainer: {
         flex: 1,
         position: 'relative', // 오버레이 위치 기준점
+        backgroundColor: '#F0F9FF',
     },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 

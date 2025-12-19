@@ -1,4 +1,5 @@
 import GameHeader from "@/components/game/common/GameHeader";
+import FlashlightOverlay from "@/components/game/mazeAdventure/FlashLightOverlay";
 import useMazeGame from "@/hooks/game/useMazeGame";
 import { useGameStore } from "@/store/gameStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,8 +22,8 @@ const AUDIO_FILES = {
 
 const CELL_TYPE = { PATH: 0, WALL: 1, START: 2, EXIT: 3 };
 
-// 게임 중 셀 크기 (확대 모드)
-const GAME_CELL_SIZE = 90;
+// [수정 1] 기본 셀 크기 상수명 변경
+const BASE_GAME_CELL_SIZE = 170;
 const BASE_VISIBLE_RADIUS = 1;
 
 export default function MazeAdventurePlay() {
@@ -35,24 +36,25 @@ export default function MazeAdventurePlay() {
         trapState, timeLeft
     } = useMazeGame(Number(gameId), String(level));
 
-    // 화면 크기
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-    // 프리뷰 모드 상태 (True: 전체보기, False: 게임시작)
     const [isPreviewMode, setIsPreviewMode] = useState(true);
-    const [previewCellSize, setPreviewCellSize] = useState(30); // 계산 전 기본값
-    const [previewTimer, setPreviewTimer] = useState(5); // 카운트다운 표시용
+    const [previewCellSize, setPreviewCellSize] = useState(30); 
+    const [previewTimer, setPreviewTimer] = useState(5); 
 
-    // 애니메이션 값
     const playerTranslateX = useSharedValue(0);
     const playerTranslateY = useSharedValue(0);
     const boardTranslateX = useSharedValue(0);
     const boardTranslateY = useSharedValue(0);
 
-    // 현재 적용할 셀 크기 (모드에 따라 변경)
-    const currentCellSize = isPreviewMode ? previewCellSize : GAME_CELL_SIZE;
+    // [수정 2] 손전등 레벨이 0보다 크면 30을 줄임 (Zoom Out 효과)
+    const gameCellSize = inventory.flashlightLevel > 0 
+        ? BASE_GAME_CELL_SIZE - 30 
+        : BASE_GAME_CELL_SIZE;
 
-    // 로그 타입에 따른 스타일 매핑 객체
+    // 현재 모드에 따른 최종 셀 크기
+    const currentCellSize = isPreviewMode ? previewCellSize : gameCellSize;
+
     const logStyleMap = {
         info: styles.logInfo,
         success: styles.logSuccess,
@@ -60,104 +62,70 @@ export default function MazeAdventurePlay() {
         warning: styles.logWarning,
     };
 
-
-    // 소리 재생 함수
     const playSound = async (soundName: keyof typeof AUDIO_FILES) => {
         if (isMuted) return;
-
         try {
             const { sound } = await Audio.Sound.createAsync(AUDIO_FILES[soundName]);
             await sound.playAsync();
-
-            // 재생 완료 후 메모리 해제
             sound.setOnPlaybackStatusUpdate(async (status) => {
                 if (status.isLoaded && status.didJustFinish) {
                     await sound.unloadAsync();
                 }
             });
-
         } catch (err) {
             console.log('Audio error: ', err);
         }
     };
 
-    // 상태 추적 Refs (이전 값과 비교)
     const prevPos = useRef(playerPos);
     const prevInventory = useRef(inventory);
     const prevLogsLen = useRef(0);
     const prevTrap = useRef<string | null>(null);
 
-    // 오디오 트리거
     useEffect(() => {
-        if (loading || isPreviewMode) return; // 로딩 중이나 프리뷰 땐 소리 끔
+        if (loading || isPreviewMode) return; 
 
-        // A. 이동 (Walking) - 좌표가 바뀌었을 때
         if (prevPos.current.row !== playerPos.row || prevPos.current.col !== playerPos.col) {
-
             if (grid && grid[playerPos.row] && grid[playerPos.row][playerPos.col] === CELL_TYPE.EXIT) {
                 playSound('correct');
             } else {
                 playSound('walking');
             }
-
             prevPos.current = playerPos;
         }
 
-        // B. 아이템 획득 (Get Item) - 인벤토리 상태 변화 감지
         const gotKey = !prevInventory.current.hasKey && inventory.hasKey;
         const gotFlashlight = inventory.flashlightLevel > prevInventory.current.flashlightLevel;
 
         if (gotKey || gotFlashlight) {
-            // ※ 만약 "사용(Use)"해서 레벨이 오른게 아니라 "줍줍"해서 오른거라면 여기서 재생
-            // 손전등 사용 로직은 아래 로그 기반에서 처리하거나 여기서 분기 처리
             playSound('getItem');
         }
         prevInventory.current = inventory;
 
-        // C. 함정 발동 (Trap)
         if (!prevTrap.current && trapState) {
             playSound('trap');
         }
         prevTrap.current = trapState;
 
-        // D. 로그 기반 트리거 (Bump, OpenDoor, UseFlashlight)
-        // 상태값만으로 알기 힘든 이벤트는 로그 텍스트를 분석해서 처리
         if (logs.length > prevLogsLen.current) {
             const latestLog = logs[logs.length - 1];
             const text = latestLog.text.toLowerCase();
-
-            // 1. 벽 충돌 (Bump)
-            if (text.includes('wall') || text.includes('blocked') || text.includes('bump')) {
-                playSound('bump');
-            }
-            // 2. 문 열기 (Open Door)
-            else if (text.includes('door') && (text.includes('open') || text.includes('unlocked'))) {
-                playSound('openDoor');
-            }
-            // 3. 손전등 사용 (Use Flashlight)
-            // 인벤토리 레벨업과 겹칠 수 있으니 로직에 따라 조정 필요
-            else if (text.includes('flashlight') && (text.includes('use') || text.includes('active'))) {
-                playSound('useFlashlight');
-            }
-
+            if (text.includes('wall') || text.includes('blocked') || text.includes('bump')) playSound('bump');
+            else if (text.includes('door') && (text.includes('open') || text.includes('unlocked'))) playSound('openDoor');
+            else if (text.includes('flashlight') && (text.includes('use') || text.includes('active'))) playSound('useFlashlight');
             prevLogsLen.current = logs.length;
         }
     }, [playerPos, inventory, trapState, logs, loading, isPreviewMode]);
 
-    // 프리뷰 모드 타이머 및 셀 크기 계산
     useEffect(() => {
         if (!loading && grid && containerSize.width > 0) {
-            // A. 프리뷰용 셀 크기 계산 (화면에 꽉 차게)
             const mapWidth = grid[0].length;
             const mapHeight = grid.length;
-
-            // 가로/세로 중 더 꽉 차는 비율로 맞춤 (여백 약간 둠)
             const calcW = (containerSize.width - 40) / mapWidth;
             const calcH = (containerSize.height - 40) / mapHeight;
             const fitSize = Math.min(calcW, calcH);
             setPreviewCellSize(fitSize);
 
-            // B. 5초 카운트다운 로직
             const countdownInterval = setInterval(() => {
                 setPreviewTimer((prev) => {
                     if (prev <= 1) {
@@ -168,11 +136,8 @@ export default function MazeAdventurePlay() {
                 });
             }, 1000);
 
-            // C. 5초 후 게임 모드 전환
             const modeTimer = setTimeout(() => {
                 setIsPreviewMode(false);
-
-                // 게임 시작 시 로그 길이 싱크 맞춰서 불필요한 소리 방지
                 prevLogsLen.current = logs.length;
             }, 5000);
 
@@ -183,13 +148,12 @@ export default function MazeAdventurePlay() {
         }
     }, [loading, grid, containerSize]);
 
-    // 애니메이션 로직 (모드에 따라 타겟 위치가 다름)
+    // [수정 3] 의존성 배열에 gameCellSize 추가 및 로직 적용
     useEffect(() => {
         if (!loading && grid && containerSize.width > 0) {
-            // 현재 모드에 맞는 셀 크기 사용
-            const size = isPreviewMode ? previewCellSize : GAME_CELL_SIZE;
+            // isPreviewMode 여부에 따라 size 결정
+            const size = isPreviewMode ? previewCellSize : gameCellSize;
 
-            // 플레이어 이동
             playerTranslateX.value = withTiming(playerPos.col * size, {
                 duration: 500, easing: Easing.out(Easing.quad),
             });
@@ -197,18 +161,15 @@ export default function MazeAdventurePlay() {
                 duration: 500, easing: Easing.out(Easing.quad),
             });
 
-            // 보드 이동 (카메라)
             let targetBoardX = 0;
             let targetBoardY = 0;
 
             if (isPreviewMode) {
-                // 프리뷰: 화면 중앙 정렬
                 const mapPixelWidth = grid[0].length * size;
                 const mapPixelHeight = grid.length * size;
                 targetBoardX = (containerSize.width - mapPixelWidth) / 2;
                 targetBoardY = (containerSize.height - mapPixelHeight) / 2;
             } else {
-                // 게임모드: 플레이어 팔로우
                 targetBoardX = (containerSize.width / 2) - (playerPos.col * size) - (size / 2);
                 targetBoardY = (containerSize.height / 2) - (playerPos.row * size) - (size / 2);
             }
@@ -216,9 +177,9 @@ export default function MazeAdventurePlay() {
             boardTranslateX.value = withTiming(targetBoardX, { duration: 500 });
             boardTranslateY.value = withTiming(targetBoardY, { duration: 500 });
         }
-    }, [playerPos, loading, grid, containerSize, isPreviewMode, previewCellSize]);
+        // [중요] gameCellSize가 변할 때마다 재계산해야 하므로 deps에 추가
+    }, [playerPos, loading, grid, containerSize, isPreviewMode, previewCellSize, gameCellSize]);
 
-    // 스타일
     const animatedPlayerStyle = useAnimatedStyle(() => ({
         transform: [
             { translateX: playerTranslateX.value },
@@ -235,23 +196,20 @@ export default function MazeAdventurePlay() {
         ]
     }));
 
-    // 로그 스크롤
     const scrollViewRef = useRef<ScrollView>(null);
     useEffect(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
     }, [logs]);
 
-    const currentRadius = BASE_VISIBLE_RADIUS + inventory.flashlightLevel;
+    const lightRadius = 200 + (inventory.flashlightLevel * 80);
 
-    // 셀 렌더링 (포그 & 함정 표시 로직 변경)
     const renderCell = (cellValue: number, r: number, c: number) => {
         const distR = Math.abs(r - playerPos.row);
         const distC = Math.abs(c - playerPos.col);
-        const isVisible = distR <= currentRadius && distC <= currentRadius;
+        const renderDistance = BASE_VISIBLE_RADIUS + inventory.flashlightLevel + 3;
 
-        // 안개 로직: 프리뷰 모드가 아니고, 시야 밖일 때만 안개 처리
-        if (!isPreviewMode && !isVisible) {
-            return <View key={`${r}-${c}`} style={[styles.cell, { width: currentCellSize, height: currentCellSize }, styles.cellFog]} />;
+        if (!isPreviewMode && (distR > renderDistance || distC > renderDistance)) {
+            return <View key={`${r}-${c}`} style={{ width: currentCellSize, height: currentCellSize, backgroundColor: '#000' }} />;
         }
 
         const item = items.find(i => i.row === r && i.col === c);
@@ -263,21 +221,19 @@ export default function MazeAdventurePlay() {
         if (isWall) {
             return (
                 <View key={`${r}-${c}`} style={{ width: currentCellSize, height: currentCellSize }}>
-                    {/* 벽의 윗면 */}
                     <View style={{
                         width: currentCellSize,
                         height: innerHeight,
-                        backgroundColor: '#FF9F1C', // 밝은 주황
+                        backgroundColor: '#58e666ff',
                         borderRadius: 4,
                         zIndex: 2
                     }} />
-                    {/* 벽의 옆면 (그림자/두께 역할) */}
                     <View style={{
                         position: 'absolute',
                         bottom: 0,
                         width: currentCellSize,
-                        height: wallDepth + 2, // 약간 겹치게
-                        backgroundColor: '#C05600', // 어두운 주황
+                        height: wallDepth + 2,
+                        backgroundColor: '#263e25ff', 
                         borderBottomLeftRadius: 4,
                         borderBottomRightRadius: 4,
                         zIndex: 1
@@ -286,14 +242,11 @@ export default function MazeAdventurePlay() {
             );
         }
 
-        // 바닥 그리기 (PATH, START, EXIT 모두 여기로 옴)
         return (
             <View key={`${r}-${c}`} style={[styles.cell, { width: currentCellSize, height: currentCellSize }, styles.cellPath]}>
-                
-                {/* 바닥 패턴 */}
-                <View style={{ width: 4, height: 4, backgroundColor: '#3D2C63', borderRadius: 2, opacity: 0.3 }} />
+                <View style={{ width: 4, height: 4, backgroundColor: '#464448ff', borderRadius: 2, opacity: 0.3 }} />
 
-                {item && (
+                {item && ( 
                     <Text style={{ fontSize: currentCellSize * 0.5 }}>
                         {item.type === 'KEY' && '🔑'}
                         {item.type === 'DOOR' && '🚪'}
@@ -303,12 +256,7 @@ export default function MazeAdventurePlay() {
                         {(isPreviewMode || trapState) && item.type === 'TRAP_HOLE' && '🕳️'}
                     </Text>
                 )}
-                
-                {/* [수정] EXIT일 때 깃발 표시 (배경은 바닥임) */}
                 {cellValue === CELL_TYPE.EXIT && <Text style={{ fontSize: currentCellSize * 0.6 }}>🏁</Text>}
-                
-                {/* (선택) START일 때 발자국 등을 표시하고 싶다면 추가 */}
-                {/* {cellValue === CELL_TYPE.START && <Text>👣</Text>} */}
             </View>
         );
     };
@@ -326,8 +274,6 @@ export default function MazeAdventurePlay() {
         <SafeAreaView style={styles.safeArea}>
             <GameHeader />
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-
-                {/* 상단 정보바 */}
                 <View style={styles.infoBar}>
                     <View style={styles.inventoryGroup}>
                         <View style={[styles.invItem, inventory.hasKey && styles.invActive]}>
@@ -344,7 +290,6 @@ export default function MazeAdventurePlay() {
                     )}
                 </View>
 
-                {/* 게임 보드 */}
                 <View style={styles.mazeContainer} onLayout={(e) => setContainerSize(e.nativeEvent.layout)}>
                     <Animated.View style={[styles.gridBoard, animatedBoardStyle]}>
                         {grid.map((row, r) => (
@@ -352,24 +297,23 @@ export default function MazeAdventurePlay() {
                                 {row.map((cell, c) => renderCell(cell, r, c))}
                             </View>
                         ))}
-                        {/* 캐릭터 */}
                         <Animated.View style={[styles.playerEntity, animatedPlayerStyle]}>
-                            {/* 캐릭터 그림자 */}
                             <View style={{
                                 position: 'absolute', bottom: 2, width: '60%', height: 6,
                                 backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 10
                             }} />
-                            {/* 캐릭터 본체 */}
                             <Text style={{ fontSize: currentCellSize * 0.7, marginBottom: 5 }}>
                                 {trapState === 'TRAP_GHOST' ? '😱' : '🤠'}
                             </Text>
                         </Animated.View>
                     </Animated.View>
 
+                    {!isPreviewMode && (
+                        <FlashlightOverlay radius={lightRadius} />
+                    )}
                     {isPaused && <View style={styles.pauseOverlay}><Text style={styles.pauseText}>PAUSED</Text></View>}
                 </View>
 
-                {/* 로그 및 입력 */}
                 <View style={styles.terminalContainer}>
                     <ScrollView ref={scrollViewRef} style={styles.logList}>
                         {logs.map((l, i) => (
@@ -410,7 +354,7 @@ export default function MazeAdventurePlay() {
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#1A122E' }, // 전체 배경: 아주 어두운 보라
+    safeArea: { flex: 1, backgroundColor: '#1A122E' }, 
     container: { flex: 1 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
@@ -424,21 +368,19 @@ const styles = StyleSheet.create({
     invText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
 
     mazeContainer: {
-        flex: 3, backgroundColor: '#2D1B4E', // 바닥색 (Deep Purple)
+        flex: 3, backgroundColor: '#f7f7f8ff', 
         overflow: 'hidden',
     },
     gridBoard: { position: 'absolute', top: 0, left: 0 },
     row: { flexDirection: 'row' },
 
-    // Cell Styles
     cell: { justifyContent: 'center', alignItems: 'center' },
     cellPath: {
-        backgroundColor: '#4C3575', // 이동 가능한 길 (조금 밝은 보라)
-        borderWidth: 0.5, borderColor: '#3D2C63' // 타일 경계
+        backgroundColor: '#9bb865ff', 
+        borderWidth: 0.5, borderColor: '#3D2C63' 
     },
-    cellFog: { backgroundColor: '#1A122E' }, // 안개는 전체 배경색과 동일하게
+    cellFog: { backgroundColor: '#1A122E' },
 
-    // UI Elements
     previewBadge: { backgroundColor: '#F59E0B', padding: 5, borderRadius: 5 },
     previewText: { color: 'white', fontWeight: 'bold' },
     trapAlert: { backgroundColor: '#EF4444', padding: 5, borderRadius: 5 },
