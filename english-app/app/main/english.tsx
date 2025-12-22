@@ -3,7 +3,7 @@ import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Animated, FlatList, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, Animated, FlatList, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 interface Place {
     id: number;
@@ -63,12 +63,12 @@ const PlaceCard = ({ item, index, width, numColumns, onPress }: any) => {
             // 📱 앱: 터치 이벤트 (앱에서도 누를 때 커지는 효과)
             onPressIn={handleIn}
             onPressOut={handleOut}
-            style={{ 
-                marginHorizontal: gap / 2, 
-                marginBottom: gap 
+            style={{
+                marginHorizontal: gap / 2,
+                marginBottom: gap
             }}
         >
-            <Animated.View 
+            <Animated.View
                 style={[
                     styles.card,
                     {
@@ -146,26 +146,46 @@ const English = () => {
 
     // ✨ 헤더를 별도의 함수(컴포넌트)로 분리
     const renderHeader = () => (
-        <Animated.View 
+        <Animated.View
             style={[
-                styles.header, 
-                { 
+                styles.header,
+                {
                     transform: [{ translateY: headerTranslateY }], // 위에서 아래로 슬라이드
                     opacity: headerOpacity // 서서히 나타남
                 }
             ]}
         >
             <Text style={styles.headerTitle}>Where to go?</Text>
-            <Text style={styles.headerSubtitle}>학습할 장소를 선택하고 모험을 떠나보세요!</Text>
+            <Text style={styles.headerSubtitle}>Select a place for traveling!</Text>
         </Animated.View>
     );
 
     const handlePlacePress = (id: number, name: string) => {
-        console.log(`Go to ${name}`);
-        router.push({
-            pathname: "/main/english/[id]",
-            params: { id: id, placeName: name },
-        });
+
+        // 웹 환경
+        if (Platform.OS === 'web') {
+            const width = 1200;
+            const height = 900;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+
+            // URL 생성 (encodeURIComponent: 이름에 공백이나 특수문자가 있어도 안전하게 처리)
+            const url = `${window.location.origin}/english/${id}?placeName=${encodeURIComponent(name)}`;
+
+            console.log("생성된 URL:", url); 
+            
+            window.open(
+                url,
+                `place_popup_${id}`,
+                `width=${width}, height=${height}, top=${top}, left=${left}, resizable=yes, scrollbars=yes`
+            );
+
+        } else {  // 앱 환경
+            router.push({
+                pathname: "/english/[id]" as any,
+                params: { id, placeName: name },
+            });
+        }
     };
 
     if (isLoading) return <ActivityIndicator size="large" style={styles.loader} />;
@@ -178,17 +198,17 @@ const English = () => {
 
                 // 2. 분리한 Card 컴포넌트 렌더링
                 renderItem={({ item, index }) => (
-                    <PlaceCard 
-                        item={item} 
-                        index={index} 
-                        width={width} 
-                        numColumns={numColumns} 
+                    <PlaceCard
+                        item={item}
+                        index={index}
+                        width={width}
+                        numColumns={numColumns}
                         onPress={handlePlacePress}
                     />
                 )}
                 keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
                 numColumns={numColumns}
-                key={numColumns} 
+                key={numColumns}
                 contentContainerStyle={styles.listContent}
                 columnWrapperStyle={styles.columnWrapper}
             />

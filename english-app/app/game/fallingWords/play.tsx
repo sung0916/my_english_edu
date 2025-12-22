@@ -1,6 +1,7 @@
 import { fetchGameContent, submitGameScore, WordDto } from "@/api/gameApi";
 import GameHeader from "@/components/game/common/GameHeader";
 import WordBubble from "@/components/game/fallingWords/WordBubble";
+import useBGM from "@/hooks/game/useBGM";
 import { useGameStore } from "@/store/gameStore";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
@@ -43,6 +44,7 @@ export default function FallingWordsGame() {
     const router = useRouter();
     const navigation = useNavigation();
     const pathname = usePathname();
+    const { playSfxWithDucking } = useBGM('fallingword');
 
     // Stores
     const { setScore, resetGame, isPaused, isPlaying, setIsPlaying } = useGameStore();
@@ -239,8 +241,10 @@ export default function FallingWordsGame() {
             scoreRef.current = displayScore;
             setScore(displayScore);  // Zustand 업데이트
 
-            // b. TTS 재생
-            Speech.speak(matchedWord.content, { language: 'en' });
+            playSfxWithDucking(async () => {
+                // b. TTS 재생
+                Speech.speak(matchedWord.content, { language: 'en' });
+            });
 
             // c. 입력창 초기화
             setInputText('');
@@ -257,11 +261,14 @@ export default function FallingWordsGame() {
             setInputText('');  // 오답 시 입력창 초기화
 
             if (soundObject.current) {
-                try {
-                    await soundObject.current.replayAsync();  // 소리를 처음부터 재생(겹쳐서 재생 가능)
-                } catch (e) {
-                    console.error(e);
-                }
+                playSfxWithDucking(async () => {
+                    try {
+                        await soundObject.current?.replayAsync();  // 소리를 처음부터 재생(겹쳐서 재생 가능)
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }, 500);
+
             } else {  // 사운드 파일 없을 시 임시 피드백 (진동 등)
                 console.log("Wrong Answer!");
             }
@@ -274,7 +281,7 @@ export default function FallingWordsGame() {
         const displayScore = finalIntScore >= 100 ? 100 : scoreRef.current;
         const title = isClear ? "🏆 Stage Clear! 🏆" : "💔 Game Over 💔";
 
-        console.log("Saving score...", {userId: user?.userId, score: finalIntScore});
+        console.log("Saving score...", { userId: user?.userId, score: finalIntScore });
 
         if (user && user.userId) {  // 서버로 점수 전송 (로그인 된 경우)
             try {

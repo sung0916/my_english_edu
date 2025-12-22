@@ -1,5 +1,6 @@
 import GameHeader from "@/components/game/common/GameHeader";
 import FlashlightOverlay from "@/components/game/mazeAdventure/FlashLightOverlay";
+import useBGM from "@/hooks/game/useBGM";
 import useMazeGame from "@/hooks/game/useMazeGame";
 import { useGameStore } from "@/store/gameStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,6 +30,7 @@ const BASE_VISIBLE_RADIUS = 1;
 export default function MazeAdventurePlay() {
     const { gameId, level } = useLocalSearchParams();
     const { isPaused, isMuted } = useGameStore();
+    const { playSfxWithDucking } = useBGM('mazeadventure');
 
     const {
         loading, grid, items, playerPos, inventory, logs,
@@ -64,18 +66,29 @@ export default function MazeAdventurePlay() {
 
     const playSound = async (soundName: keyof typeof AUDIO_FILES) => {
         if (isMuted) return;
-        try {
-            const { sound } = await Audio.Sound.createAsync(AUDIO_FILES[soundName]);
-            await sound.playAsync();
-            sound.setOnPlaybackStatusUpdate(async (status) => {
-                if (status.isLoaded && status.didJustFinish) {
-                    await sound.unloadAsync();
-                }
-            });
-        } catch (err) {
-            console.log('Audio error: ', err);
+
+        // 효과음 재생 로직 함수
+        const playSfx = async () => {
+            try {
+                const { sound } = await Audio.Sound.createAsync(AUDIO_FILES[soundName]);
+                await sound.playAsync();
+                sound.setOnPlaybackStatusUpdate(async (status) => {
+                    if (status.isLoaded && status.didJustFinish) {
+                        await sound.unloadAsync();
+                    }
+                });
+            } catch (err) { console.log(err); }
+        };
+
+        // Ducking 적용 여부 결정
+        if (soundName === 'walking' || soundName === 'bump') {
+            playSfx();  // 그냥 재생
+        } else {
+            // getItem, correct, trap 등은 BGM을 줄였다가 다시 키움
+            // 두 번째 인자는 BGM이 작아져 있는 시간(ms)
+            playSfxWithDucking(playSfx, 1500);
         }
-    };
+    }
 
     const prevPos = useRef(playerPos);
     const prevInventory = useRef(inventory);

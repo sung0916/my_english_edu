@@ -1,26 +1,32 @@
 import { CrosswordData, fetchGameContent, submitGameScore } from "@/api/gameApi";
 import GameHeader from "@/components/game/common/GameHeader";
+import useBGM from "@/hooks/game/useBGM";
 import { useGameStore } from "@/store/gameStore";
 import { useUserStore } from "@/store/userStore";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Audio } from "expo-av";
 import { useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, DimensionValue, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 const GAME_ID = 4;
 const LEVEL_MAP: Record<string, string> = {
     '1': 'FIRST', '2': 'SECOND', '3': 'THIRD', '4': 'FOURTH', '5': 'FIFTH',
 };
+const AUDIO_FILES = {
+    correct: require('@/assets/audio/game/correct.mp3'),
+    wrong: require('@/assets/audio/game/wrong.mp3'),
+};
 
 export default function CrosswordPuzzleGame() {
     const router = useRouter();
     const { level } = useLocalSearchParams<{ level: string }>();
     const { user } = useUserStore();
-    const { isPaused, setIsPlaying, resetGame } = useGameStore();
+    const { isPaused, isMuted, setIsPlaying, resetGame } = useGameStore();
     const { width: windowWidth } = useWindowDimensions();
     const navigation = useNavigation();
     const pathname = usePathname();
+    const { playSfxWithDucking } = useBGM('crossword');
 
     // === State ===
     const [isLoading, setIsLoading] = useState(true);
@@ -31,51 +37,35 @@ export default function CrosswordPuzzleGame() {
     const [hintCount, setHintCount] = useState(10);
     const [hasTyped, setHasTyped] = useState(false); // ✨ 플레이스홀더 제어용
 
-    // === Audio Refs ===
-    const correctSound = useRef<Audio.Sound | null>(null);
-    const wrongSound = useRef<Audio.Sound | null>(null);
-
     const gameLevelKey = LEVEL_MAP[level || '1'] || 'FIRST';
 
     useEffect(() => {
         resetGame();
         loadGameData();
-        loadSounds(); // ✨ 사운드 로드
 
         return () => {
             setIsPlaying(false);
-            unloadSounds(); // ✨ 사운드 해제
         };
     }, []);
 
-    const loadSounds = async () => {
-        try {
-            const { sound: correct } = await Audio.Sound.createAsync(
-                require('@/assets/audio/game/correct.mp3')
-            );
-            correctSound.current = correct;
-
-            const { sound: wrong } = await Audio.Sound.createAsync(
-                require('@/assets/audio/game/wrong.mp3')
-            );
-            wrongSound.current = wrong;
-        } catch (error) {
-            console.log("Sound loading failed", error);
-        }
-    };
-
-    const unloadSounds = async () => {
-        if (correctSound.current) await correctSound.current.unloadAsync();
-        if (wrongSound.current) await wrongSound.current.unloadAsync();
-    };
-
     const playSound = async (type: 'correct' | 'wrong') => {
-        try {
-            const sound = type === 'correct' ? correctSound.current : wrongSound.current;
-            if (sound) await sound.replayAsync();
-        } catch (e) {
-            console.log(e);
-        }
+        if (isMuted) return;
+
+        const playSfx = async () => {
+            try {
+                const { sound } = await Audio.Sound.createAsync(AUDIO_FILES[type]);
+                await sound.playAsync();
+                sound.setOnPlaybackStatusUpdate(async (status) => {
+                    if (status.isLoaded && status.didJustFinish) {
+                        await sound.unloadAsync();
+                    }
+                });
+            } catch (error) {
+                console.log("Sound loading failed", error);
+            }
+        };
+
+        playSfxWithDucking(playSfx, 1000);
     };
 
     const loadGameData = async () => {

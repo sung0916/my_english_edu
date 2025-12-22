@@ -25,7 +25,10 @@ export default function RootLayout() {
   const { isLoggedIn, user } = useUserStore();
   const router = useRouter();
   const segments = useSegments();
-  const isGameRoute = segments[0] === 'game'; // 경로가 game 폴더에 있는지 확인(0으로 명시적 적용)
+
+  const rootSegment = segments[0];
+  const hideHeaderRoutes = ['game', 'english'];
+  const shouldHideHeader = hideHeaderRoutes.includes(rootSegment);
 
   useEffect(() => {
     if (!isHydrated || (!fontsLoaded && !fontError)) return;
@@ -53,19 +56,16 @@ export default function RootLayout() {
   return (
     <Stack  // Stack이 최상위 컴포넌트
       screenOptions={{
-        header: isGameRoute ? undefined : () => <Header />,    // 모든 스크린에 공통 헤더를 적용(game 폴더 경로 제외)
+        header: shouldHideHeader ? undefined : () => <Header />,    // 모든 스크린에 공통 헤더를 적용(game 폴더 경로 제외)
+        // headerShown: !shouldHideHeader,
         headerShadowVisible: false,  // Stack 자체의 그림자 등을 제거
         // 필요하다면 여기서 헤더의 높이 등을 조절 (headerStyle: { height: 80 })
       }}
     >
-      {/* 특정 페이지만 헤더를 다르게 하기 위해, screenOptions을 개별적으로 설정 */}
-      <Stack.Screen
-        name="game"
-        options={{
-          headerShown: false,  // 헤더 영역 제거
-          header: () => null   // 만의 하나 커스텀 헤더가 남지 않도록 null 처리
-        }}
-      />
+      {/* 각 폴더별 라우트 설정 */}
+      <Stack.Screen name="main" />
+      <Stack.Screen name="game" options={{ headerShown: false }} />
+      <Stack.Screen name="english" options={{ headerShown: false }} />
     </Stack>
   );
 }

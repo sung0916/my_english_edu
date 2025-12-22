@@ -1,11 +1,12 @@
 import { API_BASE_URL } from "@/api";
 import { CardOption } from "@/api/gameApi";
 import GameHeader from "@/components/game/common/GameHeader";
-import { useGameSound } from "@/hooks/game/useGameSound";
+import useBGM from "@/hooks/game/useBGM";
 import { useGameTimer } from "@/hooks/game/useGameTimer";
 import { useMysteryCardGame } from "@/hooks/game/useMysteryCardGame";
 import { useGameStore } from "@/store/gameStore";
-import { useEffect } from "react";
+import { Audio } from "expo-av";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,6 +20,12 @@ interface GameCardProps {
     shouldFlipBack: boolean;  // 다시 덮기
     onFlippedback: () => void;  // 덮기 완료 후 콜백
 }
+
+const AUDIO_FILES = {
+    correct: require('@/assets/audio/game/correct.mp3'),
+    wrong: require('@/assets/audio/game/wrong.mp3'),
+    flip: require('@/assets/audio/game/card_flip.mp3'),
+};
 
 // 카드의 개별 컴포넌트 (애니메이션 로직 포함)
 const GameCard = ({ option, onPress, disabled, cardWidth, shouldFlipBack, onFlippedback }:
@@ -99,7 +106,9 @@ const GameCard = ({ option, onPress, disabled, cardWidth, shouldFlipBack, onFlip
 // 메인 게임 스크린
 export default function MysteryCardsPlay() {
     const { width } = useWindowDimensions();
-    const { isPaused } = useGameStore();
+    const { isPaused, isMuted } = useGameStore();
+    const { playSfxWithDucking } = useBGM('mysterycard');
+    const [ isFlipping, setIsFlipping ] = useState(false);
 
     // Hook을 통한 로직 분리 (데이터, 상태 관리)
     const {
@@ -108,15 +117,36 @@ export default function MysteryCardsPlay() {
         handleAnswer, handleTimeOver, resetWrongCard
     } = useMysteryCardGame();
 
-    // 사운드 훅 사용
-    const { playCorrect, playWrong } = useGameSound();
+    const playSound = async (type: 'correct' | 'wrong' | 'flip') => {
+        if (isMuted) return;
+
+        // 효과음 재생
+        const playSfx = async () => {
+            try {
+                const { sound } = await Audio.Sound.createAsync(AUDIO_FILES[type]);
+                await sound.playAsync();
+                sound.setOnPlaybackStatusUpdate(async (status) => {
+                    if (status.isLoaded && status.didJustFinish) {
+                        await sound.unloadAsync();
+                    }
+                });
+
+            } catch (err) { console.log(err); }
+        };
+
+        if (type === 'flip') {
+            playSfx();
+        } else {
+            playSfxWithDucking(playSfx, type === 'correct' ? 1000 : 500);
+        }
+    };
 
     // 타이머 훅 사용
     const { timeLeft, resetTimer } = useGameTimer({
         initialTime: limitSeconds,
         shouldRun: !loading && !isProcessing && !isPaused,
         onTimeOver: () => {
-            playWrong();
+            playSound('wrong');
             handleTimeOver();
         }
     });
@@ -198,15 +228,24 @@ export default function MysteryCardsPlay() {
                                 key={`${currentIndex} - ${opt.wordId}`}
                                 option={opt}
                                 cardWidth={finalCardWidth}
-                                disabled={isProcessing || isPaused}
+                                disabled={isProcessing || isPaused || isFlipping}
                                 shouldFlipBack={wrongCardId === opt.wordId}
                                 onFlippedback={resetWrongCard}
                                 onPress={() => {
                                     // 정답 체크 로직 (Sound 훅 활용)
-                                    if (isPaused) return;
-                                    const isCorrect = handleAnswer(opt);
-                                    if (isCorrect) playCorrect();
-                                    else playWrong();
+                                    if (isPaused || isFlipping) return;
+                                    setIsFlipping(true);
+                                    playSound('flip');
+                                    setTimeout(() => {
+                                        const isCorrect = handleAnswer(opt);
+                                        if (isCorrect) {
+                                            playSound('correct');
+                                            setIsFlipping(false);
+                                        } else {
+                                            playSound('wrong');
+                                            setIsFlipping(false);
+                                        }
+                                    }, 400);
                                 }}
                             />
                         ))}
