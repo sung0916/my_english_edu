@@ -9,7 +9,7 @@ import { crossPlatformAlert } from "../../utils/crossPlatformAlert";
 
 // 업로드된 이미지의 응답 타입을 정의합니다. (백엔드 ImageResponse DTO 참고)
 interface UploadedImage {
-    id: number;
+    imageId: number;
     url: string; // 에디터에 삽입될 URL
     imageUrl: string; // imageUrl 필드가 있다면 그것을 사용
 }
@@ -60,7 +60,7 @@ const WriteNative = () => {
                 editorRef.current?.insertImage(imageUrlToInsert);
 
                 // 업로드 성공 시, 반환된 이미지 ID를 상태에 추가
-                setUploadedImageIds(prevIds => [...prevIds, uploadedImage.id]);
+                setUploadedImageIds(prevIds => [...prevIds, uploadedImage.imageId]);
             }
         } catch (error) {
             console.error("이미지 업로드 실패:", error);

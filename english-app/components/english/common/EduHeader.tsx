@@ -6,9 +6,11 @@ import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native
 
 interface EduHeaderProps {
     title: string; // 장소 이름 (예: Kitchen)
+    isAtLobby?: boolean;
+    onHomeClick?: () => void;
 }
 
-export default function EduHeader({ title }: EduHeaderProps) {
+export default function EduHeader({ title, isAtLobby, onHomeClick }: EduHeaderProps) {
     const router = useRouter();
 
     // 상태 관리
@@ -29,6 +31,12 @@ export default function EduHeader({ title }: EduHeaderProps) {
                 }
             }
         );
+    };
+
+    const handleHomePress = () => {
+        if (onHomeClick) {
+            onHomeClick();
+        }
     };
 
     // 2. 전체화면 토글
@@ -72,7 +80,7 @@ export default function EduHeader({ title }: EduHeaderProps) {
         <View style={styles.container}>
             {/* 왼쪽: 타이틀 & 홈 버튼 */}
             <View style={styles.leftGroup}>
-                <TouchableOpacity onPress={handleExit} style={styles.iconButton}>
+                <TouchableOpacity onPress={handleHomePress} style={[styles.iconButton, {opacity: isAtLobby ? 0.3 : 1}]} disabled={isAtLobby}>
                     <Ionicons name="home" size={24} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.titleText}>{title}</Text>

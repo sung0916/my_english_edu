@@ -1,18 +1,22 @@
 import { Feather } from '@expo/vector-icons';
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUserStore } from "../../store/userStore";
 
 const Header = () => {
   // userStore에서 user 객체 전체를 추출
-  const { isLoggedIn, logout, user } = useUserStore();
+  const { isLoggedIn, logout, user, checkTokenExpiry } = useUserStore();
   const router = useRouter();
 
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    checkTokenExpiry();
+  }, []);
 
   const handleLogout = () => {
     logout();

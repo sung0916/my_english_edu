@@ -2,6 +2,7 @@ package com.englishapp.api_server.config.jwt;
 
 import com.englishapp.api_server.domain.UserRole;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -95,8 +96,6 @@ public class JwtUtil {
 
     // 토큰 유효성 체크
     public boolean validateToken(String token) {
-
-        // try-catch 제거
         return !isTokenExpired(token);
     }
 }

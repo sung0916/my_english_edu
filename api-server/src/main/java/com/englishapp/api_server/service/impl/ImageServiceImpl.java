@@ -63,3 +63,4 @@ public class ImageServiceImpl implements ImageService {
         return ImageResponse.from(savedImage);
     }
 }
+

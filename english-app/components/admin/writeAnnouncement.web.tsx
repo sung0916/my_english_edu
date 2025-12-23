@@ -8,7 +8,7 @@ import { crossPlatformAlert } from "../../utils/crossPlatformAlert";
 // import { Editor } from '@toast-ui/react-editor';
 
 interface UploadedImage {
-    id: number;
+    imageId: number;
     url: string;
     imageUrl: string;
 }
@@ -28,8 +28,9 @@ const WriteWeb = () => {
         }
         
         // 3. 에디터의 내용을 가져옵니다.
-        const contentMarkdown = editorRef.current?.getInstance().getMarkdown();
-        if (!contentMarkdown || !contentMarkdown.trim()) {
+        //const contentMarkdown = editorRef.current?.getInstance().getMarkdown();
+        const contentHtml = editorRef.current?.getInstance().getHTML();
+        if (!contentHtml || !contentHtml.trim()) {
             crossPlatformAlert("", "내용을 입력해주세요.");
             return;
         }
@@ -37,7 +38,7 @@ const WriteWeb = () => {
         try {
             await apiClient.post('/api/announcements/write', {
                 title: title,
-                content: contentMarkdown, // 마크다운 텍스트를 전송
+                content: contentHtml, // 마크다운 텍스트를 전송
                 imageIds: uploadedImageIds,
             });
             crossPlatformAlert("성공", "공지사항이 등록되었습니다.");
@@ -82,7 +83,7 @@ const WriteWeb = () => {
                                 // 업로드된 이미지 URL을 에디터에 전달합니다.
                                 callback(imageUrl, 'image');
                                 
-                                setUploadedImageIds(prevIds => [...prevIds, imageInfo.id]);
+                                setUploadedImageIds(prevIds => [...prevIds, imageInfo.imageId]);
                             }
                         } catch (error) {
                             console.error("이미지 업로드 실패:", error);

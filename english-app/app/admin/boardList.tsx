@@ -43,6 +43,7 @@ const BoardList = () => {
                 params: {
                     page: page - 1,
                     size: ITEMS_PER_PAGE,
+                    sort: 'id,desc',
                 }
             });
             

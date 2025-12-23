@@ -59,6 +59,12 @@ const PlaceDetail = () => {
     const [placeData, setPlaceData] = useState<PlaceData | null>(null);
     const [selectedObjectId, setSelectedObjectId] = useState<number | null>(null);
     const [isGameModalVisible, setGameModalVisible] = useState(false);
+    const isAtLobby = !isGameModalVisible;
+
+    // 로비 버튼
+    const handleBackToLobby = () => {
+        setGameModalVisible(false);
+    };
 
     // 데이터 로드 (API 연동)
     useEffect(() => {
@@ -96,7 +102,7 @@ const PlaceDetail = () => {
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
-            <EduHeader title={title} />
+            <EduHeader title={title} isAtLobby={isAtLobby} onHomeClick={handleBackToLobby} />
 
             <View style={styles.contentContainer}>
                 {/* 배경 이미지 (Touch Zone이 아닌 곳 누르면 선택 해제) */}

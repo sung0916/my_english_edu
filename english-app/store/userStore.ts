@@ -1,4 +1,5 @@
 // import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 import { Platform } from 'react-native';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -44,6 +45,12 @@ interface UserState {
     login: (userData: User, token: string) => void;
     logout: () => void;
     clearPersistedStorage: () => void;  // 스토리지 비우기 함수
+    checkTokenExpiry: () => void;
+}
+
+// JWT 디코딩 타입 정의
+interface JwtPayload {
+    exp: number;  // 만료 시간 (Unix Timestamp)
 }
 
 // 스토어 생성
@@ -54,6 +61,28 @@ export const useUserStore = create<UserState>(
             user: null,
             token: null,
             isLoggedIn: false,
+
+            checkTokenExpiry: () => {
+                const { token } = get();
+                if (!token) {
+                    set({ isLoggedIn: false, user: null });
+                    return;
+                }
+
+                try {
+                    const decoded = jwtDecode<JwtPayload>(token);
+                    const currentTiem = Date.now() / 1000;  // 초 단위
+
+                    // 토큰이 만료되었다면 로그아웃 처리
+                    if (decoded.exp < currentTiem) {
+                        console.log("토큰 만료, 자동 로그아웃 실행");
+                        set({ user: null, token: null, isLoggedIn: false });
+                    }
+
+                } catch (err) {
+                    set({ user: null, token: null, isLoggedIn: false });
+                }
+            },
 
             login: (userData, token) => set({
                 user: userData,
@@ -76,6 +105,11 @@ export const useUserStore = create<UserState>(
             // persist 설정 (v3 방식)
             name: 'user-auth-storage', // 1. 스토리지에 저장될 이름
             getStorage: getStorage,    // 2. v4의 'storage' 대신 'getStorage' 사용
+
+            // 앱이 켜지거나, 사이트 방문하여 스토리지 불러온 직후 실행
+            onRehydrateStorage: () => (state) => {
+                state?.checkTokenExpiry();  // 만료 체크
+            }
         }
     ),
 );
