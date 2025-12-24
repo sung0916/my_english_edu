@@ -1,0 +1,21 @@
+package com.englishapp.api_server.repository;
+
+import com.englishapp.api_server.entity.Cart;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface CartRepository extends JpaRepository<Cart, Long> {
+
+    // 특정 유저의 장바구니 목록 조회 (fetch join 사용)
+    @Query("SELECT c FROM Cart c JOIN FETCH c.product WHERE c.user.id = :userId")
+    List<Cart> findByUserId(@Param("userId") Long userId);
+
+    // 장바구니에 있는 상품인지 확인
+    Optional<Cart> findByUserIdAndProductId(Long userId, Long productId);
+}

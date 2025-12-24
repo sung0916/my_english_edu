@@ -24,4 +24,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     // 타입과 관련 ID를 기준으로 정렬 순서가 가장 빠른 첫번째 이미지 조회(썸네일용)
     Optional<Image> findFirstByTypeAndRelatedIdOrderBySortOrderAsc(ImageType type, Long relatedId);
+
+    List<Image> findByFileNameIn(List<String> fileNames);
 }

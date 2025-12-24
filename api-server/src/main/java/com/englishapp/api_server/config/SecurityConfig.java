@@ -55,8 +55,8 @@ public class SecurityConfig {
                         // 3. 인증/회원가입은 누구나
                         .requestMatchers("/api/auth/login", "/api/users/signup").permitAll()
 
-                        // 4. 게시판/상품 조회는 누구나
-                        .requestMatchers(HttpMethod.GET, "/api/announcements/**", "/api/products/**").permitAll()
+                        // 4. 장소/게시판/상품 조회는 누구나
+                        .requestMatchers(HttpMethod.GET, "/api/places/getPlaces", "/api/announcements/**", "/api/products/**").permitAll()
 
                         // 5. 게시글 작성: ADMIN, TEACHER 가능
                         .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")

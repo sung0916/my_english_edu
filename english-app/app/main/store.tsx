@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 // 한 페이지에 표시할 아이템 개수
-const ITEMS_PER_PAGE = 8; 
+const ITEMS_PER_PAGE = 12; 
 
 // 상품 데이터 인터페이스
 interface Item {

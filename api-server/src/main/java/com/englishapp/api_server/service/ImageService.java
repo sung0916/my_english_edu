@@ -10,4 +10,6 @@ public interface ImageService {
 
     // 이미지 업로드
     List<ImageResponse> uploadImages(List<MultipartFile> files, ImageType imageType, Long relatedId);
+
+    void activateImagesFromContent(String content, ImageType type, Long relatedId);
 }

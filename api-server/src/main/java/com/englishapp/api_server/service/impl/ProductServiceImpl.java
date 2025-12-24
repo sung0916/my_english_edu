@@ -10,6 +10,7 @@ import com.englishapp.api_server.entity.Product;
 import com.englishapp.api_server.entity.User;
 import com.englishapp.api_server.repository.ImageRepository;
 import com.englishapp.api_server.repository.ProductRepository;
+import com.englishapp.api_server.service.ImageService;
 import com.englishapp.api_server.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +33,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
+    private final ImageService imageService;
 
     @Value("${app.base-url}")
     private String baseUrl;
@@ -63,6 +66,13 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
+        // 본문 이미지 처리 (자동 파싱 & 연결)
+        imageService.activateImagesFromContent(
+                request.getDescription(),
+                ImageType.PRODUCT,
+                savedProduct.getId()
+        );
+
         return ProductResponse.from(savedProduct);
     }
 
@@ -92,15 +102,28 @@ public class ProductServiceImpl implements ProductService {
      * @return 상품 상세 정보 DTO */
     @Override
     public ProductResponse getProductDetail(Long id) {
-        // ID 기반의 Product 엔티티 조회 (존재하지 않으면 EntityNotFoundException 예외 발생
+        // 1. ID 기반의 Product 엔티티 조회 (존재하지 않으면 EntityNotFoundException 예외 발생
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 상품을 찾을 수 없음: " + id));
 
-        // 조회된 상품의 ID와 PRODUCT 타입을 기준으로 관련된 이미지 전체 조회
-        List<Image> images = imageRepository.findByTypeAndRelatedId(ImageType.PRODUCT, product.getId());
+        // 2. 이 상품과 연결된 '모든' 이미지(갤러리 + 본문 포함) 조회
+        List<Image> allImages = imageRepository.findByTypeAndRelatedId(ImageType.PRODUCT, product.getId());
 
-        // Product 엔티티와 Image 엔티티 목록을 DTO로 변환하여 반환
-        return ProductResponse.from(product, images);
+        // 3. [핵심 로직] 본문(Description)에 포함된 이미지는 갤러리 목록에서 제외하기
+        String description = product.getDescription();
+        List<Image> galleryImages;
+
+        if (description != null && !description.isEmpty()) {
+            galleryImages = allImages.stream()
+                    .filter(image -> !description.contains(image.getFileName())) // 본문에 파일명이 없는 것만 남김
+                    .collect(Collectors.toList());
+        } else {
+            // 본문이 없으면 필터링 없이 전체가 갤러리 이미지
+            galleryImages = allImages;
+        }
+
+        // 4. 필터링된 갤러리 이미지만 DTO에 담아서 반환
+        return ProductResponse.from(product, galleryImages);
     }
 
     // 상품 수정
@@ -112,6 +135,12 @@ public class ProductServiceImpl implements ProductService {
         //Entity에 업데이트 로직을 위임하여 객체지향적으로 관리
         product.update(request.getProductName(), request.getPrice(), request.getAmount(),
                  request.getDescription(), request.getType(), request.getStatus());
+
+        imageService.activateImagesFromContent(
+                request.getDescription(),
+                ImageType.PRODUCT,
+                product.getId()
+        );
 
         // @Transactional에 의해 메서드 종료 시 변경 감지(dirty checking)되어 자동 업데이트
         return ProductResponse.from(product);

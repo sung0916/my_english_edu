@@ -1,11 +1,11 @@
-import apiClient, { API_BASE_URL, apiClientWithFile } from "@/api";
+import apiClient, { apiClientWithFile } from "@/api";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 
 interface ImageDetail {
@@ -26,7 +26,7 @@ interface ProductDetail {
 type ProductType = 'SUBSCRIPTION' | 'ITEM';
 
 interface UploadedImage {
-    id: number;
+    imageId: number;
     url: string; // 에디터에 삽입될 URL
     imageUrl: string; // imageUrl 필드가 있다면 그것을 사용
 }
@@ -40,53 +40,79 @@ const EditProductNative = () => {
     const [price, setPrice] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState<ProductType>('ITEM');
-    const [uploadedImageIds, setUploadedImageIds] = useState<number[]>([]);
+    const [galleryImages, setGalleryImages] = useState<UploadedImage[]>([]);
     const [initialContent, setInitialContent] = useState('');
 
-    const handleImageUpload = async () => {
+    // 1. [에디터용] 본문 이미지 업로드 (상태 추가 X)
+    const handleEditorUpload = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (permissionResult.granted === false) {
-            crossPlatformAlert("권한 필요", "이미지를 업로드하려면 사진첩 접근 권한이 필요합니다.");
-            return;
-        }
+        if (!permissionResult.granted) return crossPlatformAlert("권한 필요", "권한이 필요합니다.");
 
         const pickerResult = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             quality: 1,
         });
 
-        if (pickerResult.canceled) {
-            return;
-        }
+        if (pickerResult.canceled) return;
 
         const asset = pickerResult.assets[0];
         const formData = new FormData();
-
-        // [수정된 부분] mimeType 오류를 해결하는 안정적인 코드
         const file = {
             uri: asset.uri,
             name: asset.fileName || 'image.jpg',
-            type: asset.type ? `image/${asset.type}` : 'image/jpeg', // asset.type을 사용
+            type: asset.type ? `image/${asset.type}` : 'image/jpeg',
         };
         formData.append('files', file as any);
 
         try {
             const response = await apiClientWithFile.post<UploadedImage[]>('/api/images/upload', formData);
-
             if (response.data && response.data.length > 0) {
                 const uploadedImage = response.data[0];
-                // 백엔드 응답 필드명(imageUrl 또는 url)에 맞춰주세요.
-                const imageUrlToInsert = uploadedImage.imageUrl || uploadedImage.url;
-                const fullImageUrl = `${API_BASE_URL}/${imageUrlToInsert}`;
-                editorRef.current?.insertImage(fullImageUrl);
+                const imageUrl = uploadedImage.imageUrl || uploadedImage.url;
 
-                // 업로드 성공 시, 반환된 이미지 ID를 상태에 추가
-                setUploadedImageIds(prevIds => [...prevIds, uploadedImage.id]);
+                // [핵심] 에디터에 삽입만 함 (갤러리 추가 X)
+                editorRef.current?.insertImage(imageUrl);
             }
         } catch (error) {
-            console.error("이미지 업로드 실패:", error);
-            crossPlatformAlert("오류", "이미지 업로드에 실패했습니다.");
+            console.error("에디터 업로드 실패:", error);
         }
+    };
+
+    // 2. [갤러리용] 상품 대표 이미지 업로드 (상태 추가 O)
+    const handleGalleryUpload = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) return crossPlatformAlert("권한 필요", "권한이 필요합니다.");
+
+        const pickerResult = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+        });
+
+        if (pickerResult.canceled) return;
+
+        const asset = pickerResult.assets[0];
+        const formData = new FormData();
+        const file = {
+            uri: asset.uri,
+            name: asset.fileName || 'image.jpg',
+            type: asset.type ? `image/${asset.type}` : 'image/jpeg',
+        };
+        formData.append('files', file as any);
+
+        try {
+            const response = await apiClientWithFile.post<UploadedImage[]>('/api/images/upload', formData);
+            if (response.data && response.data.length > 0) {
+                const uploadedImage = response.data[0];
+                // [핵심] 갤러리 상태에 추가
+                setGalleryImages(prev => [...prev, uploadedImage]);
+            }
+        } catch (error) {
+            console.error("갤러리 업로드 실패:", error);
+        }
+    };
+
+    const handleRemoveImage = (imageId: number) => {
+        setGalleryImages(prev => prev.filter(img => img.imageId !== imageId));
     };
 
     // 상품 데이터 가져오는 로직
@@ -105,9 +131,14 @@ const EditProductNative = () => {
                         ${data.description}
                     `;
                     setInitialContent(styledDescription);  // 타이밍 문제 해결
-                    const existingImageIds = data.images.map(img => img.id);
-                    setUploadedImageIds(existingImageIds);
-                    
+
+                    const mappedImages: UploadedImage[] = data.images.map(img => ({
+                        imageId: img.id,
+                        imageUrl: img.imageUrl,
+                        url: img.imageUrl
+                    }));
+                    setGalleryImages(mappedImages);
+
                 } catch (error) {
                     console.error('상품 정보 로딩 실패: ', error);
                     crossPlatformAlert('', '상품 정보를 불러오는 데 실패함');
@@ -149,6 +180,7 @@ const EditProductNative = () => {
             amount: parseInt(amount, 10),
             type,
             description,
+            imageIds: galleryImages.map(img => img.imageId),
         }
 
         // API 요청
@@ -179,7 +211,7 @@ const EditProductNative = () => {
 
             <View style={styles.formGroup}>
                 <Text style={styles.label}>가격</Text>
-                <TextInput 
+                <TextInput
                     style={styles.input}
                     placeholder="가격을 입력하세요"
                     value={price}
@@ -194,12 +226,12 @@ const EditProductNative = () => {
                     placeholder="수량을 입력하세요"
                     value={amount}
                     onChangeText={setAmount}
-                    keyboardType="numeric" 
+                    keyboardType="numeric"
                 />
             </View>
             <View style={styles.formGroup}>
                 <Text style={styles.label}>상품 타입</Text>
-                <Picker 
+                <Picker
                     selectedValue={type}
                     onValueChange={(itemValue) => setType(itemValue)}
                 >
@@ -207,30 +239,49 @@ const EditProductNative = () => {
                     <Picker.Item label="구독권" value="SUBSCRIPTION" />
                 </Picker>
             </View>
-            
+
             <View style={styles.formGroup}>
                 <Text style={styles.label}>상세 설명</Text>
                 <RichToolbar
                     editor={editorRef}
                     actions={[
-                        actions.setBold, 
-                        actions.setItalic, 
-                        actions.setUnderline, 
-                        actions.insertBulletsList, 
-                        actions.insertOrderedList, 
+                        actions.setBold,
+                        actions.setItalic,
+                        actions.setUnderline,
+                        actions.insertBulletsList,
+                        actions.insertOrderedList,
                         actions.insertImage,
                         'insertImage'
                     ]}
-                    iconMap={{ 
-                        insertImage: () => <Ionicons name="image-outline" size={24} color="#495057" />
+                    iconMap={{
+                        customAddImage: () => <Ionicons name="image-outline" size={24} color="#495057" />
                     }}
-                    onPressAddImage={handleImageUpload}
+                    onPressAddImage={handleEditorUpload}
                 />
                 <RichEditor
                     ref={editorRef}
-                    initialContentHTML={initialContent} 
+                    initialContentHTML={initialContent}
                     style={styles.editor}
                 />
+            </View>
+
+            <View style={styles.attachmentContainer}>
+                <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom:10}}>
+                    <Text style={styles.label}>상품 대표 이미지 (갤러리)</Text>
+                    <TouchableOpacity onPress={handleGalleryUpload}>
+                        <Text style={{color:'#007bff'}}>+ 이미지 추가</Text>
+                    </TouchableOpacity>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {galleryImages.map((img) => (
+                        <View key={img.imageId} style={styles.thumbnailWrapper}>
+                            <Image source={{ uri: img.imageUrl }} style={styles.thumbnail} />
+                            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveImage(img.imageId)}>
+                                <Ionicons name="close" size={12} color="#fff" />
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </ScrollView>
             </View>
 
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -249,6 +300,10 @@ const styles = StyleSheet.create({
     editor: { minHeight: 200, borderWidth: 1, borderColor: '#dee2e6' },
     submitButton: { backgroundColor: '#007bff', padding: 15, borderRadius: 5, alignItems: 'center', marginTop: 16 },
     submitButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    attachmentContainer: { marginBottom: 20 },
+    thumbnailWrapper: { width: 80, height: 80, marginRight: 10, borderRadius: 8, overflow: 'hidden', borderWidth: 1, borderColor: '#eee' },
+    thumbnail: { width: '100%', height: '100%' },
+    removeButton: { position: 'absolute', top: 4, right: 4, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center' },
 });
 
 export default EditProductNative;
