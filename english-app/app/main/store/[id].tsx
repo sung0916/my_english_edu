@@ -1,7 +1,7 @@
 import apiClient from "@/api";
 import PermitCustomButton from "@/components/common/PermitButtonProps";
+import { useCartStore } from "@/store/useCartStore";
 import { useUserStore } from "@/store/userStore";
-import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -34,11 +34,13 @@ interface ProductDetail {
 const ProductDetailPage = () => {
     const router = useRouter();
     const { id } = useLocalSearchParams<{ id: string }>();
-    const { user } = useUserStore();
+    const { user, isLoggedIn } = useUserStore();
+    const { addToCart } = useCartStore();
     const [product, setProduct] = useState<ProductDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const [isAddingCart, setIsAddingCart] = useState(false);
 
     useEffect(() => {
         // id가 유효할 때만 API 호출
@@ -68,9 +70,50 @@ const ProductDetailPage = () => {
         }
     };
 
+    const handleAddToCart = async () => {
+        if (!isLoggedIn) {
+            alert('Please Log in first');
+            router.push('/auth/login');
+            return;
+        }
+        if (!product) return;
+
+        try {
+            setIsAddingCart(true);
+            // useCartStore의 addToCart 액션 호출 (API 연동됨)
+            await addToCart(product.id, quantity);
+
+            // 성공 시 알림 및 사용자 선택 유도
+            if (Platform.OS === 'web') {
+                // 웹: confirm 창 사용
+                alert("장바구니에 담았습니다.");
+            } else {
+                // 앱: Alert 사용
+                alert("장바구니에 담았습니다.");
+                // 필요 시 장바구니 이동 로직 추가
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("장바구니 담기에 실패했습니다.");
+        } finally {
+            setIsAddingCart(false);
+        }
+    };
+
     const handleEditPress = () => {
         // 관리자 전용 수정 페이지로 이동
         router.push(`/admin/product/${id}`);
+    };
+
+    const handleBuyNow = () => {
+        if (!isLoggedIn) {
+            alert("로그인이 필요합니다.");
+            router.push('/auth/login');
+            return;
+        }
+        // 바로 구매 로직 (예: 결제 페이지로 수량/상품ID 넘기기)
+        router.push(`/user/payment?productId=${id}&amount=${quantity}`);
     };
 
     // 플랫폼에 따라 상세 설명을 렌더링하는 컴포넌트
@@ -199,10 +242,22 @@ const ProductDetailPage = () => {
 
                     {/* 버튼 그룹 (장바구니 / 바로구매) */}
                     <View style={styles.actionButtons}>
-                        <TouchableOpacity style={[styles.btn, styles.cartBtn]} onPress={() => crossPlatformAlert("", "장바구니에 담았습니다.")}>
-                            <Text style={styles.cartBtnText}>장바구니 담기</Text>
+                        <TouchableOpacity 
+                            style={[styles.btn, styles.cartBtn]} 
+                            onPress={handleAddToCart}
+                            disabled={isAddingCart}
+                        >
+                            {isAddingCart ? (
+                                <ActivityIndicator color="#333" />
+                            ) : (
+                                <Text style={styles.cartBtnText}>장바구니 담기</Text>
+                            )}
                         </TouchableOpacity>
-                        <TouchableOpacity style={[styles.btn, styles.buyBtn]} onPress={() => router.push(`/user/payment`)}>
+
+                        <TouchableOpacity 
+                            style={[styles.btn, styles.buyBtn]} 
+                            onPress={handleBuyNow}
+                        >
                             <Text style={styles.buyBtnText}>바로구매</Text>
                         </TouchableOpacity>
                     </View>

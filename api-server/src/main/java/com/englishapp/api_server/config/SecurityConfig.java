@@ -58,22 +58,25 @@ public class SecurityConfig {
                         // 4. 장소/게시판/상품 조회는 누구나
                         .requestMatchers(HttpMethod.GET, "/api/places/getPlaces", "/api/announcements/**", "/api/products/**").permitAll()
 
-                        // 5. 게시글 작성: ADMIN, TEACHER 가능
+                        // 5. 장바구니 기능
+                        .requestMatchers("/api/carts/**").hasAnyAuthority("TEACHER", "STUDENT")
+
+                        // 6. 게시글 작성: ADMIN, TEACHER 가능
                         .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")
 
-                        // 6. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 @PreAuthorize로 구독 상태 체크 로직 작성 후 추후 추가)
+                        // 7. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 @PreAuthorize로 구독 상태 체크 로직 작성 후 추후 추가)
                         .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
 
-                        // 7. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
+                        // 8. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
                         .requestMatchers("/api/announcements/**", "/api/products/**").hasAuthority("ADMIN")
 
-                        // 8. 관리자 페이지
+                        // 9. 관리자 페이지
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
-                        // 9. 내 정보 확인 등 인증된 유저 공통 기능
+                        // 10. 내 정보 확인 등 인증된 유저 공통 기능
                         .requestMatchers("/api/users/me", "/api/auth/confirm-password").authenticated() // 인증된 모든 유저가 접근 가능
 
-                        // 10. 그 외 모든 요청은 인증 필요
+                        // 11. 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
                 // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가

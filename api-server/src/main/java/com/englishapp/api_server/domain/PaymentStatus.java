@@ -2,8 +2,8 @@ package com.englishapp.api_server.domain;
 
 public enum PaymentStatus {
 
-    COMPLETED,
+    PROCESSING,
+    PAID,
     FAILED,
     CANCELED,
-    REFUNDED,
 }

@@ -37,7 +37,7 @@ public class Payment {
 
     // 결제 성공 메서드
     public void succeed(String pgTid) {
-        this.status = PaymentStatus.COMPLETED;
+        this.status = PaymentStatus.PAID;
         this.pgTid = pgTid;
         this.paidAt = LocalDateTime.now();
     }
