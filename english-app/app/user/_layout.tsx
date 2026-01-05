@@ -1,21 +1,23 @@
 import UserHeader from "@/components/user/UserHeader";
 import UserSidebar from "@/components/user/UserSidebar";
 import { useUIStore } from "@/store/uiStore";
-import { Slot } from "expo-router";
+import { Slot, usePathname } from "expo-router";
 import { Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const UserLayout = () => {
     const { width } = useWindowDimensions();
+    const pathname = usePathname();
     const isMobile = width < 768;
     const { isSidebarOpen, toggleSidebar } = useUIStore();
+    const isCartPage = pathname.includes('cart');
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <UserHeader />
 
             <View style={styles.layoutContainer}>
-                {!isMobile && <UserSidebar />}
+                {!isMobile && !isCartPage && <UserSidebar />}
 
                 {isMobile && (
                     <Modal

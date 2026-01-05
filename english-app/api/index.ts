@@ -3,8 +3,8 @@ import { router } from 'expo-router';
 import { useUserStore } from '../store/userStore';
 
 // addProduct, EditProduct, write 등에서 URL 조립과정에 사용할 api 주소
-// export const API_BASE_URL = 'http://localhost:8080';
-export const API_BASE_URL = 'http://192.168.1.246:8080';  // 다른 컴퓨터에 공유할 API (디버깅용)
+ export const API_BASE_URL = 'http://localhost:8080';
+// export const API_BASE_URL = 'http://192.168.1.246:8080';  // 다른 컴퓨터에 공유할 API (디버깅용)
 
 // JSON 데이터를 위한 기본 API 클라이언트
 const apiClient = axios.create({

@@ -106,14 +106,27 @@ const ProductDetailPage = () => {
         router.push(`/admin/product/${id}`);
     };
 
-    const handleBuyNow = () => {
+    const handleBuyNow = async () => {
         if (!isLoggedIn) {
-            alert("로그인이 필요합니다.");
+            alert("Please login first");
             router.push('/auth/login');
             return;
         }
-        // 바로 구매 로직 (예: 결제 페이지로 수량/상품ID 넘기기)
-        router.push(`/user/payment?productId=${id}&amount=${quantity}`);
+        if (!product) return;
+
+        // 바로 구매 로직
+        try {
+            setIsAddingCart(true);
+            await addToCart(product.id, quantity);
+            router.push('/user/cart');
+
+        } catch (err) {
+            console.error(err);
+            alert('Error in processing now.\nTry again.');
+
+        } finally {
+            setIsAddingCart(false);
+        }
     };
 
     // 플랫폼에 따라 상세 설명을 렌더링하는 컴포넌트
@@ -257,8 +270,13 @@ const ProductDetailPage = () => {
                         <TouchableOpacity 
                             style={[styles.btn, styles.buyBtn]} 
                             onPress={handleBuyNow}
+                            disabled={isAddingCart}
                         >
-                            <Text style={styles.buyBtnText}>바로구매</Text>
+                            {isAddingCart ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text style={styles.buyBtnText}>바로구매</Text>
+                            )}
                         </TouchableOpacity>
                     </View>
 

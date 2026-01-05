@@ -49,11 +49,11 @@ export default function CartPage() {
   }, [items]);
 
   // --- [로직] 선택 관련 ---
-  
+
   // 전체 선택/해제 토글
   const handleSelectAll = () => {
     const validItems = items.filter(item => item.status === 'ONSALE');
-    
+
     if (selectedIds.size === validItems.length) {
       setSelectedIds(new Set()); // 모두 해제
     } else {
@@ -84,9 +84,9 @@ export default function CartPage() {
 
     // 확인 절차
     if (Platform.OS === 'web') {
-       if (!confirm(`${selectedIds.size}개 상품을 삭제하시겠습니까?`)) return;
+      if (!confirm(`${selectedIds.size}개 상품을 삭제하시겠습니까?`)) return;
     } else {
-        // 모바일은 Alert 사용 (비동기 처리 필요하지만 간단히 구현)
+      // 모바일은 Alert 사용 (비동기 처리 필요하지만 간단히 구현)
     }
 
     try {
@@ -110,7 +110,7 @@ export default function CartPage() {
   const { totalProductPrice, finalPrice } = useMemo(() => {
     const selectedItems = items.filter(item => selectedIds.has(item.cartId));
     const total = selectedItems.reduce((sum, item) => sum + item.totalPrice, 0);
-    
+
     return {
       totalProductPrice: total,
       finalPrice: total // 배송비 없음
@@ -126,16 +126,16 @@ export default function CartPage() {
     return (
       <View style={[styles.card, !isSale && styles.cardDisabled]}>
         {/* 체크박스 영역 */}
-        <Pressable 
-          style={styles.checkboxContainer} 
+        <Pressable
+          style={styles.checkboxContainer}
           onPress={() => handleToggleItem(item.cartId, item.status)}
           disabled={!isSale}
         >
           {isSale ? (
-            <Ionicons 
-              name={isChecked ? "checkbox" : "square-outline"} 
-              size={24} 
-              color={isChecked ? "#4A90E2" : "#ccc"} 
+            <Ionicons
+              name={isChecked ? "checkbox" : "square-outline"}
+              size={24}
+              color={isChecked ? "#4A90E2" : "#ccc"}
             />
           ) : (
             <Ionicons name="square" size={24} color="#e0e0e0" />
@@ -145,21 +145,18 @@ export default function CartPage() {
         {/* 상품 정보 영역 */}
         <View style={styles.cardContent}>
           <Text style={styles.headerTitle}>
-            {item.productName} 
+            {item.productName}
             {!isSale && <Text style={styles.soldOutBadge}> (판매중지)</Text>}
           </Text>
-          
+
           <View style={styles.productBody}>
-            <Image 
-              source={{ uri: item.thumbnailImageUrl || 'https://via.placeholder.com/80' }} 
-              style={[styles.image, !isSale && { opacity: 0.5 }]} 
+            <Image
+              source={{ uri: item.thumbnailImageUrl || 'https://via.placeholder.com/80' }}
+              style={[styles.image, !isSale && { opacity: 0.5 }]}
             />
-            
+
             <View style={styles.infoCol}>
               <Text style={styles.priceText}>{formatPrice(item.price)}원</Text>
-              {isSale && (
-                <Text style={styles.deliveryTag}>🚀 로켓배송</Text>
-              )}
             </View>
           </View>
 
@@ -190,19 +187,19 @@ export default function CartPage() {
 
   // --- [렌더링] 결제 수단 컴포넌트 ---
   const PaymentOption = ({ method, label, color, icon }: any) => (
-    <Pressable 
+    <Pressable
       style={[styles.payOption, paymentMethod === method && styles.payOptionSelected]}
       onPress={() => setPaymentMethod(method)}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <MaterialCommunityIcons 
-          name={paymentMethod === method ? "radiobox-marked" : "radiobox-blank"} 
-          size={24} 
-          color={paymentMethod === method ? "#4A90E2" : "#ccc"} 
+        <MaterialCommunityIcons
+          name={paymentMethod === method ? "radiobox-marked" : "radiobox-blank"}
+          size={24}
+          color={paymentMethod === method ? "#4A90E2" : "#ccc"}
         />
         <View style={[styles.iconBox, { backgroundColor: color }]}>
-            {/* 아이콘 이미지가 없어서 텍스트나 기본 아이콘으로 대체 */}
-            <Text style={{fontSize: 10, color: '#fff', fontWeight: 'bold'}}>{label[0]}</Text>
+          {/* 아이콘 이미지가 없어서 텍스트나 기본 아이콘으로 대체 */}
+          <Text style={{ fontSize: 10, color: '#fff', fontWeight: 'bold' }}>{label[0]}</Text>
         </View>
         <Text style={styles.payLabel}>{label}</Text>
       </View>
@@ -216,71 +213,61 @@ export default function CartPage() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        
+
         {/* 1. 상단 타이틀 */}
         <View style={styles.pageHeader}>
-            <Text style={styles.pageTitle}>장바구니({items.length})</Text>
+          <Text style={styles.pageTitle}>장바구니({items.length})</Text>
         </View>
 
         {/* 2. 전체 선택 / 선택 삭제 바 */}
         <View style={styles.selectionBar}>
-            <Pressable style={styles.selectAllBtn} onPress={handleSelectAll}>
-                <Ionicons 
-                    name={items.length > 0 && selectedIds.size === items.filter(i => i.status === 'ONSALE').length ? "checkbox" : "square-outline"} 
-                    size={22} 
-                    color="#4A90E2" 
-                />
-                <Text style={styles.selectText}>전체 선택 ({selectedIds.size}/{items.length})</Text>
-            </Pressable>
-            <Pressable style={styles.deleteSelectedBtn} onPress={handleDeleteSelected}>
-                <Text style={styles.deleteSelectedText}>선택 삭제</Text>
-            </Pressable>
+          <Pressable style={styles.selectAllBtn} onPress={handleSelectAll}>
+            <Ionicons
+              name={items.length > 0 && selectedIds.size === items.filter(i => i.status === 'ONSALE').length ? "checkbox" : "square-outline"}
+              size={22}
+              color="#4A90E2"
+            />
+            <Text style={styles.selectText}>전체 선택 ({selectedIds.size}/{items.length})</Text>
+          </Pressable>
+          <Pressable style={styles.deleteSelectedBtn} onPress={handleDeleteSelected}>
+            <Text style={styles.deleteSelectedText}>선택 삭제</Text>
+          </Pressable>
         </View>
 
         {/* 3. 상품 리스트 */}
         <View style={styles.listSection}>
-             <FlatList
-                data={items}
-                keyExtractor={item => item.cartId.toString()}
-                renderItem={renderItem}
-                scrollEnabled={false} // 부모 ScrollView 사용
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>장바구니가 비어있습니다.</Text>
-                    </View>
-                }
-             />
+          <FlatList
+            data={items}
+            keyExtractor={item => item.cartId.toString()}
+            renderItem={renderItem}
+            scrollEnabled={false} // 부모 ScrollView 사용
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>장바구니가 비어있습니다.</Text>
+              </View>
+            }
+          />
         </View>
 
         {/* 4. 결제 수단 선택 */}
         {selectedIds.size > 0 && (
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>결제수단</Text>
-                <View style={styles.payGroup}>
-                    <PaymentOption method="TOSS" label="토스페이" color="#0050FF" />
-                    <PaymentOption method="KAKAO" label="카카오페이" color="#FEE500" />
-                    <PaymentOption method="CARD" label="신용카드" color="#333" />
-                    <PaymentOption method="MOBILE" label="휴대폰결제" color="#2DB400" />
-                </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>결제수단</Text>
+            <View style={styles.payGroup}>
+              <PaymentOption method="TOSS" label="토스페이" color="#0050FF" />
+              <PaymentOption method="KAKAO" label="카카오페이" color="#FEE500" />
+              <PaymentOption method="CARD" label="신용카드" color="#333" />
+              <PaymentOption method="MOBILE" label="휴대폰결제" color="#2DB400" />
             </View>
+          </View>
         )}
 
-        {/* 5. 주문 예상 금액 (요약) */}
+        {/* 5. 주문 총 금액 */}
         <View style={styles.summarySection}>
-            <Text style={styles.sectionTitle}>주문 예상 금액</Text>
-            <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>총 상품 가격</Text>
-                <Text style={styles.summaryValue}>{formatPrice(totalProductPrice)}원</Text>
-            </View>
-            <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>총 배송비</Text>
-                <Text style={styles.summaryValue}>0원</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>총 결제금액</Text>
-                <Text style={styles.totalValue}>{formatPrice(finalPrice)}원</Text>
-            </View>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>총 결제금액</Text>
+            <Text style={styles.totalValue}>{formatPrice(finalPrice)}원</Text>
+          </View>
         </View>
 
         {/* 하단 여백 (버튼에 가려지지 않게) */}
@@ -289,15 +276,15 @@ export default function CartPage() {
 
       {/* 6. 하단 고정 구매 버튼 */}
       <View style={styles.bottomBar}>
-          <Pressable 
-            style={[styles.checkoutBtn, selectedIds.size === 0 && styles.checkoutBtnDisabled]}
-            disabled={selectedIds.size === 0}
-            onPress={() => alert(`${formatPrice(finalPrice)}원 결제하기 (${paymentMethod})`)}
-          >
-              <Text style={styles.checkoutBtnText}>
-                  총 {selectedIds.size}개 상품 구매하기
-              </Text>
-          </Pressable>
+        <Pressable
+          style={[styles.checkoutBtn, selectedIds.size === 0 && styles.checkoutBtnDisabled]}
+          disabled={selectedIds.size === 0}
+          onPress={() => alert(`${formatPrice(finalPrice)}원 결제하기 (${paymentMethod})`)}
+        >
+          <Text style={styles.checkoutBtnText}>
+            총 {selectedIds.size}개 상품 구매하기
+          </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -306,6 +293,9 @@ export default function CartPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
     backgroundColor: '#f2f4f6', // 연한 회색 배경
   },
   scrollContent: {
@@ -316,54 +306,54 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   // 헤더
   pageHeader: {
-      padding: 20,
-      backgroundColor: '#fff',
-      borderBottomWidth: 1,
-      borderBottomColor: '#eee',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   pageTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 
   // 선택 바
   selectionBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      backgroundColor: '#fff',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 10,
   },
   selectAllBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   selectText: {
-      fontSize: 14,
-      color: '#333',
+    fontSize: 14,
+    color: '#333',
   },
   deleteSelectedBtn: {
-      padding: 6,
-      borderWidth: 1,
-      borderColor: '#ddd',
-      borderRadius: 4,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
   },
   deleteSelectedText: {
-      fontSize: 12,
-      color: '#666',
+    fontSize: 12,
+    color: '#666',
   },
 
   // 리스트 영역
   listSection: {
-      marginBottom: 10,
+    marginBottom: 10,
   },
-  
+
   // 카드 스타일
   card: {
     flexDirection: 'row',
@@ -374,201 +364,204 @@ const styles = StyleSheet.create({
     marginBottom: 2, // 카드 사이 간격
   },
   cardDisabled: {
-      backgroundColor: '#f9f9f9',
+    backgroundColor: '#f9f9f9',
   },
   checkboxContainer: {
-      justifyContent: 'flex-start',
-      paddingTop: 4,
-      marginRight: 12,
+    justifyContent: 'flex-start',
+    paddingTop: 4,
+    marginRight: 12,
   },
   cardContent: {
-      flex: 1,
-      position: 'relative',
+    flex: 1,
+    position: 'relative',
   },
   headerTitle: {
-      fontSize: 15,
-      color: '#333',
-      marginBottom: 8,
-      lineHeight: 20,
-      paddingRight: 20, // 삭제 버튼 공간
+    fontSize: 15,
+    color: '#333',
+    marginBottom: 8,
+    lineHeight: 20,
+    paddingRight: 20, // 삭제 버튼 공간
   },
   soldOutBadge: {
-      color: '#e74c3c',
-      fontWeight: 'bold',
-      fontSize: 13,
+    color: '#e74c3c',
+    fontWeight: 'bold',
+    fontSize: 13,
   },
   productBody: {
-      flexDirection: 'row',
-      marginBottom: 12,
+    flexDirection: 'row',
+    marginBottom: 12,
   },
   image: {
-      width: 70,
-      height: 70,
-      borderRadius: 6,
-      backgroundColor: '#eee',
-      marginRight: 12,
+    width: 70,
+    height: 70,
+    borderRadius: 6,
+    backgroundColor: '#eee',
+    marginRight: 12,
   },
   infoCol: {
-      justifyContent: 'center',
+    justifyContent: 'center',
   },
   priceText: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      marginBottom: 4,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
   },
   deliveryTag: {
-      fontSize: 11,
-      color: '#00891A', // 네이버/쿠팡 초록색
-      backgroundColor: '#E8F7EC',
-      alignSelf: 'flex-start',
-      paddingHorizontal: 4,
-      paddingVertical: 2,
-      borderRadius: 2,
+    fontSize: 11,
+    color: '#00891A', // 네이버/쿠팡 초록색
+    backgroundColor: '#E8F7EC',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 2,
   },
-  
+
   // 수량 조절
   controlRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      backgroundColor: '#f8f9fa',
-      padding: 8,
-      borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f9fa',
+    padding: 8,
+    borderRadius: 6,
   },
   counter: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#fff',
-      borderWidth: 1,
-      borderColor: '#ddd',
-      borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
   },
   countBtn: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   countText: {
-      width: 30,
-      textAlign: 'center',
-      fontSize: 14,
+    width: 30,
+    textAlign: 'center',
+    fontSize: 14,
   },
   itemTotal: {
-      fontSize: 14,
-      fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '600',
   },
   deleteBtn: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      padding: 4,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: 4,
   },
 
   // 섹션 공통
   section: {
-      backgroundColor: '#fff',
-      padding: 20,
-      marginBottom: 10,
+    backgroundColor: '#fff',
+    padding: 20,
+    marginBottom: 10,
   },
   sectionTitle: {
-      fontSize: 17,
-      fontWeight: 'bold',
-      marginBottom: 16,
-      color: '#333',
+    fontSize: 17,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
   },
 
   // 결제 수단
   payGroup: {
-      gap: 12,
+    gap: 12,
   },
   payOption: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 12,
-      borderWidth: 1,
-      borderColor: '#eee',
-      borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 8,
   },
   payOptionSelected: {
-      borderColor: '#4A90E2',
-      backgroundColor: '#F0F7FF',
+    borderColor: '#4A90E2',
+    backgroundColor: '#F0F7FF',
   },
   iconBox: {
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      marginLeft: 10,
-      marginRight: 10,
-      alignItems: 'center',
-      justifyContent: 'center',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginLeft: 10,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   payLabel: {
-      fontSize: 15,
-      color: '#333',
+    fontSize: 15,
+    color: '#333',
   },
 
   // 요약 영역
   summarySection: {
-      backgroundColor: '#fff',
-      padding: 20,
-      marginBottom: 20,
+    backgroundColor: '#fff',
+    padding: 20,
+    marginBottom: 20,
   },
   summaryRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   summaryLabel: { color: '#666' },
   summaryValue: { fontSize: 15, color: '#333' },
   divider: {
-      height: 1,
-      backgroundColor: '#eee',
-      marginVertical: 14,
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 14,
   },
   totalRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   totalLabel: { fontSize: 18, fontWeight: 'bold' },
   totalValue: { fontSize: 24, fontWeight: 'bold', color: '#333' },
 
   // 하단 고정 바
   bottomBar: {
-      position: Platform.OS === 'web' ? 'fixed' : 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: '#fff',
-      padding: 16,
-      borderTopWidth: 1,
-      borderTopColor: '#eee',
-      // 그림자
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 3,
-      elevation: 10,
+    position: Platform.OS === 'web' ? 'fixed' : 'absolute',
+    width: '100%',
+    maxWidth: 800,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    marginHorizontal: 'auto',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    // 그림자
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 10,
   },
   checkoutBtn: {
-      backgroundColor: '#4A90E2',
-      paddingVertical: 16,
-      borderRadius: 8,
-      alignItems: 'center',
+    backgroundColor: '#4A90E2',
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   checkoutBtnDisabled: {
-      backgroundColor: '#ccc',
+    backgroundColor: '#ccc',
   },
   checkoutBtnText: {
-      color: '#fff',
-      fontSize: 18,
-      fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 
   emptyContainer: {
-      padding: 40,
-      alignItems: 'center',
+    padding: 40,
+    alignItems: 'center',
   },
   emptyText: {
-      color: '#999',
+    color: '#999',
   }
 });
