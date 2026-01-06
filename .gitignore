@@ -1,17 +1,28 @@
 # =================================================
-# General
+# 1. General & OS
 # =================================================
 .DS_Store
+Thumbs.db
 *.log
+*.tmp
 
-# Build 결과물
+# =================================================
+# 2. Build & Dist (빌드 결과물)
+# =================================================
 build/
 out/
+dist/
+dist-ssr/
+web-build/
 
-# Gradle 캐시 및 설정
-.gradle/
-
-# STS (Eclipse)
+# =================================================
+# 3. IDE & Tools
+# =================================================
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
 .apt_generated
 .classpath
 .factorypath
@@ -20,6 +31,7 @@ out/
 .springBeans
 .sts4-cache
 bin/
+.eslintcache
 
 # NetBeans
 /nbproject/private/
@@ -29,57 +41,50 @@ bin/
 /.nb-gradle/
 
 # =================================================
-# IDEs - IntelliJ IDEA / VSCode
+# 4. Backend (Spring Boot / Gradle)
 # =================================================
-.idea/
-.vscode/
-*.iml
-*.iws
-*.ipr
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+logs/
+*.pid
+
+# !! SECURITY (Backend) !!
+# 경로가 바뀌어도 안전하게 잡히도록 **/ 패턴 사용
+**/application-local.yml
+**/application-secret.json
+**/application-secret.yml
+**/application-prod.yml
+**/gcp-credentials.json
 
 # =================================================
-# Java / Spring Boot / Gradle (Backend)
+# 5. Frontend (React / Vite)
 # =================================================
-api-server/build/
-api-server/.gradle/
-
-# !! SECURITY !!
-# Ignore sensitive application configuration
-# api-server/src/main/resources/application-local.yml
-# api-server/src/main/resources/gcp-credentials.json
-application-local.yml
-gcp-credentials.json
-
-# =================================================
-# Node.js / Expo (Frontend)
-# =================================================
-
-# 의존성 폴더
+# 의존성 모듈 (가장 중요)
 node_modules/
-package-lock.json
 
-# Expo & Metro 관련 파일
+# Expo & Metro (혹시 남아있을 찌꺼기 파일 무시)
 .expo/
 .metro-health-check*
-
-# 빌드 결과물
-dist/
-web-build/
 
 # 타입스크립트 빌드 정보
 *.tsbuildinfo
 expo-env.d.ts
 
-# 생성된 네이티브 폴더 (필요시 직접 생성해서 사용)
+# Native 폴더 (웹 전용으로 전환했으므로 무시 처리)
 /ios
 /android
 
-# -----------------------------------------
-# Sensitive & OS specific
-# -----------------------------------------
+# 테스팅 커버리지
+coverage/
+
+# =================================================
+# 6. Global Security (환경변수 및 키)
+# =================================================
 # 로컬 환경 변수 파일 (비밀번호, API 키 등)
-.env*.local
-gcp-credentials.json
+.env
+.env.local
+.env.*.local
+*.local
 
 # 인증서 및 키 파일
 *.jks
@@ -89,13 +94,12 @@ gcp-credentials.json
 *.mobileprovision
 *.pem
 
-# 디버그 로그 파일
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+# 공통 비밀 키 파일
+secrets.json
+client_secret.json
 
-# macOS 시스템 파일
-.DS_Store
-
-# local env files
-.env*.local
+# 디버그 로그
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
