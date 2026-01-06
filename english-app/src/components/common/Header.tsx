@@ -2,7 +2,6 @@ import { Menu, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
-// import logo from '@/assets/images/favicon.png'; // Todo: Check asset path
 
 const Header = () => {
     const { isLoggedIn, logout, user } = useUserStore();
@@ -23,9 +22,11 @@ const Header = () => {
             {/* Logo */}
             <div className="flex-shrink-0">
                 <Link to="/" onClick={closeMenu}>
-                    {/* Placeholder for Logo if image not ready */}
-                    <span className="text-2xl font-bold text-blue-600">MonsterEdu</span>
-                    {/* <img src={logo} alt="Logo" className="w-24 h-auto object-contain" /> */}
+                    <img
+                        src="/logo.png"
+                        alt="MonsterEdu"
+                        className="w-[100px] h-[70px] object-contain"
+                    />
                 </Link>
             </div>
 

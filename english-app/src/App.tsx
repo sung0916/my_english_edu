@@ -100,11 +100,12 @@ function App() {
 
                 {/* 6. User Routes (UserLayout 적용) */}
                 <Route path="user" element={<UserLayout />}>
-                    <Route path="cart" element={<CartPage />} />
+                    
                     <Route path="payment" element={<div className="p-10 text-center">Payment Page (Ready)</div>} />
                     <Route path="place" element={<div className="p-10 text-center">Place Page (Ready)</div>} />
                     <Route path="result" element={<div className="p-10 text-center">Result Page (Ready)</div>} />
                 </Route>
+                <Route path="user/cart" element={<CartPage />} />
 
                 {/* 7. Admin Routes (AdminLayout 적용) */}
                 <Route path="admin" element={<AdminLayout />}>

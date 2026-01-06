@@ -92,7 +92,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 허용할 출처(Origin) 설정
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8081", "http://localhost:19006", "http://192.168.1.246:8081"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:19006", "http://192.168.1.246:5173"));
 
         // 허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
