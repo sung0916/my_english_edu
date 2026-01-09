@@ -18,4 +18,8 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     // 장바구니에 있는 상품인지 확인
     Optional<Cart> findByUserIdAndProductId(Long userId, Long productId);
+
+    // 장바구니에서 선택된 상품들 조회
+    @Query("SELECT c FROM Cart c JOIN FETCH c.product WHERE c.user.id = :userId AND c.id IN :cartIds")
+    List<Cart> findByUserIdAndIdIn(@Param("userId") Long id, @Param("cartIds") List<Long> cartIds);
 }

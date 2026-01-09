@@ -36,6 +36,7 @@ import StorePage from './pages/main/StorePage';
 import EnglishDetailPage from './pages/detail/EnglishEdu';
 import BoardDetailPage from './pages/detail/BoardDetailPage';
 import StoreDetailPage from './pages/detail/StoreDetailPage';
+import PaymentPage from './pages/user/PaymentPage';
 
 function App() {
     return (
@@ -106,6 +107,7 @@ function App() {
                     <Route path="result" element={<div className="p-10 text-center">Result Page (Ready)</div>} />
                 </Route>
                 <Route path="user/cart" element={<CartPage />} />
+                <Route path="user/payment" element={<PaymentPage />} />
 
                 {/* 7. Admin Routes (AdminLayout 적용) */}
                 <Route path="admin" element={<AdminLayout />}>

@@ -55,3 +55,7 @@ logging:
     # 개발 시 SQL을 자세히 보기 위한 설정
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+portone:
+  api-key: "PLACEHOLDER_KEY"
+  api-secret: "PLACEHOLDER_SECRET"

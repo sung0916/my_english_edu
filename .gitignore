@@ -50,6 +50,7 @@ logs/
 
 # !! SECURITY (Backend) !!
 # 경로가 바뀌어도 안전하게 잡히도록 **/ 패턴 사용
+**/application.yml
 **/application-local.yml
 **/application-secret.json
 **/application-secret.yml

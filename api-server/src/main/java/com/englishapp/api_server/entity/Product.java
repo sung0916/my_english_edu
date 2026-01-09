@@ -1,5 +1,6 @@
 package com.englishapp.api_server.entity;
 
+import com.englishapp.api_server.domain.LicensePeriod;
 import com.englishapp.api_server.domain.ProductStatus;
 import com.englishapp.api_server.domain.ProductType;
 import jakarta.persistence.*;
@@ -40,6 +41,10 @@ public class Product {
     private ProductType type;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "license_period")
+    private LicensePeriod licensePeriod;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "product_status", nullable = false)
     @Builder.Default
     private ProductStatus status = ProductStatus.ONSALE;
@@ -75,5 +80,21 @@ public class Product {
         if (quantity > 0) {
             this.salesVolume += quantity;
         }
+    }
+
+    // OrderItem이 생성될 때 재고량 감소 메서드
+    public void removeStock(int quantity) {
+        int restStock = this.amount - quantity;
+        if (restStock < 0) {
+            throw new IllegalStateException("재고량 부족함");  // TODO: 커스텀 Exception 추가
+        }
+
+        this.amount = restStock;
+        this.increaseSalesVolume(quantity);
+    }
+
+    // 판매 취소 시 재고 복구
+    public void addStock(int quantity) {
+        this.amount += quantity;
     }
 }

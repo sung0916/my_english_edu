@@ -1,6 +1,7 @@
 package com.englishapp.api_server.dto.response;
 
 import com.englishapp.api_server.domain.ProductStatus;
+import com.englishapp.api_server.domain.ProductType;
 import com.englishapp.api_server.entity.Image;
 import com.englishapp.api_server.entity.Product;
 import com.englishapp.api_server.util.UrlBuilder;
@@ -16,6 +17,7 @@ public class ProductListResponse {
     private int price;
     private String imageUrl;
     private ProductStatus status;
+    private ProductType type;
 
     public static ProductListResponse from(Product product, Image thumbnail) {
 
@@ -29,6 +31,7 @@ public class ProductListResponse {
                 .price(product.getPrice())
                 .imageUrl(thumbnailUrl)
                 .status(product.getStatus())
+                .type(product.getType())
                 .build();
     }
 }

@@ -240,7 +240,7 @@ export default function CrosswordPuzzlePage() {
                             onChange={(e) => setInputText(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder={hasTyped ? "" : "Type Word..."}
-                            className="flex-1 h-12 border-2 border-[#3498DB] rounded-lg px-3 text-center text-lg font-bold uppercase outline-none focus:ring-2 focus:ring-[#3498DB]/50"
+                            className="flex-1 h-12 border-2 border-[#3498DB] rounded-lg px-3 text-center text-lg font-bold outline-none focus:ring-2 focus:ring-[#3498DB]/50"
                             autoComplete="off"
                         />
 

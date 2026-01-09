@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "@/api";
 import { Pagination } from "@/components/common/Pagination";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
+import { ProductType } from "@/types/product";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -11,6 +12,7 @@ interface Item {
     productName: string;
     price: number;
     imageUrl: string | null;
+    type: ProductType;
 }
 
 interface Page<T> {
@@ -56,7 +58,7 @@ const StorePage = () => {
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
                     {items.map((item) => (
-                        <div 
+                        <div
                             key={item.id}
                             onClick={() => navigate(`/main/store/${item.id}`)}
                             className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md cursor-pointer transition-shadow"
@@ -68,9 +70,31 @@ const StorePage = () => {
                                     <div className="w-full h-full flex items-center justify-center text-gray-300">NO IMAGE</div>
                                 )}
                             </div>
+
                             <div className="p-3">
-                                <h3 className="font-medium text-gray-800 text-sm mb-1 truncate">{item.productName}</h3>
-                                <p className="font-bold text-gray-900">{item.price.toLocaleString()}원</p>
+                                <h3 className="font-medium text-gray-800 text-sm mb-2 truncate">
+                                    {item.productName}
+                                </h3>
+
+                                {/* [수정] 가격과 뱃지를 양끝 정렬 (justify-between) */}
+                                <div className="flex justify-between items-center">
+                                    <p className="font-bold text-gray-900 text-lg">
+                                        {item.price.toLocaleString()}원
+                                    </p>
+
+                                    {/* 타입 뱃지 표시 */}
+                                    <span
+                                        className={`
+                                            text-xs font-bold px-2 py-1 rounded 
+                                            ${item.type === 'SUBSCRIPTION'
+                                                ? 'bg-blue-100 text-blue-600'  // Plan 스타일
+                                                : 'bg-gray-100 text-gray-600'   // Goods 스타일
+                                            }
+                                        `}
+                                    >
+                                        {item.type === 'SUBSCRIPTION' ? 'Plan' : 'Goods'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     ))}

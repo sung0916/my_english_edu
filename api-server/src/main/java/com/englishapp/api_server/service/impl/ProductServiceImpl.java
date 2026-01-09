@@ -78,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 페이징 조회
     public Page<ProductListResponse> getAllProducts(Pageable pageable) {
-        Page<Product> productPage = productRepository.findAll(pageable);
+        Page<Product> productPage = productRepository.findAllRepresentative(pageable);
 
         // map 내부 로직을 람다식으로 풀어서 작성
         return productPage.map(product -> {
@@ -101,15 +101,16 @@ public class ProductServiceImpl implements ProductService {
      * @param id 조회할 상품의 ID
      * @return 상품 상세 정보 DTO */
     @Override
+    @Transactional(readOnly = true)
     public ProductResponse getProductDetail(Long id) {
         // 1. ID 기반의 Product 엔티티 조회 (존재하지 않으면 EntityNotFoundException 예외 발생
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 상품을 찾을 수 없음: " + id));
 
-        // 2. 이 상품과 연결된 '모든' 이미지(갤러리 + 본문 포함) 조회
+        // 2-1. 이 상품과 연결된 '모든' 이미지(갤러리 + 본문 포함) 조회
         List<Image> allImages = imageRepository.findByTypeAndRelatedId(ImageType.PRODUCT, product.getId());
 
-        // 3. [핵심 로직] 본문(Description)에 포함된 이미지는 갤러리 목록에서 제외하기
+        // 2-2. [핵심 로직] 본문(Description)에 포함된 이미지는 갤러리 목록에서 제외하기
         String description = product.getDescription();
         List<Image> galleryImages;
 
@@ -122,8 +123,11 @@ public class ProductServiceImpl implements ProductService {
             galleryImages = allImages;
         }
 
+        // 3. 같은 이름 가진 형제 상품들 조회 (옵션 구성을 위해 설정)
+        List<Product> siblings = productRepository.findByProductName(product.getProductName());
+
         // 4. 필터링된 갤러리 이미지만 DTO에 담아서 반환
-        return ProductResponse.from(product, galleryImages);
+        return ProductResponse.from(product, galleryImages, siblings);
     }
 
     // 상품 수정

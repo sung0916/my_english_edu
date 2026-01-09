@@ -1,5 +1,6 @@
 package com.englishapp.api_server.dto.request;
 
+import com.englishapp.api_server.domain.LicensePeriod;
 import com.englishapp.api_server.domain.ProductStatus;
 import com.englishapp.api_server.domain.ProductType;
 import com.englishapp.api_server.entity.Product;
@@ -19,6 +20,7 @@ public class ProductRequest {
         private String description;
         private ProductType type;
         private List<Long> imageIds;
+        private LicensePeriod licensePeriod;
 
         // DTO를 Entity로 변환하는 메서드
         public Product toEntity() {
@@ -28,6 +30,7 @@ public class ProductRequest {
                     .amount(this.amount)
                     .description(this.description)
                     .type(this.type)
+                    .licensePeriod(licensePeriod)
                     .build();
         }
     }

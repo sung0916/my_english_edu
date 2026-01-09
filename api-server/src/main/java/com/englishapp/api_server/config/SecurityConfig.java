@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // 1. OPTIONS 요청 허용 (CORS Preflight) - 모든 OPTIONS 요청은 인증/인가 없이 항상 허용 (가장 먼저 처리)
+                        // 1. OPTIONS 요청 허용 (CORS Preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "**").permitAll()
 
                         // 2. 정적 리소스 (이미지) 조회는 누구나, 수정/삭제는 ADMIN만
@@ -58,28 +58,33 @@ public class SecurityConfig {
                         // 4. 장소/게시판/상품 조회는 누구나
                         .requestMatchers(HttpMethod.GET, "/api/places/getPlaces", "/api/announcements/**", "/api/products/**").permitAll()
 
-                        // 5. 장바구니 기능
-                        .requestMatchers("/api/carts/**").hasAnyAuthority("TEACHER", "STUDENT")
+                        // 5. 장바구니, 주문, 결제 기능 (결제 검증 포함)
+                        .requestMatchers("/api/carts/**", "/api/orders/**", "/api/payments/**").hasAnyAuthority("TEACHER", "STUDENT", "ADMIN")
 
-                        // 6. 게시글 작성: ADMIN, TEACHER 가능
+                        // 6-1. 관리자 전용 기능 (일시정지, 재시작) - 구체적인 URL을 먼저 체크
+                        .requestMatchers("/api/licenses/*/pause", "/api/licenses/*/resume").hasAuthority("ADMIN")
+                        // 6-2. 학생/선생님 기능 (내 수강권 조회, 시작하기)
+                        .requestMatchers("/api/licenses/my", "/api/licenses/*/start").hasAnyAuthority("TEACHER", "STUDENT", "ADMIN")
+
+                        // 7. 게시글 작성: ADMIN, TEACHER 가능
                         .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")
 
-                        // 7. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 @PreAuthorize로 구독 상태 체크 로직 작성 후 추후 추가)
+                        // 8. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 추후 추가)
                         .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
 
-                        // 8. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
+                        // 9. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
                         .requestMatchers("/api/announcements/**", "/api/products/**").hasAuthority("ADMIN")
 
-                        // 9. 관리자 페이지
+                        // 10. 관리자 페이지
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
-                        // 10. 내 정보 확인 등 인증된 유저 공통 기능
-                        .requestMatchers("/api/users/me", "/api/auth/confirm-password").authenticated() // 인증된 모든 유저가 접근 가능
+                        // 11. 내 정보 확인 등 인증된 유저 공통 기능
+                        .requestMatchers("/api/users/me", "/api/auth/confirm-password").authenticated()
 
-                        // 11. 그 외 모든 요청은 인증 필요
+                        // 12. 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
-                // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
+                // JwtAuthenticationFilter 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class);
 

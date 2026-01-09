@@ -4,6 +4,7 @@ import com.englishapp.api_server.domain.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +23,9 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
+
+    @Column(nullable = false)
+    private BigDecimal amount;
 
     @Column(name = "pg_provider")
     private String pgProvider;  // 토스, 카카오페이 등
