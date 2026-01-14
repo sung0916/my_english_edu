@@ -48,9 +48,7 @@ const Header = () => {
                         ) : (
                             <Link to="/user/place" className="text-sm font-medium hover:text-blue-500">MyPage</Link>
                         )}
-                        {user?.role !== 'ADMIN' && (
-                            <Link to="/user/cart" className="text-sm font-medium hover:text-blue-500">Cart</Link>
-                        )}
+                        <Link to="/user/cart" className="text-sm font-medium hover:text-blue-500">Cart</Link>
                         <button onClick={handleLogout} className="text-sm font-medium hover:text-red-500">Logout</button>
                     </>
                 ) : (

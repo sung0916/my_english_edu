@@ -4,9 +4,9 @@ import { useUIStore } from "@/store/uiStore";
 const menuItems = [
     { name: 'Places', href: '/user/place' },
     { name: 'Results', href: '/user/result' },
-    { name: 'Payment History', href: '/user/payment' },
-    { name: 'Edit Profile', href: '/auth/confirmPasswordForEdit' },
-    { name: 'Withdraw Account', href: '/auth/confirmPasswordForWithdraw', isDanger: true },
+    { name: 'Order History', href: '/user/payment' },
+    { name: 'Edit Profile', href: '/auth/confirm-edit' },
+    { name: 'Withdraw Account', href: '/auth/confirm-withdraw', isDanger: true },
 ];
 
 const UserSidebar = () => {
@@ -31,7 +31,7 @@ const UserSidebar = () => {
 
             <aside 
                 className={`
-                    fixed md:sticky top-0 left-0 h-full w-64 bg-gray-50 border-r border-gray-200 
+                    fixed md:sticky top-0 left-0 h-screen w-64 bg-gray-50 border-r border-gray-200 
                     transform transition-transform duration-300 ease-in-out z-40
                     pt-16 md:pt-4  
                     ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 

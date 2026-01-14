@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.Map;
@@ -21,47 +22,79 @@ public class PortOneClient {
     @Value("${portone.api-secret:}")
     private String apiSecret;
 
-    // 포트원 구버전 API (V2 SDK를 써도 검증은 안정적인 V1으로 사용)
-    private final RestClient restClient = RestClient.create("https://api.iamport.kr");
+    // 포트원 V2 API
+    private final RestClient restClient = RestClient.create("https://api.portone.io");
 
-    // 1. 관리자 토큰 발급 (API 호출 권한 획득)
+    // 1. 관리자 토큰 발급 (V2)
     public String getAccessToken() {
+        log.info("DEBUG: PortOne V2 API Secret 사용");
+
         Map<String, String> body = Map.of(
-                "imp_key", apiKey,
-                "imp_secret", apiSecret
+                "apiSecret", apiSecret
         );
 
         try {
-            PortOneDto.TokenResponse result = restClient.post()
-                    .uri("/users/getToken")
+            PortOneDto.V2TokenResponse result = restClient.post()
+                    .uri("/login/api-secret")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(body)
                     .retrieve()
-                    .body(PortOneDto.TokenResponse.class);
+                    .body(PortOneDto.V2TokenResponse.class);
 
-            if (result == null || result.getResponse() == null) {
-                throw new RuntimeException("포트원 토큰 발급 실패");
+            if (result == null || result.getAccessToken() == null) {
+                throw new RuntimeException("포트원 V2 토큰 발급 실패");
             }
-            return result.getResponse().getAccess_token();
+            return result.getAccessToken();
 
         } catch (Exception e) {
-            log.error("포트원 토큰 발급 실패: {}", e.getMessage());
-            throw new RuntimeException("결제 서버 연동 중 오류 발생");
+            log.error("포트원 V2 토큰 발급 실패: {}", e.getMessage());
+            throw new RuntimeException("결제 서버 연동 중 오류 발생 (V2 Login)");
         }
     }
 
-    // 2. 결제 단건 조회 (검증용)
-    public PortOneDto.PaymentResponse getPaymentInfo(String impUid, String accessToken) {
+    // 2. 결제 단건 조회 (V2 - paymentId 또는 txId로 조회)
+    // 여기서 paymentId는 PortOne의 Transaction ID(txId)를 의미한다고 가정
+    public PortOneDto.PaymentResponse getPaymentInfo(String paymentId, String accessToken) {
         try {
-            return restClient.get()
-                    .uri("/payments/" + impUid)
-                    .header("Authorization", accessToken)
+            PortOneDto.V2PaymentResponse v2Response = restClient.get()
+                    .uri("/payments/" + paymentId)
+                    .header("Authorization", "Bearer " + accessToken)
                     .retrieve()
-                    .body(PortOneDto.PaymentResponse.class);
+                    .body(PortOneDto.V2PaymentResponse.class);
 
+            if (v2Response == null) {
+                throw new RuntimeException("V2 결제 응답 없음");
+            }
+
+            // V2 응답을 기존 V1 DTO로 매핑하여 서비스 계층 영향 최소화
+            PortOneDto.PaymentResponse wrapper = new PortOneDto.PaymentResponse();
+            PortOneDto.PaymentResponse.Response inner = new PortOneDto.PaymentResponse.Response();
+
+            return mapV2ToV1(v2Response);
+
+        } catch (HttpClientErrorException e) {
+            log.error("포트원 API 오류 응답: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("포트원 연동 오류: " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            log.error("포트원 결제 조회 실패: impUid={}, error={}", impUid, e.getMessage());
-            throw new RuntimeException("결제 검증 중 오류 발생");
+            log.error("포트원 V2 결제 조회 실패: paymentId={}, error={}", paymentId, e.getMessage());
+            throw new RuntimeException("결제 검증 중 오류 발생 (V2 Lookup)");
         }
+    }
+
+    private PortOneDto.PaymentResponse mapV2ToV1(PortOneDto.V2PaymentResponse v2) {
+        PortOneDto.PaymentResponse.Response inner = PortOneDto.PaymentResponse.Response.builder()
+                .imp_uid(v2.getTransactionId()) // txId -> imp_uid
+                .merchant_uid(v2.getId())       // paymentId -> merchant_uid (Note: paymentId in V2 is usually the Order ID provided by merchant)
+                .amount((int) v2.getAmount().getTotal())
+                .status(v2.getStatus().toLowerCase()) // PAID -> paid
+                .pay_method("card") // V2 usually abstracts this, defaulting to card or assuming from context for now
+                .pg_provider("html5_inicis") // Defaulting as checking implementation details is complex in V2
+                .build();
+
+        return PortOneDto.PaymentResponse.builder()
+                .code(0)
+                .message(null)
+                .response(inner)
+                .build();
     }
 }

@@ -41,11 +41,11 @@ const ConfirmPasswordPage = ({ nextPath, title = "Checking Password", subtitle }
     };
 
     return (
-        <div className="h-full flex justify-center items-center bg-[#f5f5f5] p-4">
-            <div className="w-full max-w-[400px] bg-white rounded-lg p-8 shadow-lg">
+        <div className="h-screen flex justify-center items-center bg-[#f5f5f5] p-4">
+            <div className="w-full max-w-[400px] bg-white rounded-lg mb-[200px] p-8 shadow-lg">
                 <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">{title}</h1>
                 <p className="text-sm text-center text-gray-500 mb-8">
-                    {subtitle || "안전한 정보 보호를 위해 현재 비밀번호를 입력해주세요."}
+                    {subtitle || "Please Enter your password"}
                 </p>
 
                 <div className="mb-6">

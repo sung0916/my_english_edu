@@ -10,20 +10,17 @@ import {
     IoRadioButtonOn,
     IoRadioButtonOff
 } from "react-icons/io5";
+import apiClient from "@/api";
 
 // 숫자 포맷 함수
 const formatPrice = (price: number) => price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-type PaymentMethod = 'TOSS' | 'KAKAO' | 'CARD' | 'MOBILE';
 
 export default function CartPage() {
     const navigate = useNavigate();
     const { isLoggedIn } = useUserStore();
     const { items, fetchCart, updateItemAmount, removeItem } = useCartStore();
-
     const [isLoading, setIsLoading] = useState(false);
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('TOSS');
 
     // 1. 초기 데이터 로드
     useEffect(() => {
@@ -88,13 +85,38 @@ export default function CartPage() {
         await updateItemAmount(cartId, newAmount);
     };
 
+    // 주문 생성 및 결제 페이지 이동💫
+    const handleOrderCreate = async () => {
+        if (selectedIds.size === 0) {
+            alert("Select products to pay");
+            return;
+        }
+
+        try {
+            // a. 백엔드에 주문 생성 요청 (DTO: {cartIds: [1,2,3]})
+            const response = await apiClient.post('/api/orders', {
+                cartIds: Array.from(selectedIds)
+            });
+
+            // b. 생성된 orderId 받기
+            const {orderId} = response.data;
+
+            // c. 결제 페이지 이동
+            navigate(`/user/checkout?orderId=${orderId}`);
+
+        } catch (err) {
+            console.error('주문 생성 실패 : ', err);
+            alert("Failed loading products")
+        }
+    };
+
     const { finalPrice } = useMemo(() => {
         const selectedItems = items.filter(item => selectedIds.has(item.cartId));
         const total = selectedItems.reduce((sum, item) => sum + item.totalPrice, 0);
         return { finalPrice: total };
     }, [items, selectedIds]);
 
-    // --- [수정된 부분] 렌더링: 개별 아이템 (UI 디자인 변경) ---
+    // --- 렌더링: 개별 아이템 ---
     const CartItemRow = ({ item }: { item: CartItem }) => {
         const isSale = item.status === 'ONSALE';
         const isChecked = selectedIds.has(item.cartId);
@@ -121,7 +143,7 @@ export default function CartPage() {
 
                     {/* 이미지 */}
                     <img 
-                        src={item.thumbnailImageUrl || 'https://via.placeholder.com/100'} 
+                        src={item.thumbnailImageUrl || 'https://placeholder.com/100'} 
                         alt={item.productName} 
                         className="w-24 h-24 object-cover rounded-lg border border-gray-100 mr-6 shadow-sm shrink-0"
                     />
@@ -177,26 +199,6 @@ export default function CartPage() {
         );
     };
 
-    // --- 렌더링: 결제 수단 ---
-    const PaymentOption = ({ method, label, color }: { method: PaymentMethod, label: string, color: string }) => (
-        <div 
-            onClick={() => setPaymentMethod(method)}
-            className={`
-                flex items-center p-3 border rounded-lg cursor-pointer transition-all
-                ${paymentMethod === method ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200 hover:bg-gray-50'}
-            `}
-        >
-            {paymentMethod === method 
-                ? <IoRadioButtonOn className="text-blue-600 text-xl mr-2" /> 
-                : <IoRadioButtonOff className="text-gray-300 text-xl mr-2" />
-            }
-            <div className="w-6 h-6 rounded-full flex items-center justify-center mr-2 text-white text-[10px] font-bold shadow-sm" style={{ backgroundColor: color }}>
-                {label[0]}
-            </div>
-            <span className="text-sm font-medium text-gray-700">{label}</span>
-        </div>
-    );
-
     if (isLoading && items.length === 0) {
         return <div className="p-20 text-center text-gray-500">장바구니 정보를 불러오는 중입니다...</div>;
     }
@@ -231,37 +233,20 @@ export default function CartPage() {
                 )}
             </div>
 
-            {/* 결제 수단 및 금액 요약 박스 (Grid Layout) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* 왼쪽: 결제 수단 */}
-                <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm h-full">
-                    <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">결제 수단</h2>
-                    <div className="grid grid-cols-1 gap-3">
-                        <PaymentOption method="TOSS" label="토스페이" color="#0050FF" />
-                        <PaymentOption method="KAKAO" label="카카오페이" color="#FEE500" />
-                        <PaymentOption method="CARD" label="신용카드" color="#333" />
-                        <PaymentOption method="MOBILE" label="휴대폰결제" color="#2DB400" />
-                    </div>
+            {/* 💰 금액 요약 박스 (기존 결제수단 UI 제거 후 디자인 단순화) */}
+            <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm mb-8">
+                <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">결제 금액</h2>
+                <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-600">총 상품금액</span>
+                    <span className="font-medium">{formatPrice(finalPrice)}원</span>
                 </div>
-
-                {/* 오른쪽: 최종 금액 */}
-                <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm h-full flex flex-col justify-between">
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">결제 금액</h2>
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-gray-600">총 상품금액</span>
-                            <span className="font-medium">{formatPrice(finalPrice)}원</span>
-                        </div>
-                        <div className="flex justify-between items-center mb-2 text-gray-600">
-                            <span>배송비</span>
-                            <span>0원</span>
-                        </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                        <span className="text-lg font-bold text-gray-800">최종 결제금액</span>
-                        <span className="text-3xl font-bold text-blue-600">{formatPrice(finalPrice)}원</span>
-                    </div>
+                <div className="flex justify-between items-center mb-2 text-gray-600">
+                    <span>배송비</span>
+                    <span>0원</span>
+                </div>
+                <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                    <span className="text-lg font-bold text-gray-800">최종 결제금액</span>
+                    <span className="text-3xl font-bold text-blue-600">{formatPrice(finalPrice)}원</span>
                 </div>
             </div>
 
@@ -275,7 +260,7 @@ export default function CartPage() {
                                 : 'bg-gray-300 cursor-not-allowed'}
                         `}
                         disabled={selectedIds.size === 0}
-                        onClick={() => alert(`${formatPrice(finalPrice)}원 결제하기 (${paymentMethod})`)}
+                        onClick={handleOrderCreate} 
                     >
                         총 {selectedIds.size}개 상품 구매하기
                     </button>

@@ -8,8 +8,8 @@ const menuItems = [
     { name: 'Product List', href: '/admin/productList' },
     { name: 'Board List', href: '/admin/boardList' },
     { name: 'Chart', href: '/admin/chart' },
-    { name: 'Edit Account', href: '/auth/confirmPasswordForEdit' },
-    { name: 'Withdraw Account', href: '/auth/confirmPasswordForWithdraw', isDanger: true },
+    { name: 'Edit Account', href: '/auth/confirm-edit' },
+    { name: 'Withdraw Account', href: '/auth/confirm-withdraw', isDanger: true },
 ];
 
 const AdminSidebar = () => {

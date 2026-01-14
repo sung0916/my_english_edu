@@ -26,4 +26,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     Optional<Image> findFirstByTypeAndRelatedIdOrderBySortOrderAsc(ImageType type, Long relatedId);
 
     List<Image> findByFileNameIn(List<String> fileNames);
+
+    // OrderServiceImpl 용
+    List<Image> findByRelatedIdInAndTypeAndStatus(List<Long> relatedIds, ImageType type, ImageStatus status);
 }

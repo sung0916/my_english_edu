@@ -36,7 +36,9 @@ import StorePage from './pages/main/StorePage';
 import EnglishDetailPage from './pages/detail/EnglishEdu';
 import BoardDetailPage from './pages/detail/BoardDetailPage';
 import StoreDetailPage from './pages/detail/StoreDetailPage';
-import PaymentPage from './pages/user/PaymentPage';
+import CheckoutPage from './pages/user/CheckoutPage';
+import PaymentSuccessPage from './pages/user/PaymentSuccessPage';
+import MyOrderListPage from './pages/user/MyOrderListPage';
 
 function App() {
     return (
@@ -53,12 +55,12 @@ function App() {
                     <Route path="signup" element={<SignupPage />} />
                     <Route
                         path="confirm-edit"
-                        element={<ConfirmPasswordPage nextPath="/auth/edit-profile" subtitle="정보 수정을 위해 비밀번호를 입력해주세요." />}
+                        element={<ConfirmPasswordPage nextPath="/auth/edit-profile" subtitle="Please enter your password for edit" />}
                     />
                     <Route path="edit-profile" element={<EditProfilePage />} />
                     <Route
                         path="confirm-withdraw"
-                        element={<ConfirmPasswordPage nextPath="/auth/withdraw" subtitle="계정 삭제를 위해 비밀번호를 입력해주세요." />}
+                        element={<ConfirmPasswordPage nextPath="/auth/withdraw" subtitle="Please enter your password for withdraw" />}
                     />
                     <Route path="withdraw" element={<WithdrawPage />} />
                 </Route>
@@ -102,12 +104,13 @@ function App() {
                 {/* 6. User Routes (UserLayout 적용) */}
                 <Route path="user" element={<UserLayout />}>
                     
-                    <Route path="payment" element={<div className="p-10 text-center">Payment Page (Ready)</div>} />
+                    <Route path="payment" element={<MyOrderListPage />} />
                     <Route path="place" element={<div className="p-10 text-center">Place Page (Ready)</div>} />
                     <Route path="result" element={<div className="p-10 text-center">Result Page (Ready)</div>} />
                 </Route>
                 <Route path="user/cart" element={<CartPage />} />
-                <Route path="user/payment" element={<PaymentPage />} />
+                <Route path="user/checkout" element={<CheckoutPage />} />
+                <Route path="payment/success" element={<PaymentSuccessPage />} />
 
                 {/* 7. Admin Routes (AdminLayout 적용) */}
                 <Route path="admin" element={<AdminLayout />}>

@@ -34,6 +34,7 @@ public class Payment {
     private String pgTid;  // PG사 거래 고유 번호
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private PaymentStatus status;
 
     @Column(name = "paid_at")

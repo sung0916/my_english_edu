@@ -88,7 +88,7 @@ const EditProduct = () => {
         };
 
         try {
-            await apiClient.post('/api/products/edit', payload);
+            await apiClient.patch('/api/products/edit', payload);
             crossPlatformAlert('성공', '상품 정보가 수정되었습니다.');
             navigate(-1);
         } catch (error) {
