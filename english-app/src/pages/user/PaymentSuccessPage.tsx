@@ -66,7 +66,7 @@ export default function PaymentSuccessPage() {
                     <h2 className="text-lg font-bold text-gray-800 mb-4">Order List</h2>
                     <div className="space-y-4">
                         {order.items.map((item) => (
-                            <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <div key={item.productId} className="flex flex-col sm:flex-row items-start sm:items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 {/* 썸네일 */}
                                 <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 mr-4 overflow-hidden">
                                     {item.thumbnailUrl ? (
@@ -105,7 +105,7 @@ export default function PaymentSuccessPage() {
                                     ) : (
                                         // B. 수강권일 때: 시작일 설정 버튼
                                         <button 
-                                            onClick={() => openDateModal(item.id)}
+                                            onClick={() => openDateModal(item.productId)}
                                             className="w-full sm:w-auto flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg shadow-md transition-transform active:scale-95"
                                         >
                                             <IoCalendarNumber className="text-xl" />

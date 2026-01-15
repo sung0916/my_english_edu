@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useUIStore } from "@/store/uiStore";
 
 const menuItems = [
+    { name: 'My Classes', href: '/user/myClass' },
     { name: 'Places', href: '/user/place' },
     { name: 'Results', href: '/user/result' },
     { name: 'Order History', href: '/user/payment' },

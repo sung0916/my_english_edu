@@ -5,7 +5,7 @@ export type ProductType = 'ITEM' | 'SUBSCRIPTION';
 
 // 주문 상세 조회
 export interface OrderItemDetail {
-    id: number;
+    productId: number;
     productName: string;
     productType: ProductType;
     price: number;
@@ -29,6 +29,11 @@ export interface OrderResponse {
     orderedAt: string;
     status: string;
     items: OrderItemDetail[];
+
+    buyerName: string;
+    buyerEmail: string;
+    buyerTel: string;
+    payMethod: string;
 }
 
 // 마이페이지 주문 목록 조회

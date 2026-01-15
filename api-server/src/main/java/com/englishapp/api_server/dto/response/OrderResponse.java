@@ -4,6 +4,7 @@ import com.englishapp.api_server.domain.OrderStatus;
 import com.englishapp.api_server.domain.ProductType;
 import com.englishapp.api_server.entity.Order;
 import com.englishapp.api_server.entity.OrderItem;
+import com.englishapp.api_server.entity.Payment;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,9 +23,14 @@ public class OrderResponse {
     private LocalDateTime orderedAt;
     private OrderStatus status;
 
+    private String buyerName;
+    private String buyerEmail;
+    private String buyerTel;
+    private String payMethod;
+
     private List<OrderItemDto> items;  // 상세 조회를 위한 아이템 리스트 (필요 시 사용)
 
-    public static OrderResponse from(Order order, Map<Long, String> thumbnailMap) {
+    public static OrderResponse from(Order order, Map<Long, String> thumbnailMap, Map<Long, Payment> paymentMap) {
         // 주문명 생성 로직
         String name = "상품 정보 없음";
         List<OrderItem> items = order.getOrderItems();
@@ -43,6 +49,13 @@ public class OrderResponse {
                 })
                 .collect(Collectors.toList());
 
+        // 결제 정보 찾기
+        Payment payment = paymentMap.get(order.getId());
+        String methodText = "결제 정보 없음";
+        if (payment != null) {
+            methodText = convertProviderToText(payment.getPgProvider());
+        }
+
         return OrderResponse.builder()
                 .orderId(order.getId())
                 .totalPrice(order.getTotalPrice())
@@ -50,6 +63,10 @@ public class OrderResponse {
                 .orderedAt(order.getOrderedAt())
                 .status(order.getStatus())
                 .items(itemDtos)
+                .buyerName(order.getUser().getUsername())
+                .buyerEmail(order.getUser().getEmail())
+                .buyerTel(order.getUser().getTel())
+                .payMethod(methodText)
                 .build();
     }
 
@@ -76,6 +93,19 @@ public class OrderResponse {
                     .amount(item.getAmount())
                     .thumbnailUrl(thumbnailUrl)
                     .build();
+        }
+    }
+
+    // PG사 코드를 한글로 변환하는 메서드
+    private static String convertProviderToText(String pgProvider) {
+        if (pgProvider == null) return "간편 결제";
+        switch (pgProvider.toLowerCase()) {
+            case "html5_inicis": return "Credit Card";
+            case "kakaopay": return "KakaoPay";
+            case "tosspay": return "TossPay";
+            case "naverpay": return "NaverPay";
+            case "danal": return "MobilePay";
+            default: return pgProvider;
         }
     }
 }

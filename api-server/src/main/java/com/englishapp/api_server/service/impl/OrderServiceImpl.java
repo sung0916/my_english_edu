@@ -8,6 +8,7 @@ import com.englishapp.api_server.entity.*;
 import com.englishapp.api_server.repository.CartRepository;
 import com.englishapp.api_server.repository.ImageRepository;
 import com.englishapp.api_server.repository.OrderRepository;
+import com.englishapp.api_server.repository.PaymentRepository;
 import com.englishapp.api_server.service.OrderService;
 import com.englishapp.api_server.util.UrlBuilder;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;  // Product 엔티티가 담겨있음
     private final ImageRepository imageRepository;
+    private final PaymentRepository paymentRepository;
 
     // 장바구니 항목을 기반으로 주문 생성
     @Override
@@ -59,7 +61,8 @@ public class OrderServiceImpl implements OrderService {
         log.info("주문 생성 완료: OrderID={}, User={}, Price={}",
                 order.getId(), user.getUsername(), order.getTotalPrice());
         Map<Long, String> thumbnailMap = getThumbnailMap(List.of(order));
-        return OrderResponse.from(order, thumbnailMap);
+        Map<Long, Payment> paymentMap = getPaymentMap(List.of(order));
+        return OrderResponse.from(order, thumbnailMap, paymentMap);
     }
 
     // 주문 목록 조회
@@ -70,9 +73,10 @@ public class OrderServiceImpl implements OrderService {
                 orderRepository.findAllByUserIdOrderByOrderedAtDesc(user.getId());
 
         Map<Long, String> thumbnailMap = getThumbnailMap(orders);
+        Map<Long, Payment> paymentMap = getPaymentMap(orders);
 
         return orders.stream()
-                .map(order -> OrderResponse.from(order, thumbnailMap))
+                .map(order -> OrderResponse.from(order, thumbnailMap, paymentMap))
                 .collect(Collectors.toList());
     }
 
@@ -87,11 +91,12 @@ public class OrderServiceImpl implements OrderService {
         // 2. 데이터 소유권 확인 (보안 검증)
         checkOwnership(user, order);
 
-        // 3. 해당 주문의 썸네일 Map 생성
+        // 3. 해당 주문의 썸네일, 결제 정보 Map 생성
         Map<Long, String> thumbnailMap = getThumbnailMap(List.of(order));
+        Map<Long, Payment> paymentMap = getPaymentMap(List.of(order));
 
         // 4. DTO 반환 (items 리스트 포함됨)
-        return OrderResponse.from(order, thumbnailMap);
+        return OrderResponse.from(order, thumbnailMap, paymentMap);
     }
 
     // 주문 리스트에서 상품 ID로 이미지 Map 생성
@@ -124,6 +129,20 @@ public class OrderServiceImpl implements OrderService {
                         Image::getRelatedId,  // Key: 상품 ID
                         image -> UrlBuilder.buildImageUrl(image.getImageUrl()),  // Value: 전체 URL
                         (prev, next) -> prev  // 중복 키(상품당 이미지 여러개)가 있으면 첫번째 사용
+                ));
+    }
+
+    // PaymentMap 생성 헬퍼 메서드
+    private Map<Long, Payment> getPaymentMap(List<Order> orders) {
+        if (orders.isEmpty()) return Collections.emptyMap();
+        List<Long> orderIds = orders.stream().map(Order::getId).toList();
+        List<Payment> payments = paymentRepository.findByOrderIdIn(orderIds);
+
+        return payments.stream()
+                .collect(Collectors.toMap(
+                        p -> p.getOrder().getId(),   // Key: Order ID
+                        p -> p,                      // Value: Payment 객체 자체
+                        (p1, p2) -> p1      // 중복 시 첫번째 유지
                 ));
     }
 

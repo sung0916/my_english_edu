@@ -46,9 +46,7 @@ const MyOrderListPage = () => {
 
     // 3. 상세 페이지 이동 핸들러
     const handleRowClick = (orderId: number) => {
-        // 상세 페이지로 이동 (기존 SuccessPage를 재활용하거나 별도 Detail 페이지 사용)
-        // 여기서는 SuccessPage 구조를 재활용하는 예시로 작성
-        navigate(`/payment/success?orderId=${orderId}`);
+        navigate(`/user/orderDetail?orderId=${orderId}`);
     };
 
     return (
