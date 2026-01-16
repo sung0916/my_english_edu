@@ -1,6 +1,5 @@
 package com.englishapp.api_server.dto.response;
 
-import com.englishapp.api_server.domain.LicensePeriod;
 import com.englishapp.api_server.domain.LicenseStatus;
 import com.englishapp.api_server.entity.StudentLicense;
 import lombok.Builder;
@@ -13,22 +12,30 @@ import java.time.LocalDateTime;
 public class LicenseResponse {
 
     private Long licenseId;
+    private Long productId;
     private String productName;
-    private LicensePeriod period;
     private LicenseStatus status;
-    private LocalDateTime startAt;
-    private LocalDateTime endAt;
+    private String startAt;
+    private String endAt;
+    private boolean isPaused;
 
     public static LicenseResponse from(StudentLicense license) {
 
-        // Subscription과 Product가 Lazy Loading으로 연결되어 있다고 가정
-        // TODO: 실제로는 Fetch Join을 쓴 쿼리가 필요할 수 있음 - 여기서는 구조만 잡음
+        String productName = license.getSubscription().getProduct().getProductName();
+        Long productId = license.getSubscription().getProduct().getId();
+
         return LicenseResponse.builder()
                 .licenseId(license.getId())
-                .period(license.getLicensePeriod())
+                .productId(productId)
+                .productName(productName)
                 .status(license.getStatus())
-                .startAt(license.getStartAt())
-                .endAt(license.getEndAt())
+                .startAt(license.getStartAt() != null
+                        ? license.getStartAt().toLocalDate().toString()
+                        : "-")
+                .endAt(license.getEndAt() != null
+                        ? license.getEndAt().toLocalDate().toString()
+                        : "-")
+                .isPaused(license.getStatus() == LicenseStatus.PAUSED)
                 .build();
     }
 

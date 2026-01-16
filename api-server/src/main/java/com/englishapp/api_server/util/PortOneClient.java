@@ -97,4 +97,30 @@ public class PortOneClient {
                 .response(inner)
                 .build();
     }
+
+    // 결제 취소 요청
+    public void cancelPayment(String paymentId, String reason, String accessToken) {
+
+        try {
+            Map<String, String> body = Map.of("reason", reason);
+
+            restClient.post()
+                    .uri("/payments/" + paymentId + "/cancel")
+                    .header("Authorization", "Bearer" + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();  // 응답 본문 필요 없음
+
+            log.info("포트원 결제 취소 성공: paymentId={}", paymentId);
+
+        } catch (HttpClientErrorException e) {
+            log.error("포트원 취소 실패: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("결제 취소 연동 실패: " + e.getResponseBodyAsString());
+
+        } catch (Exception e) {
+            log.error("포트원 취소 중 알 수 없는 오류: {}", e.getMessage());
+            throw new RuntimeException("결제 취소 중 오류 발생");
+        }
+    }
 }

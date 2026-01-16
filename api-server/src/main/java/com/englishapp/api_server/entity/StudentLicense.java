@@ -28,8 +28,9 @@ public class StudentLicense {
     @JoinColumn(name = "student_user_id", nullable = false)
     private User student;
 
-    @Column(name = "subscription_id")
-    private Long subscriptionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscription_id")
+    private Subscription subscription;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "license_period")
@@ -54,11 +55,11 @@ public class StudentLicense {
     private LicenseLevel level;
 
     // 결제 직후, 라이선스 생성 메서드
-    public static StudentLicense createLicense(User student, Long subscriptionId, LicensePeriod period) {
+    public static StudentLicense createLicense(User student, Subscription subscription, LicensePeriod period) {
 
         return StudentLicense.builder()
                 .student(student)
-                .subscriptionId(subscriptionId)
+                .subscription(subscription)
                 .licensePeriod(period)
                 .status(LicenseStatus.PENDING)
                 // TODO: .level(라이센스레벨)
@@ -107,5 +108,12 @@ public class StudentLicense {
         this.endAt = now.plusSeconds(this.remainingSeconds);
         this.remainingSeconds = null;  // 사용했으니 초기화
         this.status = LicenseStatus.ACTIVE;
+    }
+
+    // 환불 처리
+    public void expire() {
+        this.status = LicenseStatus.EXPIRED;
+        this.endAt = LocalDateTime.now(); // 즉시 종료
+        this.remainingSeconds = null;     // 재시작 방지
     }
 }

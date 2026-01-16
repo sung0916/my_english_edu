@@ -9,4 +9,8 @@ public interface PaymentService {
     // 결제 검증 및 완료 처리
     @Transactional
     void verifyAndCompletePayment(User user, PaymentRequest.Verify request);
+
+    // 결제 취소 요청 관리
+    @Transactional
+    void processRefund(Long orderId, String reason);
 }

@@ -2,7 +2,10 @@ package com.englishapp.api_server.service.impl;
 
 import com.englishapp.api_server.domain.ImageStatus;
 import com.englishapp.api_server.domain.ImageType;
+import com.englishapp.api_server.domain.OrderStatus;
+import com.englishapp.api_server.domain.ProductType;
 import com.englishapp.api_server.dto.request.OrderRequest;
+import com.englishapp.api_server.dto.response.AdminOrderDto;
 import com.englishapp.api_server.dto.response.OrderResponse;
 import com.englishapp.api_server.entity.*;
 import com.englishapp.api_server.repository.CartRepository;
@@ -14,6 +17,8 @@ import com.englishapp.api_server.util.UrlBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -155,5 +160,36 @@ public class OrderServiceImpl implements OrderService {
             log.warn("권한 없는 주문 접근: User={}, OrderId={}", user.getId(), order.getId());
             throw new AccessDeniedException("해당 주문에 접근 권한 없음");
         }
+    }
+
+    // 결제 취소 요청
+    @Transactional
+    @Override
+    public void requestRefund(User user, Long orderId, String reason) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
+
+        // 본인 확인
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("취소 요청된 주문이 본인의 주문이 아닙니다.");
+        }
+
+        // 이미 환불되었거나 취소된 건인지 확인
+        if (order.getStatus() != OrderStatus.PAID) {
+            throw new IllegalStateException("결제 완료 상태의 주문만 환불을 요청할 수 있습니다.");
+        }
+
+        // 상태 변경
+        order.changeStatus(OrderStatus.REFUND_REQUESTED);
+        log.info("환불 요청 접수: OrderId={}, User={}, Reason={}", orderId, user.getEmail(), reason);
+    }
+
+    // 관리자용 주문 목록 조회
+    @Transactional(readOnly = true)
+    @Override
+    public Page<AdminOrderDto> getAdminOrders(OrderStatus status, ProductType type, Pageable pageable) {
+
+        Page<Order> orders = orderRepository.findByFilters(status, type, pageable);
+        return orders.map(AdminOrderDto::from);
     }
 }

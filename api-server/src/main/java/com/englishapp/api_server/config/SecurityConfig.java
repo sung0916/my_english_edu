@@ -45,43 +45,40 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // 1. OPTIONS 요청 허용 (CORS Preflight)
+                        // 1. OPTIONS 요청 허용 (CORS Preflight) - 맨 위 유지
                         .requestMatchers(HttpMethod.OPTIONS, "**").permitAll()
 
-                        // 2. 정적 리소스 (이미지) 조회는 누구나, 수정/삭제는 ADMIN만
+                        // 2. 정적 리소스 (이미지 등)
                         .requestMatchers(HttpMethod.GET, "/api/images/**").permitAll()
-                        .requestMatchers("/api/images/**").hasAuthority("ADMIN")
+                        // .requestMatchers("/api/images/**").hasAuthority("ADMIN") // 필요 시 주석 해제
 
-                        // 3. 인증/회원가입은 누구나
-                        .requestMatchers("/api/auth/login", "/api/users/signup").permitAll()
+                        // 3. 공용 API (인증/조회)
+                        .requestMatchers("/api/auth/**", "/api/users/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/places/**", "/api/announcements/**", "/api/products/**").permitAll()
 
-                        // 4. 장소/게시판/상품 조회는 누구나
-                        .requestMatchers(HttpMethod.GET, "/api/places/getPlaces", "/api/announcements/**", "/api/products/**").permitAll()
+                        // A. 관리자, 본인 전용 기능 (일시정지, 재시작) - 가장 구체적이므로 먼저 체크
+                        .requestMatchers("/api/licenses/*/pause", "/api/licenses/*/resume").hasAnyAuthority("STUDENT", "TEACHER", "ADMIN")
 
-                        // 5. 장바구니, 주문, 결제 기능 (결제 검증 포함)
-                        .requestMatchers("/api/carts/**", "/api/orders/**", "/api/payments/**").hasAnyAuthority("TEACHER", "STUDENT", "ADMIN")
+                        // B. 내 수강권 조회 (GET /api/licenses/my) - 학생, 선생님, 관리자 모두 가능
+                        .requestMatchers(HttpMethod.GET, "/api/licenses/my").hasAnyAuthority("STUDENT", "TEACHER", "ADMIN")
 
-                        // 6-1. 관리자 전용 기능 (일시정지, 재시작) - 구체적인 URL을 먼저 체크
-                        .requestMatchers("/api/licenses/*/pause", "/api/licenses/*/resume").hasAuthority("ADMIN")
-                        // 6-2. 학생/선생님 기능 (내 수강권 조회, 시작하기)
-                        .requestMatchers("/api/licenses/my", "/api/licenses/*/start").hasAnyAuthority("TEACHER", "STUDENT", "ADMIN")
+                        // C. 수강 시작 (PATCH) - 학생, 선생님, 관리자 모두 가능
+                        .requestMatchers(HttpMethod.PATCH, "/api/licenses/start-by-item").hasAnyAuthority("STUDENT", "TEACHER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/licenses/*/start").hasAnyAuthority("STUDENT", "TEACHER", "ADMIN")
 
-                        // 7. 게시글 작성: ADMIN, TEACHER 가능
+                        // 4. 결제/주문 관련 (결제 검증 등)
+                        .requestMatchers("/api/carts/**", "/api/orders/**", "/api/payments/**").hasAnyAuthority("STUDENT", "TEACHER", "ADMIN")
+
+                        // 5. 게시글/게임 작성 등
                         .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")
-
-                        // 8. 게임 관련 API: ADMIN, TEACHER만 접근 가능 (STUDENT는 추후 추가)
                         .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
 
-                        // 9. 게시판/상품 나머지 기능(수정/삭제 등)은 ADMIN만
+                        // 6. 관리자 전용 (상품관리, 게시판관리, 어드민페이지)
                         .requestMatchers("/api/announcements/**", "/api/products/**").hasAuthority("ADMIN")
-
-                        // 10. 관리자 페이지
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
-                        // 11. 내 정보 확인 등 인증된 유저 공통 기능
+                        // 7. 기타 인증 필요 요청
                         .requestMatchers("/api/users/me", "/api/auth/confirm-password").authenticated()
-
-                        // 12. 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
                 // JwtAuthenticationFilter 추가

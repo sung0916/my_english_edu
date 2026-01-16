@@ -1,4 +1,4 @@
-import { getOrderDetail, OrderResponse, startSubscription } from "@/api/paymentApi";
+import { getOrderDetail, OrderResponse, requestRefund, startSubscription } from "@/api/paymentApi";
 import { useEffect, useState } from "react";
 import { IoCalendarNumber, IoChevronBack, IoClose, IoLocationSharp } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -18,6 +18,8 @@ export default function OrderDetailPage() {
 
     const [order, setOrder] = useState<OrderResponse | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+    const [refundReason, setRefundReason] = useState("");
 
     // 모달 관련 상태
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,6 +67,31 @@ export default function OrderDetailPage() {
         } catch (error) {
             console.error(error);
             alert("Failed to apply start date");
+        }
+    };
+
+    // 환불 요청 모달
+    const handleRefundClick = () => {
+        if (order?.status === 'REFUND_REQUESTED') {
+            alert("이미 환불 요청이 접수되었습니다.");
+            return;
+        }
+        setRefundReason(""); // 초기화
+        setIsRefundModalOpen(true);
+    };
+
+    // 환불 요청 전송
+    const submitRefundRequest = async () => {
+        if (!refundReason.trim()) return;
+
+        try {
+            await requestRefund(order!.orderId, refundReason);
+            alert("환불 요청이 접수되었습니다. 관리자 확인 후 처리됩니다.");
+            setIsRefundModalOpen(false);
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+            alert("환불 요청 처리에 실패했습니다.");
         }
     };
 
@@ -139,18 +166,15 @@ export default function OrderDetailPage() {
 
                                 {/* 우측 버튼 그룹 */}
                                 <div className="w-full sm:w-40 flex flex-col gap-2">
-                                    {/* 공통 버튼 */}
                                     <button
-                                        className="w-full py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                        onClick={() => alert("준비 중인 기능입니다.")}
+                                        className={`w-full py-2 border rounded text-sm transition-colors ${order?.status === 'REFUND_REQUESTED'
+                                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                        onClick={handleRefundClick} // 함수 교체
+                                        disabled={order?.status === 'REFUND_REQUESTED' || order?.status === 'REFUNDED'}
                                     >
-                                        Exchange Request
-                                    </button>
-                                    <button
-                                        className="w-full py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                        onClick={() => alert("리뷰 작성 기간이 아닙니다.")}
-                                    >
-                                        Refund Request
+                                        {order?.status === 'REFUND_REQUESTED' ? '요청 심사중' : 'Refund Request'}
                                     </button>
 
                                     {/* 구독권 전용 버튼 */}
@@ -222,7 +246,55 @@ export default function OrderDetailPage() {
                 </div>
             </div>
 
-            {/* 날짜 설정 모달 (재사용) */}
+            {/* 환불 입력 모달 */}
+            {isRefundModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
+                        {/* 헤더 */}
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-gray-900">Refund form</h3>
+                            <button onClick={() => setIsRefundModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                <IoClose size={24} />
+                            </button>
+                        </div>
+                        
+                        {/* 내용 */}
+                        <p className="text-sm text-gray-600 mb-4">
+                            Please enter your reason for refund
+                        </p>
+                        
+                        <textarea
+                            value={refundReason}
+                            onChange={(e) => setRefundReason(e.target.value)}
+                            placeholder="Write here"
+                            className="w-full h-32 border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none mb-6"
+                        />
+
+                        {/* 버튼 */}
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={() => setIsRefundModalOpen(false)}
+                                className="flex-1 py-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={submitRefundRequest}
+                                disabled={refundReason.trim().length === 0} // 👈 글자 없으면 비활성화
+                                className={`flex-1 py-3 text-white rounded-xl font-bold shadow-lg transition-colors ${
+                                    refundReason.trim().length === 0
+                                    ? 'bg-gray-300 cursor-not-allowed shadow-none' // 비활성 스타일
+                                    : 'bg-red-500 hover:bg-red-600 shadow-red-200' // 활성 스타일
+                                }`}
+                            >
+                                Proceed
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 날짜 설정 모달 */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">

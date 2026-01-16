@@ -1,5 +1,6 @@
 package com.englishapp.api_server.entity;
 
+import com.englishapp.api_server.domain.OrderStatus;
 import com.englishapp.api_server.domain.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,5 +46,10 @@ public class Payment {
         this.status = PaymentStatus.PAID;
         this.pgTid = pgTid;
         this.paidAt = LocalDateTime.now();
+    }
+
+    // 결제 상태 변경 (환불용)
+    public void changeStatus(PaymentStatus newStatus) {
+        this.status = newStatus;
     }
 }

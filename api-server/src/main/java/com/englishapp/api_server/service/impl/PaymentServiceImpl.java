@@ -97,7 +97,36 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("결제 및 상품 지급 완료: OrderId={}, User={}", orderId, user.getEmail());
     }
 
-    // --- 아래 Helper 메서드들은 기존과 동일 ---
+    // 결제 취소 요청 관리
+    @Transactional
+    @Override
+    public void processRefund(Long orderId, String reason) {
+        // 주문 조회
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
+
+        // 결제 정보 조회 (paymentId(UUID) 필요)
+        Payment payment = paymentRepository.findByOrder(order)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
+
+        // PortOne API 호출 (환불)
+        String token = portOneClient.getAccessToken();
+        // DB에 저장해둔 pgTid(paymentId/TransactionId) 사용
+        portOneClient.cancelPayment(payment.getPgTid(), reason, token);
+
+        // DB 상태 업데이트
+        payment.changeStatus(PaymentStatus.CANCELED);
+        order.changeStatus(OrderStatus.REFUNDED);
+
+        // 연결된 수강권 Expired 처리
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getProduct().getType() == ProductType.SUBSCRIPTION) {
+
+                studentLicenseRepository.findBySubscription_Order_Id(order.getId())
+                        .forEach(license -> license.expire());
+            }
+        }
+    }
 
     private void clearCartItems(User user, Order order) {
         List<Long> productIds = order.getOrderItems().stream()
@@ -128,7 +157,7 @@ public class PaymentServiceImpl implements PaymentService {
         for (int i = 0; i < item.getAmount(); i++) {
             StudentLicense license = StudentLicense.createLicense(
                     user,
-                    subscription.getId(),
+                    subscription,
                     item.getProduct().getLicensePeriod()
             );
             studentLicenseRepository.save(license);

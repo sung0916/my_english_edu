@@ -5,6 +5,7 @@ const menuItems = [
     { name: 'Student List', href: '/admin/studentList' },
     { name: 'Teacher List', href: '/admin/teacherList' },
     { name: 'Permit-required List', href: '/admin/permitList' },
+    { name: 'Order List', href: '/admin/orderList' },
     { name: 'Product List', href: '/admin/productList' },
     { name: 'Board List', href: '/admin/boardList' },
     { name: 'Chart', href: '/admin/chart' },

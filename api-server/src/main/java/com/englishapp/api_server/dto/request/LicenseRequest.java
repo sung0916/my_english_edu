@@ -10,4 +10,10 @@ import java.time.LocalDate;
 public class LicenseRequest {
 
     private LocalDate startDate;
+    private Long orderItemId;
+
+    public LicenseRequest(LocalDate startDate, Long orderItemId) {
+        this.startDate = startDate;
+        this.orderItemId = orderItemId;
+    }
 }

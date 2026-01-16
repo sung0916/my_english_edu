@@ -41,6 +41,8 @@ import CheckoutPage from './pages/user/CheckoutPage';
 import PaymentSuccessPage from './pages/user/PaymentSuccessPage';
 import MyOrderListPage from './pages/user/MyOrderListPage';
 import OrderDetailPage from './pages/detail/OrderDetailPage';
+import MyLicensePage from './pages/user/MyLicensePage';
+import AdminOrderListPage from './pages/admin/OrderListPage';
 
 function App() {
     return (
@@ -110,6 +112,7 @@ function App() {
 
                         <Route path="payment" element={<MyOrderListPage />} />
                         <Route path="orderDetail" element={<OrderDetailPage />} />
+                        <Route path="licenseList" element={<MyLicensePage />} />
                         <Route path="place" element={<div className="p-10 text-center">Place Page (Ready)</div>} />
                         <Route path="result" element={<div className="p-10 text-center">Result Page (Ready)</div>} />
                     </Route>
@@ -137,6 +140,9 @@ function App() {
                         <Route path="productList" element={<ProductListPage />} />
                         <Route path="addProduct" element={<AddProduct />} />
                         <Route path="editProduct/:id" element={<EditProduct />} />
+
+                        {/* 판매 목록 */}
+                        <Route path="orderList" element={<AdminOrderListPage />} />
                     </Route>
 
                     {/* 404 Not Found */}

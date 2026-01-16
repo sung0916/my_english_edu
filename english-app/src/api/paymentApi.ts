@@ -64,3 +64,23 @@ export const startSubscription = async (orderItemId: number, startDate: string) 
     });
     return response.data;
 };
+
+// 수강권 일시정지 요청
+export const pauseLicense = async (licenseId: number) => {
+    const response = await apiClient.patch(`/api/licenses/${licenseId}/pause`);
+    return response.data;
+};
+
+// 수강권 재시작 요청
+export const resumeLicense = async (licenseId: number) => {
+    const response = await apiClient.patch(`/api/licenses/${licenseId}/resume`);
+    return response.data;
+};
+
+// 환불 요청
+export const requestRefund = async (orderId: number, reason: string) => {
+    const response = await apiClient.post(`/api/orders/${orderId}/refund-request`, {
+        reason
+    });
+    return response.data;
+};

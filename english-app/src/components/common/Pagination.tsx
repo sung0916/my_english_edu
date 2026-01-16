@@ -22,7 +22,7 @@ export const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`px-3 py-2 border rounded hover:bg-gray-100 ${
+        className={`px-3 py-1 border rounded hover:bg-gray-100 ${
           currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'text-blue-600'
         }`}
       >
@@ -34,9 +34,9 @@ export const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange
         <button
           key={pageNumber}
           onClick={() => onPageChange(pageNumber)}
-          className={`px-3 py-2 border rounded ${
+          className={`px-3 py-1 border rounded ${
             currentPage === pageNumber
-              ? 'bg-blue-600 text-white border-blue-600 font-bold'
+              ? 'bg-blue-500 text-white border-blue-600 font-bold'
               : 'text-blue-600 border-gray-300 hover:bg-gray-100'
           }`}
         >
@@ -48,7 +48,7 @@ export const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`px-3 py-2 border rounded hover:bg-gray-100 ${
+        className={`px-3 py-1 border rounded hover:bg-gray-100 ${
           currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'text-blue-600'
         }`}
       >

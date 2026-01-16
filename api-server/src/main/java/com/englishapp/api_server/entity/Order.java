@@ -69,8 +69,4 @@ public class Order {
         }
         this.status = newStatus;
     }
-
-    // (참고) Builder 패턴을 쓰셨다면 totalPrice 설정을 위해 setter를 열거나(지양),
-    // Builder 내에서 계산하거나, 위처럼 생성 메서드에서 주입해야 합니다.
-    // 여기서는 편의상 필드 직접 할당으로 표현했습니다.
 }
