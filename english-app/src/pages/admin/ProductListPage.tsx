@@ -24,7 +24,7 @@ interface Page<T> {
 
 const ProductListPage = () => {
     const navigate = useNavigate();
-    const productSearchOptions: SearchOption[] = [{ value: 'productName', label: '상품명' }];
+    const productSearchOptions: SearchOption[] = [{ value: 'productName', label: 'Product' }];
 
     const [isLoading, setIsLoading] = useState(true);
     const [products, setProducts] = useState<Product[]>([]);
@@ -64,21 +64,21 @@ const ProductListPage = () => {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col">
+        <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm h-full flex flex-col">
             <div className="mb-4">
                 <SearchBox options={productSearchOptions} onSearch={() => {}} />
             </div>
 
             <div className="flex flex-row bg-gray-50 border-b-2 border-gray-200 py-3 px-2 font-bold text-gray-700 text-center">
-                <div className="flex-1">번호</div>
-                <div className="flex-[3.5]">상품명</div>
-                <div className="flex-[1.5]">판매량</div>
-                <div className="flex-[1.5]">상태 관리</div>
+                <div className="flex-1">No</div>
+                <div className="flex-[3.5]">Name</div>
+                <div className="flex-[1.5]">Sales</div>
+                <div className="flex-[1.5]">Status</div>
             </div>
 
             <div className="flex-1 overflow-y-auto">
                 {products.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">등록된 상품이 없습니다.</div>
+                    <div className="p-10 text-center text-gray-500">No product in store</div>
                 ) : (
                     products.map((item) => (
                         <div 
@@ -98,8 +98,8 @@ const ProductListPage = () => {
                                         ${item.status === 'ONSALE' ? 'text-blue-600 border-blue-200 bg-blue-50' : 'text-gray-500 border-gray-200 bg-gray-50'}
                                     `}
                                 >
-                                    <option value="ONSALE">판매 중</option>
-                                    <option value="NOTONSALE">판매 중지</option>
+                                    <option value="ONSALE">On sale</option>
+                                    <option value="NOTONSALE">Paused</option>
                                 </select>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ const ProductListPage = () => {
                     className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
                 >
                     <IoAddCircleOutline size={18} />
-                    <span>상품 등록</span>
+                    <span>Add</span>
                 </button>
                 
                 <div className="w-full flex justify-center">

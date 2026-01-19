@@ -24,8 +24,8 @@ interface Page<T> {
 const BoardPage = () => {
     const navigate = useNavigate();
     const boardSearchOptions: SearchOption[] = [
-        { value: 'title', label: '제목' },
-        { value: 'content', label: '내용' },
+        { value: 'title', label: 'Title' },
+        { value: 'content', label: 'Content' },
     ];
 
     const [isLoading, setIsLoading] = useState(true);
@@ -63,10 +63,10 @@ const BoardPage = () => {
 
             {/* 테이블 헤더 */}
             <div className="flex bg-gray-50 border-b-2 border-gray-200 py-3 px-4 mt-4 font-bold text-gray-700 text-center">
-                <div className="w-16">번호</div>
-                <div className="flex-1 text-left px-4">제목</div>
-                <div className="w-24">작성일</div>
-                <div className="w-16">조회수</div>
+                <div className="w-16">No</div>
+                <div className="flex-1 text-left px-4">Title</div>
+                <div className="w-24">Write date</div>
+                <div className="w-16">Views</div>
             </div>
 
             {/* 테이블 바디 */}
@@ -74,7 +74,7 @@ const BoardPage = () => {
                 {isLoading ? (
                     <div className="p-10 text-center text-gray-500">Loading...</div>
                 ) : posts.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">등록된 게시글이 없습니다.</div>
+                    <div className="p-10 text-center text-gray-500">No announcements</div>
                 ) : (
                     posts.map((item) => (
                         <div 

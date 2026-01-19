@@ -25,8 +25,8 @@ interface Page<T> {
 const BoardListPage = () => {
     const navigate = useNavigate();
     const boardSearchOptions: SearchOption[] = [
-        { value: 'title', label: '제목' },
-        { value: 'content', label: '내용' },
+        { value: 'title', label: 'Title' },
+        { value: 'content', label: 'Content' },
     ];
 
     const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +48,7 @@ const BoardListPage = () => {
             setTotalItems(response.data.totalElements);
         } catch (error) {
             console.error("로드 실패:", error);
-            crossPlatformAlert("오류", "공지사항 목록을 불러오는 중 오류가 발생했습니다.");
+            crossPlatformAlert("Failed", "Try again");
         } finally {
             setIsLoading(false);
         }
@@ -64,34 +64,34 @@ const BoardListPage = () => {
 
     const handleDelete = (id: number, title: string) => {
         crossPlatformConfirm(
-            "공지사항 삭제",
-            `'${title}' 공지사항을 삭제하시겠습니까?`,
+            "Delete Announcement",
+            `Do you want to remove '${title}'?`,
             async () => {
                 try {
                     await apiClient.delete(`/api/announcements/${id}`);
-                    crossPlatformAlert("성공", "삭제되었습니다.");
+                    crossPlatformAlert("Success", "");
                     fetchAnnouncements(currentPage);
                 } catch (error) {
-                    crossPlatformAlert("오류", "삭제 실패");
+                    crossPlatformAlert("Failed", "Try again");
                 }
             }
         );
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col">
+        <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm h-full flex flex-col">
             <div className="mb-4">
                 <SearchBox options={boardSearchOptions} onSearch={handleSearch} />
             </div>
 
             {/* 테이블 헤더 */}
             <div className="flex flex-row bg-gray-50 border-b-2 border-gray-200 py-3 px-2 font-bold text-gray-700 text-center">
-                <div className="flex-1">번호</div>
-                <div className="flex-[4]">제목</div>
-                <div className="flex-[1.5]">작성자</div>
-                <div className="flex-[2]">작성일</div>
-                <div className="flex-1">조회수</div>
-                <div className="flex-[1.5]">관리</div>
+                <div className="flex-1">No</div>
+                <div className="flex-[4]">Title</div>
+                <div className="flex-[1.5]">Written by</div>
+                <div className="flex-[2]">Posted at</div>
+                <div className="flex-1">Views</div>
+                <div className="flex-[1.5]">Delete</div>
             </div>
 
             {/* 테이블 바디 */}
@@ -134,7 +134,7 @@ const BoardListPage = () => {
                     className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
                 >
                     <IoPencil />
-                    <span>글쓰기</span>
+                    <span>Add</span>
                 </button>
                 
                 <div className="w-full flex justify-center">

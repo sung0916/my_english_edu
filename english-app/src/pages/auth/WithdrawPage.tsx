@@ -11,8 +11,8 @@ const WithdrawPage = () => {
 
   const handleWithdraw = () => {
     crossPlatformConfirm(
-      "정말로 탈퇴하시겠습니까?",
-      "이 작업은 되돌릴 수 없으며, 계정의 모든 정보가 영구적으로 삭제됩니다.",
+      "Do you want to withdraw?",
+      "This action is irreversible and will delete all information\nin your account",
       proceedWithdrawal 
     );
   };
@@ -23,31 +23,32 @@ const WithdrawPage = () => {
       
       if (response.status === 200) {
         logout();
-        crossPlatformAlert("탈퇴 완료", "회원 탈퇴가 완료되었습니다.");
+        crossPlatformAlert("Success", "See you again");
         navigate('/auth/login', { replace: true });
       }
     } catch (error: any) {
       console.error("탈퇴 실패: ", error);
-      crossPlatformAlert("탈퇴 실패", error.response?.data?.message || "오류가 발생했습니다.");
+      crossPlatformAlert("Failed", error.response?.data?.message || "Try again");
     }
   };
 
   return (
-    <div className="h-full flex justify-center items-center bg-[#f5f5f5] p-4">
-      <div className="w-full max-w-[400px] bg-white rounded-lg p-8 shadow-lg text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">회원 탈퇴</h1>
+    <div className="h-screen flex justify-center items-center bg-[#f5f5f5] p-4">
+      <div className="w-full max-w-[400px] bg-white rounded-lg p-8 shadow-lg text-center mb-60">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Delete account</h1>
         
         <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-8">
             <p className="text-gray-700 text-sm leading-6">
-            회원 탈퇴를 진행하면 계정과 관련된 <span className="font-bold text-red-500">모든 데이터가 삭제</span>되며 복구할 수 없습니다.
+              If you cancel your membership, 
+              <p className="font-bold text-red-500">all data related to your account will be deleted and cannot be recovered</p>
             </p>
             <p className="text-gray-700 text-sm leading-6 mt-2 font-semibold">
-            신중하게 결정해주세요.
+            Please decide carefully
             </p>
         </div>
 
         <RefuseCustomButton 
-            title="회원 탈퇴" 
+            title="Proceed" 
             onClick={handleWithdraw} 
             className="w-full"
         />

@@ -53,7 +53,7 @@ export default function CheckoutPage() {
     const handlePayment = async () => {
         if (!orderData || !user) return;
         if (!window.PortOne) {
-            alert("결제 모듈을 불러오지 못했습니다. 새로고침 해주세요.");
+            alert("Failed to load payment module\nPlease refresh");
             return;
         }
 
@@ -150,16 +150,16 @@ export default function CheckoutPage() {
 
                                 {/* 지원하는 결제수단 아이콘 나열 */}
                                 <div className="flex items-center gap-3 flex-wrap">
-                                    <div className="bg-white p-2 rounded-md shadow-sm border border-blue-100" title="토스페이">
+                                    <div className="bg-white p-2 rounded-md shadow-sm border border-blue-100" title="TossPay">
                                         <img src={PAYMENT_LOGOS.TOSS} alt="Toss" className="h-6 object-contain scale-[2.0]" />
                                     </div>
-                                    <div className="bg-white p-2 rounded-md shadow-sm border border-blue-100" title="카카오페이">
+                                    <div className="bg-white p-2 rounded-md shadow-sm border border-blue-100" title="KakaoPay">
                                         <img src={PAYMENT_LOGOS.KAKAO} alt="Kakao" className="h-6 object-contain" />
                                     </div>
-                                    <div className="bg-white w-20 p-2 rounded-md shadow-sm border border-blue-100 flex justify-center items-center gap-1" title="삼성페이">
+                                    <div className="bg-white w-20 p-2 rounded-md shadow-sm border border-blue-100 flex justify-center items-center gap-1" title="SamsungPay">
                                         <img src={PAYMENT_LOGOS.SAMSUNG} alt="Samsung" className="h-6 object-contain scale-[2.0]" />
                                     </div>
-                                    <div className="bg-white p-2 rounded-md shadow-sm border border-blue-100 flex items-center gap-1" title="신용카드">
+                                    <div className="bg-white p-2 rounded-md shadow-sm border border-blue-100 flex items-center gap-1" title="Credit card">
                                         <img src={PAYMENT_LOGOS.CARD} alt="Card" className="h-6 object-contain" />
                                         <span className="text-xs text-gray-500 font-medium">Credit card</span>
                                     </div>
@@ -177,12 +177,12 @@ export default function CheckoutPage() {
                                 <div className="border-t border-gray-100 my-4"></div>
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="text-gray-500">Price</span>
-                                    <span className="font-medium">{orderData.price.toLocaleString()}원</span>
+                                    <span className="font-medium">{orderData.price.toLocaleString()} ₩</span>
                                 </div>
                                 <div className="border-t border-gray-100 my-4"></div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-bold text-gray-800">Total price</span>
-                                    <span className="text-2xl font-bold text-blue-600">{orderData.price.toLocaleString()}원</span>
+                                    <span className="text-2xl font-bold text-blue-600">{orderData.price.toLocaleString()} ₩</span>
                                 </div>
                             </div>
 
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
                                     ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'}
                                 `}
                             >
-                                {isLoading ? '결제창 띄우기...' : '결제하기'}
+                                {isLoading ? '결제창 띄우기...' : 'Proceed'}
                             </button>
                             <p className="text-xs text-gray-400 text-center mt-2">
                                 I have reviewed the order details above and agree to the payment.

@@ -43,6 +43,7 @@ import MyOrderListPage from './pages/user/MyOrderListPage';
 import OrderDetailPage from './pages/detail/OrderDetailPage';
 import MyLicensePage from './pages/user/MyLicensePage';
 import AdminOrderListPage from './pages/admin/OrderListPage';
+import AboutPage from './pages/main/AboutPage';
 
 function App() {
     return (
@@ -73,6 +74,9 @@ function App() {
 
                     {/* 3. Main Features (메인 메뉴) */}
                     <Route path="main">
+                        {/* 학원 소개 */}
+                        <Route path="about" element={<AboutPage />} />
+
                         {/* 게시판 */}
                         <Route path="board" element={<BoardPage />} />
                         <Route path="board/:id" element={<BoardDetailPage />} />

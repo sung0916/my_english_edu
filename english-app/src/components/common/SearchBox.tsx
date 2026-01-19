@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CustomButton from "./PosButtonProps"; // 이 버튼도 웹용으로 변환되었는지 확인 필요
+import CustomButton from "./PosButtonProps"; 
 
 export interface SearchOption {
     value: string;
@@ -57,7 +57,7 @@ export const SearchBox = ({ options, onSearch, defaultOption }: SearchBoxProps) 
                 <input
                     type="text"
                     className="w-full h-full px-4 text-base border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                    placeholder="검색어를 입력하세요"
+                    placeholder="Enter here"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -66,7 +66,7 @@ export const SearchBox = ({ options, onSearch, defaultOption }: SearchBoxProps) 
 
             {/* 검색 버튼 */}
             <div className="h-12 flex items-center">
-                <CustomButton title="검색" onClick={handleSearch} />
+                <CustomButton title="Search" onClick={handleSearch} />
             </div>
         </div>
     );

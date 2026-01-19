@@ -14,10 +14,10 @@ interface GameItem {
 }
 
 const EDU_GAMES: GameItem[] = [
-    { id: 1, title: "Mystery Word Cards", description: "단어 맞추기 게임", imageUrl: null, route: "/game/mysteryCards", isReady: true },
-    { id: 2, title: "Falling Words", description: "미스테리 카드 뒤집기", imageUrl: null, route: "/game/fallingWords", isReady: true },
-    { id: 3, title: "Maze Adventure", description: "미로 탐험가", imageUrl: null, route: "/game/mazeAdventure", isReady: true },
-    { id: 4, title: "Cross Word Puzzle", description: "가로세로 낱말퀴즈", imageUrl: null, route: "/game/crossWordPuzzle", isReady: true },
+    { id: 1, title: "Mystery Word Cards", description: "Select a word by reading sentence", imageUrl: null, route: "/game/mysteryCards", isReady: true },
+    { id: 2, title: "Falling Words", description: "Type the falling words", imageUrl: null, route: "/game/fallingWords", isReady: true },
+    { id: 3, title: "Maze Adventure", description: "Escape a maze", imageUrl: null, route: "/game/mazeAdventure", isReady: true },
+    { id: 4, title: "Cross Word Puzzle", description: "Find words and type", imageUrl: null, route: "/game/crossWordPuzzle", isReady: true },
 ];
 
 const GamePage = () => {

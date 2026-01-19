@@ -79,7 +79,7 @@ const StorePage = () => {
                                 {/* [수정] 가격과 뱃지를 양끝 정렬 (justify-between) */}
                                 <div className="flex justify-between items-center">
                                     <p className="font-bold text-gray-900 text-lg">
-                                        {item.price.toLocaleString()}원
+                                        {item.price.toLocaleString()} ₩
                                     </p>
 
                                     {/* 타입 뱃지 표시 */}

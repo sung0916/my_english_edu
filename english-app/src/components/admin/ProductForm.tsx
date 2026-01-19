@@ -101,7 +101,7 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
             }
         } catch (err) {
             console.error(err);
-            crossPlatformAlert('오류', '이미지 업로드 실패');
+            crossPlatformAlert('Failed to upload images', '');
         } finally {
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
@@ -120,7 +120,7 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
             }
         } catch (error) {
             console.error(error);
-            crossPlatformAlert('오류', '에디터 이미지 업로드 실패');
+            crossPlatformAlert('Failed to upload images', '');
         }
     };
 
@@ -137,16 +137,16 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
     };
 
     const handleSubmit = () => {
-        if (!productName.trim()) return crossPlatformAlert('', '상품명을 입력해주세요.');
+        if (!productName.trim()) return crossPlatformAlert('', 'Please enter product name');
         const descContent = editorRef.current?.getInstance().getHTML();
-        if (!descContent || descContent === '<p><br></p>') return crossPlatformAlert('', '상세 설명을 입력해주세요.');
+        if (!descContent || descContent === '<p><br></p>') return crossPlatformAlert('', 'Please enter product detail');
 
         // 1. 일반 상품 (ITEM)
         if (type === 'ITEM') {
             const priceNum = parseInt(itemPrice, 10);
             const amountNum = parseInt(itemAmount, 10);
-            if (isNaN(priceNum) || priceNum < 0) return crossPlatformAlert('', '유효한 가격을 입력해주세요.');
-            if (isNaN(amountNum) || amountNum < 0) return crossPlatformAlert('', '유효한 수량을 입력해주세요.');
+            if (isNaN(priceNum) || priceNum < 0) return crossPlatformAlert('', 'Check the price form');
+            if (isNaN(amountNum) || amountNum < 0) return crossPlatformAlert('', 'Check the amount form');
 
             onSubmit({
                 id: initialData?.id,
@@ -182,7 +182,7 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
             });
 
             if (productsToCreate.length === 0) {
-                return crossPlatformAlert('', '최소 하나 이상의 기간과 가격을 설정해주세요.');
+                return crossPlatformAlert('', 'Please set at least one period and price');
             }
 
             // 배열 전달
@@ -195,14 +195,14 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
             <div style={styles.formSection}>
                 <div style={styles.rowContainer}>
                     <div style={styles.formGroup}>
-                        <label style={styles.label}>상품명</label>
-                        <input style={styles.input} placeholder="상품명" value={productName} onChange={(e) => setProductName(e.target.value)} />
+                        <label style={styles.label}>Product Name</label>
+                        <input style={styles.input} placeholder="Enter name" value={productName} onChange={(e) => setProductName(e.target.value)} />
                     </div>
                     <div style={styles.formGroup}>
-                        <label style={styles.label}>상품 타입</label>
+                        <label style={styles.label}>Category</label>
                         <select style={styles.input} value={type} onChange={(e) => setType(e.target.value as ProductType)}>
-                            <option value="ITEM">물건</option>
-                            <option value="SUBSCRIPTION">구독권</option>
+                            <option value="ITEM">Goods</option>
+                            <option value="SUBSCRIPTION">Plan</option>
                         </select>
                     </div>
                 </div>
@@ -211,18 +211,18 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
                 {type === 'ITEM' ? (
                     <div style={styles.rowContainer}>
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>가격</label>
-                            <input style={styles.input} type="number" placeholder="가격" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                            <label style={styles.label}>price</label>
+                            <input style={styles.input} type="number" placeholder="Enter price" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
                         </div>
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>수량</label>
-                            <input style={styles.input} type="number" placeholder="수량" value={itemAmount} onChange={(e) => setItemAmount(e.target.value)} />
+                            <label style={styles.label}>Quantity</label>
+                            <input style={styles.input} type="number" placeholder="Enter quantity" value={itemAmount} onChange={(e) => setItemAmount(e.target.value)} />
                         </div>
                     </div>
                 ) : (
                     // [수정] 구독권일 때: 체크박스 리스트 표시
                     <div style={{ marginTop: '10px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '5px', border: '1px solid #dee2e6' }}>
-                        <label style={styles.label}>이용 기간별 가격 설정</label>
+                        <label style={styles.label}>Pricing by usage period</label>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
                             {ALL_PERIODS.map((period) => (
                                 <div key={period} style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#fff', padding: '10px', borderRadius: '4px', border: '1px solid #eee' }}>
@@ -235,13 +235,13 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
                                     <span style={{ width: '80px', fontSize: '14px', fontWeight: 'bold' }}>{PERIOD_LABELS[period]}</span>
                                     <input 
                                         type="number"
-                                        placeholder="가격 입력"
+                                        placeholder="Enter price"
                                         value={subPrices[period]?.price || ''}
                                         onChange={(e) => handleSubPriceChange(period, 'price', e.target.value)}
                                         disabled={!subPrices[period]?.enabled}
                                         style={{ ...styles.input, flex: 1, backgroundColor: !subPrices[period]?.enabled ? '#f1f3f5' : '#fff' }}
                                     />
-                                    <span style={{ fontSize: '14px' }}>원</span>
+                                    <span style={{ fontSize: '14px' }}> ₩</span>
                                 </div>
                             ))}
                         </div>
@@ -251,12 +251,12 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
 
             {/* 에디터 */}
             <div style={styles.editorSection}>
-                <label style={styles.label}>상세 설명</label>
+                <label style={styles.label}>Product detail</label>
                 <div style={styles.editorWrapper}>
                     <Editor
                         ref={editorRef}
                         initialValue={initialData?.description || ' '} 
-                        placeholder="상품 상세 설명을 입력하세요."
+                        placeholder="Enter the details"
                         previewStyle="vertical"
                         height="500px"
                         initialEditType="wysiwyg"
@@ -268,8 +268,8 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
             {/* 갤러리 */}
             <div style={styles.attachmentSection}>
                 <div style={styles.attachmentHeader}>
-                    <label style={styles.label}>상품 대표 이미지 (갤러리용: {galleryImages.length})</label>
-                    <button style={styles.uploadButton} onClick={() => fileInputRef.current?.click()}>+ 이미지 추가</button>
+                    <label style={styles.label}>Thumbnail (total: {galleryImages.length})</label>
+                    <button style={styles.uploadButton} onClick={() => fileInputRef.current?.click()}>+ add image</button>
                     <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleGalleryFileChange} />
                 </div>
                 <div style={styles.thumbnailList}>

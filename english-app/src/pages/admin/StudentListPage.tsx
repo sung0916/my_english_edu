@@ -18,7 +18,7 @@ interface Student {
 }
 
 const StudentListPage = () => {
-    const searchOptions: SearchOption[] = [{ value: 'userName', label: '이름' }];
+    const searchOptions: SearchOption[] = [{ value: 'userName', label: 'Name' }];
     const [allStudents, setAllStudents] = useState<Student[]>([]);
     const [displayedStudents, setDisplayedStudents] = useState<Student[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,29 +43,29 @@ const StudentListPage = () => {
     }, [allStudents, currentPage]);
 
     const handleDelete = (userId: number, username: string) => {
-        crossPlatformConfirm("학생 삭제", `'${username}' 학생을 삭제하시겠습니까?`, async () => {
+        crossPlatformConfirm("Delete student", `Are you sure to delete '${username}'?`, async () => {
             try {
                 await apiClient.delete(`/api/admin/${userId}`);
                 setAllStudents(prev => prev.map(s => s.id === userId ? { ...s, status: 'DELETED' } : s));
-                crossPlatformAlert("성공", "삭제되었습니다.");
+                crossPlatformAlert("Success", "Student deleted");
             } catch (error) {
-                crossPlatformAlert("오류", "실패했습니다.");
+                crossPlatformAlert("Failed", "Try again");
             }
         });
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm min-h-full flex flex-col">
+        <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm min-h-full flex flex-col">
             <div className="mb-4">
                 <SearchBox options={searchOptions} onSearch={() => {}} />
             </div>
 
             <div className="flex flex-row bg-gray-50 border-b-2 border-gray-200 py-3 px-2 font-bold text-gray-700 text-center">
-                <div className="flex-[1.5]">이름</div>
-                <div className="flex-[2]">아이디</div>
-                <div className="flex-[2.5]">연락처</div>
-                <div className="flex-[3]">이메일</div>
-                <div className="flex-[1.2]">삭제</div>
+                <div className="flex-[1.5]">Name</div>
+                <div className="flex-[2]">ID</div>
+                <div className="flex-[2.5]">Contact</div>
+                <div className="flex-[3]">Email</div>
+                <div className="flex-[1.2]">Delete</div>
             </div>
 
             <div className="flex-1 overflow-y-auto">
@@ -79,7 +79,7 @@ const StudentListPage = () => {
                             <div className="flex-[3] truncate px-2">{isDeleted ? '-' : item.email}</div>
                             <div className="flex-[1.2] flex justify-center">
                                 {isDeleted ? (
-                                    <span className="text-xs italic">삭제됨</span>
+                                    <span className="text-xs italic">deleted</span>
                                 ) : (
                                     <button onClick={() => handleDelete(item.id, item.username)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-full">
                                         <IoTrashOutline size={20} />

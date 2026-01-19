@@ -25,7 +25,7 @@ export default function CartPage() {
     // 1. 초기 데이터 로드
     useEffect(() => {
         if (!isLoggedIn) {
-            alert('로그인이 필요합니다.');
+            alert('Please login first');
             navigate('/auth/login');
             return;
         }
@@ -67,8 +67,8 @@ export default function CartPage() {
     };
 
     const handleDeleteSelected = async () => {
-        if (selectedIds.size === 0) return alert("삭제할 상품을 선택해주세요.");
-        if (!window.confirm(`${selectedIds.size}개 상품을 삭제하시겠습니까?`)) return;
+        if (selectedIds.size === 0) return alert("Select products you want to delete");
+        if (!window.confirm(`Do you want to delete ${selectedIds.size} items?`)) return;
 
         try {
             const deletePromises = Array.from(selectedIds).map(id => removeItem(id));
@@ -152,10 +152,10 @@ export default function CartPage() {
                     <div className="flex flex-col">
                         <div className="text-base text-gray-800 font-medium mb-1 break-keep">
                             {item.productName}
-                            {!isSale && <span className="text-red-500 font-bold text-xs ml-2">(판매중지)</span>}
+                            {!isSale && <span className="text-red-500 font-bold text-xs ml-2">(Sold out)</span>}
                         </div>
                         <div className="text-lg font-bold text-gray-900">
-                            {formatPrice(item.price)} 원
+                            {formatPrice(item.price)} ₩
                         </div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@ export default function CartPage() {
 
                         {/* 아이템별 합계 금액 */}
                         <span className="text-lg font-bold text-gray-800 min-w-[120px] text-right">
-                            {formatPrice(item.totalPrice)} 원
+                            {formatPrice(item.totalPrice)} ₩
                         </span>
                     </div>
                 )}
@@ -205,7 +205,7 @@ export default function CartPage() {
 
     return (
         <div className="w-full max-w-4xl mx-auto py-10 px-4 pb-32">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">장바구니</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">My cart</h1>
 
             {/* 선택 바 */}
             <div className="flex justify-between items-center bg-white p-4 mb-4 border border-gray-200 rounded-lg shadow-sm">
@@ -214,10 +214,10 @@ export default function CartPage() {
                         ? <IoCheckbox className="text-blue-500 text-xl" /> 
                         : <IoSquareOutline className="text-gray-400 text-xl" />
                     }
-                    전체 선택 ({selectedIds.size}/{items.length})
+                    Select all ({selectedIds.size}/{items.length})
                 </button>
                 <button onClick={handleDeleteSelected} className="text-sm px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-gray-600 transition-colors">
-                    선택 삭제
+                    Delete
                 </button>
             </div>
 
@@ -225,8 +225,8 @@ export default function CartPage() {
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-8">
                 {items.length === 0 ? (
                     <div className="py-20 text-center text-gray-400 flex flex-col items-center">
-                        <div className="text-lg mb-2">장바구니가 비어있습니다.</div>
-                        <p className="text-sm text-gray-400">원하는 상품을 담아보세요.</p>
+                        <div className="text-lg mb-2">Your cart is empty</div>
+                        <p className="text-sm text-gray-400">Add products that you want</p>
                     </div>
                 ) : (
                     items.map(item => <CartItemRow key={item.cartId} item={item} />)
@@ -235,21 +235,17 @@ export default function CartPage() {
 
             {/* 💰 금액 요약 박스 (기존 결제수단 UI 제거 후 디자인 단순화) */}
             <div className="bg-white p-6 border border-gray-200 rounded-lg shadow-sm mb-8">
-                <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">결제 금액</h2>
+                <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Payment info</h2>
                 <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">총 상품금액</span>
-                    <span className="font-medium">{formatPrice(finalPrice)}원</span>
-                </div>
-                <div className="flex justify-between items-center mb-2 text-gray-600">
-                    <span>배송비</span>
-                    <span>0원</span>
+                    <span className="text-gray-600">Price</span>
+                    <span className="font-medium">{formatPrice(finalPrice)} ₩</span>
                 </div>
                 <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                    <span className="text-lg font-bold text-gray-800">최종 결제금액</span>
-                    <span className="text-3xl font-bold text-blue-600">{formatPrice(finalPrice)}원</span>
+                    <span className="text-lg font-bold text-gray-800">Total price</span>
+                    <span className="text-3xl font-bold text-blue-600">{formatPrice(finalPrice)} ₩</span>
                 </div>
             </div>
-
+            
             {/* 하단 고정 구매 버튼 */}
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50">
                 <div className="max-w-4xl mx-auto">
@@ -262,7 +258,7 @@ export default function CartPage() {
                         disabled={selectedIds.size === 0}
                         onClick={handleOrderCreate} 
                     >
-                        총 {selectedIds.size}개 상품 구매하기
+                        Buy {selectedIds.size} items
                     </button>
                 </div>
             </div>

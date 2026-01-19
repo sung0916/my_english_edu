@@ -56,38 +56,38 @@ const PermitListPage = () => {
         const role = selectedRoles[userId];
         try {
             await apiClient.patch(`/api/admin/${userId}/approve`, { role });
-            crossPlatformAlert("성공", "승인 완료");
+            crossPlatformAlert("Success", "");
             setAllPendingUsers(prev => prev.filter(u => u.userId !== userId));
         } catch (error) {
-            crossPlatformAlert("오류", "승인 실패");
+            crossPlatformAlert("Failed", "Try again");
         }
     };
 
     const handleRemove = async (userId: number) => {
         try {
             await apiClient.delete(`/api/admin/${userId}`);
-            crossPlatformAlert("성공", "제거 완료");
+            crossPlatformAlert("Sucess to delete", "");
             setAllPendingUsers(prev => prev.filter(u => u.userId !== userId));
         } catch (error) {
-            crossPlatformAlert("오류", "제거 실패");
+            crossPlatformAlert("Failed", "Try again");
         }
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm min-h-full flex flex-col">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">승인 대기 목록</h2>
+        <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm min-h-full flex flex-col">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">Awaiting Approval</h2>
 
             <div className="flex flex-row bg-gray-50 border-b-2 border-gray-200 py-3 px-2 font-bold text-gray-700 text-center">
-                <div className="flex-[1.5]">이름</div>
-                <div className="flex-[2]">아이디</div>
-                <div className="flex-[2.5]">연락처</div>
-                <div className="flex-[2]">역할</div>
-                <div className="flex-[3]">관리</div>
+                <div className="flex-[1.5]">Name</div>
+                <div className="flex-[2]">ID</div>
+                <div className="flex-[2.5]">Contact</div>
+                <div className="flex-[2]">Position</div>
+                <div className="flex-[3]">Status</div>
             </div>
 
             <div className="flex-1 overflow-y-auto">
                 {displayedUsers.length === 0 ? (
-                    <div className="p-10 text-center text-gray-500">대기 중인 사용자가 없습니다.</div>
+                    <div className="p-10 text-center text-gray-500">No accounts in list</div>
                 ) : (
                     displayedUsers.map((item) => (
                         <div key={item.userId} className="flex flex-row items-center border-b border-gray-100 py-3 px-2 text-center hover:bg-gray-50">
@@ -106,8 +106,8 @@ const PermitListPage = () => {
                                 </select>
                             </div>
                             <div className="flex-[3] flex justify-center gap-2">
-                                <PermitCustomButton title="허가" onClick={() => handleApprove(item.userId)} className="px-3 py-1 text-sm w-20" />
-                                <RefuseCustomButton title="제거" onClick={() => handleRemove(item.userId)} className="px-3 py-1 text-sm w-20" />
+                                <PermitCustomButton title="Permit" onClick={() => handleApprove(item.userId)} className="px-3 py-1 text-sm w-20" />
+                                <RefuseCustomButton title="Refuse" onClick={() => handleRemove(item.userId)} className="px-3 py-1 text-sm w-20" />
                             </div>
                         </div>
                     ))

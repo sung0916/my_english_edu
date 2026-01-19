@@ -14,7 +14,7 @@ const AdminHeader = () => {
                 <FiMenu size={24} color="black" />
             </button>
 
-            <h1 className="text-lg font-bold text-gray-800">관리자 페이지</h1>
+            <h1 className="text-lg font-bold text-gray-800">Manager Page</h1>
 
             {/* 오른쪽 여백 (균형 맞춤용) */}
             <div className="w-8" />

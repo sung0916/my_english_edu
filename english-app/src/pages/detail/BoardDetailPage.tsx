@@ -81,10 +81,10 @@ export default function BoardDetailPage() {
                 <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">{announcement.title}</h1>
                 <div className="flex justify-between text-sm text-gray-500">
                     <div className="flex gap-4">
-                        <span>작성자: <span className="font-medium text-gray-700">{announcement.author.username}</span></span>
+                        <span>Written by: <span className="font-medium text-gray-700">{announcement.author.username}</span></span>
                         <span>{new Date(announcement.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <div>조회 {announcement.viewCount}</div>
+                    <div>Views {announcement.viewCount}</div>
                 </div>
             </div>
 

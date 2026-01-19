@@ -75,7 +75,7 @@ export default function AdminOrderListPage() {
     };
 
     return (
-        <div className="bg-white p-8 rounded-xl shadow-sm h-full flex flex-col min-w-[1000px]">
+        <div className="bg-white p-8 rounded-xl shadow-sm h-full flex flex-col min-w-[720px]">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Ordered History</h1>
 
             {/* 1. 메인 카테고리 탭 */}
@@ -120,7 +120,7 @@ export default function AdminOrderListPage() {
                     <thead>
                         <tr className="bg-gray-50 border-y border-gray-200 text-gray-600 text-sm text-center">
                             <th className="py-3 px-4 w-20">No</th>
-                            <th className="py-3 px-4">Product Name</th>
+                            <th className="py-3 px-4">Product</th>
                             <th className="py-3 px-4 w-32">Total Price</th>
                             <th className="py-3 px-4 w-40">Purchaser</th>
                             <th className="py-3 px-4 w-32">Paid At</th>

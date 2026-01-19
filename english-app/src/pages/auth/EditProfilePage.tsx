@@ -39,7 +39,7 @@ const EditProfilePage = () => {
         setTel(response.data.tel);
       } catch (error) {
         console.error("사용자 정보 로딩 실패:", error);
-        crossPlatformAlert("오류", "사용자 정보를 불러오지 못했습니다.");
+        crossPlatformAlert("Failed to load", "Try again");
         navigate(-1);
       }
     };
@@ -68,18 +68,18 @@ const EditProfilePage = () => {
 
     if (isNotEmpty(password) || isNotEmpty(passwordConfirm)) {
       if (!validatePassword(password)) {
-        newErrors.password = "비밀번호는 8~15자 (영문, 숫자 포함)여야 합니다.";
+        newErrors.password = "Must be 8 to 15 characters with numbers and letters";
       } else if (password !== passwordConfirm) {
-        newErrors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
+        newErrors.passwordConfirm = "Check your password again";
       } else {
         payload.password = password;
       }
     }
 
-    if (!validateEmail(email)) newErrors.email = "올바른 이메일 형식이 아닙니다.";
+    if (!validateEmail(email)) newErrors.email = "Not available email";
     
     const telDigitsOnly = tel.replace(/[^0-9]/g, '');
-    if (telDigitsOnly.length < 10) newErrors.tel = "올바른 전화번호를 입력해주세요.";
+    if (telDigitsOnly.length < 10) newErrors.tel = "Not available phone number";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -89,12 +89,12 @@ const EditProfilePage = () => {
     try {
       const response = await apiClient.patch('/api/users/me', payload);
       if (response.status === 200) {
-        crossPlatformAlert("수정 완료", "정보가 성공적으로 수정되었습니다.");
+        crossPlatformAlert("Success", "Profile updated");
         navigate(-1);
       }
     } catch (error: any) {
       console.error("수정 실패: ", error);
-      crossPlatformAlert("수정 실패", error.response?.data?.message || "오류가 발생했습니다.");
+      crossPlatformAlert("failed", error.response?.data?.message || "Try again");
     }
   };
 
@@ -129,7 +129,7 @@ const EditProfilePage = () => {
                 <input 
                     type="password"
                     className="w-full h-11 border border-gray-300 rounded px-3 outline-none focus:border-blue-500"
-                    placeholder="새로운 비밀번호" 
+                    placeholder="New password" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                 />
@@ -140,7 +140,7 @@ const EditProfilePage = () => {
                 <input 
                     type="password"
                     className="w-full h-11 border border-gray-300 rounded px-3 outline-none focus:border-blue-500"
-                    placeholder="비밀번호 확인" 
+                    placeholder="Check password" 
                     value={passwordConfirm} 
                     onChange={(e) => setPasswordConfirm(e.target.value)} 
                 />
@@ -150,7 +150,7 @@ const EditProfilePage = () => {
             <div className="mb-2">
                 <input 
                     className="w-full h-11 border border-gray-300 rounded px-3 outline-none focus:border-blue-500"
-                    placeholder="이메일" 
+                    placeholder="Email" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                 />
@@ -160,7 +160,7 @@ const EditProfilePage = () => {
             <div className="mb-4">
                 <input 
                     className="w-full h-11 border border-gray-300 rounded px-3 outline-none focus:border-blue-500"
-                    placeholder="전화번호" 
+                    placeholder="Contact" 
                     value={tel} 
                     onChange={handleTelChange} 
                     maxLength={13}
@@ -168,7 +168,7 @@ const EditProfilePage = () => {
                 <div className="h-4 mt-1 text-xs text-red-500 ml-1">{errors.tel}</div>
             </div>
 
-            <PermitCustomButton title="수정하기" onClick={handleUpdateProfile} className="w-full" />
+            <PermitCustomButton title="Edit" onClick={handleUpdateProfile} className="w-full" />
         </div>
       </div>
     </div>

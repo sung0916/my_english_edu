@@ -179,13 +179,13 @@ export default function StoreDetailPage() {
                     {isSubscription && (
                         <div className="mb-4">
                             <span className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded font-medium mr-2">
-                                구독권
+                                Plan
                             </span>
                         </div>
                     )}
 
                     <div className="text-3xl font-bold text-red-600 mb-6">
-                        {currentPrice.toLocaleString()}원
+                        {currentPrice.toLocaleString()} ₩
                     </div>
 
                     <div className="border-t border-gray-200 my-4" />
@@ -193,7 +193,7 @@ export default function StoreDetailPage() {
                     {/* 분기 처리: 구독권이면 기간 선택, 일반이면 수량 조절 */}
                     {isSubscription ? (
                         <div className="mb-6">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">이용 기간 선택</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Select period</label>
                             {product.options && product.options.length > 0 ? (
                                 <select
                                     className="w-full p-3 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -203,7 +203,7 @@ export default function StoreDetailPage() {
                                     {/* options에 자기 자신과 형제 상품들이 모두 들어있다고 가정 */}
                                     {product.options.map(opt => (
                                         <option key={opt.productId} value={opt.productId}>
-                                            {PERIOD_LABELS[opt.licensePeriod]} ({opt.price.toLocaleString()}원)
+                                            {PERIOD_LABELS[opt.licensePeriod]} ({opt.price.toLocaleString()} ₩)
                                         </option>
                                     ))}
                                 </select>
@@ -213,12 +213,12 @@ export default function StoreDetailPage() {
                                     {product.licensePeriod ? PERIOD_LABELS[product.licensePeriod] : '기간 정보 없음'}
                                 </div>
                             )}
-                            <p className="text-xs text-gray-500 mt-2">* 선택하신 기간만큼 이용 권한이 부여됩니다.</p>
+                            <p className="text-xs text-gray-500 mt-2">* You will be granted access for the period you have selected</p>
                         </div>
                     ) : (
                         // ITEM일 때: 수량 조절
                         <div className="flex items-center justify-between mb-6">
-                            <span className="font-bold text-gray-700">수량</span>
+                            <span className="font-bold text-gray-700"></span>
                             <div className="flex items-center border border-gray-300 rounded">
                                 <button
                                     onClick={() => handleQuantityChange(-1)}
@@ -234,9 +234,9 @@ export default function StoreDetailPage() {
                     )}
 
                     <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg mb-6">
-                        <span className="font-bold text-gray-700">총 상품금액</span>
+                        <span className="font-bold text-gray-700">Total price</span>
                         <span className="text-xl font-bold text-red-600">
-                            {(currentPrice * quantity).toLocaleString()}원
+                            {(currentPrice * quantity).toLocaleString()} ₩
                         </span>
                     </div>
 
@@ -246,20 +246,20 @@ export default function StoreDetailPage() {
                             disabled={isAddingCart}
                             className="flex-1 border border-blue-600 text-blue-600 font-bold rounded hover:bg-blue-50 transition-colors disabled:opacity-50"
                         >
-                            {isAddingCart ? '담는 중...' : '장바구니 담기'}
+                            {isAddingCart ? '담는 중...' : 'Add cart'}
                         </button>
                         <button
                             onClick={handleBuyNow}
                             disabled={isAddingCart}
                             className="flex-1 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
                         >
-                            {isAddingCart ? '처리 중...' : '바로구매'}
+                            {isAddingCart ? '처리 중...' : 'Buy'}
                         </button>
                     </div>
 
                     {user?.role === 'ADMIN' && (
                         <div className="flex justify-end mt-4">
-                            <PermitCustomButton title="수정" onClick={() => navigate(`/admin/editProduct/${id}`)} />
+                            <PermitCustomButton title="Edit" onClick={() => navigate(`/admin/editProduct/${id}`)} />
                         </div>
                     )}
                 </div>
@@ -267,7 +267,7 @@ export default function StoreDetailPage() {
 
             {/* 3. 하단: 상세 설명 */}
             <div className="border-t border-gray-200 pt-10">
-                <h2 className="text-xl font-bold mb-6 border-b border-gray-200 pb-2">상품 상세 정보</h2>
+                <h2 className="text-xl font-bold mb-6 border-b border-gray-200 pb-2">Product Detail</h2>
                 <div
                     className="prose max-w-none text-gray-800 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: product.description }}

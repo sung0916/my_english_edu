@@ -49,7 +49,7 @@ const EditProduct = () => {
                 });
             } catch (error) {
                 console.error("로딩 실패:", error);
-                crossPlatformAlert("오류", "상품 정보를 불러오지 못했습니다.");
+                crossPlatformAlert("Failed to load product data", "");
                 navigate(-1);
             } finally {
                 setIsLoading(false);
@@ -89,11 +89,11 @@ const EditProduct = () => {
 
         try {
             await apiClient.patch('/api/products/edit', payload);
-            crossPlatformAlert('성공', '상품 정보가 수정되었습니다.');
+            crossPlatformAlert('Success to edit', '');
             navigate(-1);
         } catch (error) {
             console.error('수정 실패:', error);
-            crossPlatformAlert('오류', '상품 수정 중 오류가 발생했습니다.');
+            crossPlatformAlert('Failed to edit product', '');
         }
     };
 
@@ -101,12 +101,12 @@ const EditProduct = () => {
 
     return (
         <div style={{ minHeight: 'calc(100vh - 80px)', padding: '20px', backgroundColor: '#f8f9fa' }}>
-            <h2 className="text-2xl font-bold mb-4">상품 수정</h2>
+            <h2 className="text-2xl font-bold mb-4">Edit product</h2>
             {initialData && (
                 <ProductForm 
                     initialData={initialData} 
                     onSubmit={handleEdit} 
-                    submitButtonText="수정 완료" 
+                    submitButtonText="Edit" 
                 />
             )}
         </div>
