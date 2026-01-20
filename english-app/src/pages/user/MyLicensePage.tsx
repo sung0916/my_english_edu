@@ -101,7 +101,7 @@ const MyLicensePage = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm h-full flex flex-col min-h-[600px] min-w-[925px]">
             <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <IoCalendarOutline />
-                Classes
+                Plans
             </h1>
 
             {/* 테이블 헤더 */}

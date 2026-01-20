@@ -61,15 +61,34 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         return AnnouncementResponse.from(savedAnnouncement, relatedImages);
     }
 
-    // 공지사항 목록
+    // 공지사항 목록 (+ 검색했을 때 파라미터 추가)
     @Override
     @Transactional(readOnly = true) // 데이터 변경이 없는 조회는 readOnly로 성능 최적화
-    public Page<AnnouncementListResponse> findAll(Pageable pageable) {
-        
+    public Page<AnnouncementListResponse> findAll(Pageable pageable, String searchType, String searchKeyword) {
         // DELETED 상태가 아닌 공지사항만 조회
-        Page<Announcement> announcements = announcementRepository.findByStatusNot(BoardStatus.DELETED, pageable);
-        
-        // Page의 map 기능을 사용해 DTO로 변환
+        Page<Announcement> announcements;
+
+        // 1. 검색어가 없는 경우 (전체 조회)
+        if (searchKeyword == null || searchKeyword.trim().isEmpty()) {
+            announcements = announcementRepository.findByStatusNot(BoardStatus.DELETED, pageable);
+        }
+        // 2. 검색어가 있는 경우 -> 타입 별 조회
+        else {
+            // 제목 검색
+            if ("title".equals(searchType)) {
+                announcements = announcementRepository.findByTitleContainingAndStatusNot(searchKeyword, BoardStatus.DELETED, pageable);
+            }
+            // 내용 검색
+            else if ("content".equals(searchType)) {
+                announcements = announcementRepository.findByContentContainingAndStatusNot(searchKeyword, BoardStatus.DELETED, pageable);
+            }
+            // 타입이 이상하면 기본 전체 조회 (또는 예외처리)
+            else {
+                announcements = announcementRepository.findByContentContainingAndStatusNot(searchKeyword, BoardStatus.DELETED, pageable);
+            }
+        }
+
+        // DTO 변환 반환
         return announcements.map(AnnouncementListResponse::from);
     }
 

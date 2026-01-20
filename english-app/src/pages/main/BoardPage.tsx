@@ -4,6 +4,7 @@ import apiClient from "@/api";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchBox, SearchOption } from "@/components/common/SearchBox";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
+import { useSearch } from "@/hooks/useSearch";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,25 +34,31 @@ const BoardPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
+    const { onSearch, getSearchParams, searchState } = useSearch('title');
+
     const fetchPosts = useCallback(async (page: number) => {
         setIsLoading(true);
+
         try {
-            const response = await apiClient.get<Page<Post>>('/api/announcements/list', {
-                params: {
-                    page: page - 1,
-                    size: ITEMS_PER_PAGE,
-                    sort: 'id,desc',
-                }
-            });
+            const params: any = {
+                page: page - 1,
+                size: ITEMS_PER_PAGE,
+                sort: 'id,desc',
+                ...getSearchParams()
+            };
+
+            const response = await apiClient.get<Page<Post>>('/api/announcements/list', { params });
+            
             setPosts(response.data.content);
             setTotalItems(response.data.totalElements);
+
         } catch (error) {
             console.error(error);
             crossPlatformAlert("오류", "게시글 목록 로드 실패");
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [getSearchParams]);
 
     useEffect(() => {
         fetchPosts(currentPage);
@@ -59,7 +66,7 @@ const BoardPage = () => {
 
     return (
         <div className="p-5 bg-white min-h-screen">
-            <SearchBox options={boardSearchOptions} onSearch={(type, query) => console.log(type, query)} />
+            <SearchBox options={boardSearchOptions} onSearch={onSearch} />
 
             {/* 테이블 헤더 */}
             <div className="flex bg-gray-50 border-b-2 border-gray-200 py-3 px-4 mt-4 font-bold text-gray-700 text-center">
@@ -77,8 +84,8 @@ const BoardPage = () => {
                     <div className="p-10 text-center text-gray-500">No announcements</div>
                 ) : (
                     posts.map((item) => (
-                        <div 
-                            key={item.announcementId} 
+                        <div
+                            key={item.announcementId}
                             onClick={() => navigate(`/main/board/${item.announcementId}`)}
                             className="flex items-center border-b border-gray-100 py-3 px-4 hover:bg-gray-50 cursor-pointer transition-colors text-center text-gray-600"
                         >

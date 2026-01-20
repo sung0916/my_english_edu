@@ -13,7 +13,7 @@ public interface ProductService {
     ProductResponse createProduct(ProductRequest.CreateRequest request);
 
     // 상품 목록
-    Page<ProductListResponse> getAllProducts(Pageable pageable);
+    Page<ProductListResponse> getAllProducts(Pageable pageable, String searchType, String searchKeyword);
 
     // 상품 수정
     ProductResponse editProduct(ProductRequest.UpdateRequest request);

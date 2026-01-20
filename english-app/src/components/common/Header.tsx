@@ -31,7 +31,7 @@ const Header = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-6">
+            <nav className="hidden md:flex space-x-8">
                 <Link to="/main/about" className="text-lg font-bold text-gray-700 hover:text-blue-500">About</Link>
                 <Link to="/main/english" className="text-lg font-bold text-gray-700 hover:text-blue-500">English</Link>
                 <Link to="/main/games" className="text-lg font-bold text-gray-700 hover:text-blue-500">Games</Link>
@@ -44,9 +44,9 @@ const Header = () => {
                 {isLoggedIn ? (
                     <>
                         {user?.role === 'ADMIN' ? (
-                            <Link to="/admin/studentList" className="text-sm font-medium hover:text-blue-500">ManagerPage</Link>
+                            <Link to="/admin/permitList" className="text-sm font-medium hover:text-blue-500">ManagerPage</Link>
                         ) : (
-                            <Link to="/user/place" className="text-sm font-medium hover:text-blue-500">MyPage</Link>
+                            <Link to="/user/licenseList" className="text-sm font-medium hover:text-blue-500">MyPage</Link>
                         )}
                         <Link to="/user/cart" className="text-sm font-medium hover:text-blue-500">Cart</Link>
                         <button onClick={handleLogout} className="text-sm font-medium hover:text-red-500">Logout</button>
@@ -90,9 +90,9 @@ const Header = () => {
                             {isLoggedIn ? (
                                 <>
                                     {user?.role === 'ADMIN' ? (
-                                        <Link to="/admin/studentList" onClick={closeMenu} className="text-xl font-medium text-center">ManagerPage</Link>
+                                        <Link to="/admin/permitList" onClick={closeMenu} className="text-xl font-medium text-center">ManagerPage</Link>
                                     ) : (
-                                        <Link to="/user/place" onClick={closeMenu} className="text-xl font-medium text-center">MyPage</Link>
+                                        <Link to="/user/licenseList" onClick={closeMenu} className="text-xl font-medium text-center">MyPage</Link>
                                     )}
                                     {user?.role !== 'ADMIN' && (
                                         <Link to="/user/cart" onClick={closeMenu} className="text-xl font-medium text-center">Cart</Link>

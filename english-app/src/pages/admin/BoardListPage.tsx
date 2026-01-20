@@ -5,6 +5,7 @@ import apiClient from "@/api";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchBox, SearchOption } from "@/components/common/SearchBox";
 import { crossPlatformAlert, crossPlatformConfirm } from "@/utils/crossPlatformAlert";
+import { useSearch } from "@/hooks/useSearch";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -34,25 +35,28 @@ const BoardListPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
+    const { onSearch, getSearchParams } = useSearch('title');
+
     const fetchAnnouncements = useCallback(async (page: number) => {
         setIsLoading(true);
         try {
-            const response = await apiClient.get<Page<Announcement>>('/api/announcements/list', {
-                params: {
-                    page: page - 1,
-                    size: ITEMS_PER_PAGE,
-                    sort: 'id,desc',
-                }
-            });
+            const params: any = {
+                page: page - 1,
+                size: ITEMS_PER_PAGE,
+                sort: 'id,desc',
+                ...getSearchParams() 
+            };
+            const response = await apiClient.get<Page<Announcement>>('/api/announcements/list', { params });
             setAnnouncements(response.data.content);
             setTotalItems(response.data.totalElements);
+
         } catch (error) {
             console.error("로드 실패:", error);
             crossPlatformAlert("Failed", "Try again");
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [getSearchParams]);
 
     useEffect(() => {
         fetchAnnouncements(currentPage);
@@ -81,7 +85,7 @@ const BoardListPage = () => {
     return (
         <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm h-full flex flex-col">
             <div className="mb-4">
-                <SearchBox options={boardSearchOptions} onSearch={handleSearch} />
+                <SearchBox options={boardSearchOptions} onSearch={onSearch} />
             </div>
 
             {/* 테이블 헤더 */}

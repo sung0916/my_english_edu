@@ -82,7 +82,7 @@ const EditProduct = () => {
             price: targetItem.price,
             amount: targetItem.amount,
             type: targetItem.type,
-            licensePeriod: targetItem.licensePeriod, // [추가]
+            licensePeriod: targetItem.type === 'ITEM' ? null : targetItem.licensePeriod, // [추가]
             description: targetItem.description,
             imageIds: targetItem.galleryImages.map(img => img.imageId),
         };

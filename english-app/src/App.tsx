@@ -44,6 +44,8 @@ import OrderDetailPage from './pages/detail/OrderDetailPage';
 import MyLicensePage from './pages/user/MyLicensePage';
 import AdminOrderListPage from './pages/admin/OrderListPage';
 import AboutPage from './pages/main/AboutPage';
+import TermsService from './pages/policy/TermsService';
+import TermsPrivacy from './pages/policy/TermsPrivacy';
 
 function App() {
     return (
@@ -117,8 +119,8 @@ function App() {
                         <Route path="payment" element={<MyOrderListPage />} />
                         <Route path="orderDetail" element={<OrderDetailPage />} />
                         <Route path="licenseList" element={<MyLicensePage />} />
-                        <Route path="place" element={<div className="p-10 text-center">Place Page (Ready)</div>} />
-                        <Route path="result" element={<div className="p-10 text-center">Result Page (Ready)</div>} />
+                        <Route path="learnedPlaces" element={<div className="p-10 text-center">Place Page (Ready)</div>} />
+                        <Route path="playedGames" element={<div className="p-10 text-center">Result Page (Ready)</div>} />
                     </Route>
                     <Route path="user/cart" element={<CartPage />} />
                     <Route path="user/checkout" element={<CheckoutPage />} />
@@ -148,6 +150,10 @@ function App() {
                         {/* 판매 목록 */}
                         <Route path="orderList" element={<AdminOrderListPage />} />
                     </Route>
+
+                    {/* 정책 */}
+                    <Route path="policy/service" element={<TermsService />} />
+                    <Route path="policy/privacy" element={<TermsPrivacy />} />
 
                     {/* 404 Not Found */}
                     <Route path="*" element={

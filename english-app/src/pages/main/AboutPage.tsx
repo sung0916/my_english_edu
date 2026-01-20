@@ -1,7 +1,6 @@
 
 const AboutPage = () => {
 
-
     return (
         <div className="iframe-container">
             <iframe 

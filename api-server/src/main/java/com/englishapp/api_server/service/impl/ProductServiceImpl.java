@@ -77,20 +77,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // 상품 페이징 조회
-    public Page<ProductListResponse> getAllProducts(Pageable pageable) {
-        Page<Product> productPage = productRepository.findAllRepresentative(pageable);
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductListResponse> getAllProducts(Pageable pageable, String searchType, String searchKeyword) {
+        Page<Product> products;  // = productRepository.findAllRepresentative(pageable);
+
+        // 1. 검색어가 없는 경우 (전체 조회)
+        if (searchKeyword == null || searchKeyword.trim().isEmpty()) {
+            products = productRepository.findAllRepresentative(pageable);
+        }
+        // 2. 검색어가 있는 경우 (검색된 상품 중 대표 상품만)
+        else {
+            // searchType 구분 없이 일단 상품명(productName)으로 검색한다고 가정
+            // (만약 내용 검색 등 다른 조건이 필요하면 searchType 분기 처리 추가)
+            products = productRepository.searchRepresentative(searchKeyword, pageable);
+        }
 
         // map 내부 로직을 람다식으로 풀어서 작성
-        return productPage.map(product -> {
-            // 각 상품의 대표 이미지 조회
+        return products.map(product -> {
+            //todo: 각 상품의 대표 이미지 조회 (데이터 많아지면 N+1 발생 위험)
             Image thumbnail = imageRepository
                     .findFirstByTypeAndRelatedIdOrderBySortOrderAsc(
                             ImageType.PRODUCT, product.getId()
                     ).orElse(null);
-
-            // 이미지가 존재하면 리스트에 담고, 없으면 빈 리스트 사용
-            /*List<Image> images =
-                    thumbnailOptional.map(Collections::singletonList).orElse(Collections.emptyList());*/
 
             // baseUrl 포함하여 DTO 생성
             return ProductListResponse.from(product, thumbnail);

@@ -50,17 +50,28 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public void deleteUser(Long userId) {
-        // 1. 엔티티를 찾아온다.
+        // 1. 엔티티를 찾아옴
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
-        // 2. 엔티티에게 삭제 처리를 위임한다.
+        // 2. 엔티티에게 삭제 처리를 위임
         user.deleteByAdmin();
     }
 
     @Override
-    public List<UserResponse> findAllUsers() {
-        return List.of();
+    @Transactional(readOnly = true)
+    public List<UserResponse> findAllUsers(String keyword) {
+
+        List<User> users;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            users = userRepository.findByUsernameContaining(keyword);
+        } else {
+            users = userRepository.findAll();
+        }
+
+        return users.stream()
+                .map(UserResponse::new)
+                .collect(Collectors.toList());
     }
 
     // 회원 검색

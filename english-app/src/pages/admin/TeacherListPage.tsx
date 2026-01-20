@@ -4,6 +4,7 @@ import apiClient from "@/api";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchBox, SearchOption } from "@/components/common/SearchBox";
 import { crossPlatformAlert, crossPlatformConfirm } from "@/utils/crossPlatformAlert";
+import { useSearch } from "@/hooks/useSearch";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -23,15 +24,24 @@ const TeacherListPage = () => {
     const [displayedStudents, setDisplayedStudents] = useState<Teacher[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
 
+    const { onSearch, searchState } = useSearch('userName');
+
     const fetchStudents = useCallback(async () => {
         try {
-            const response = await apiClient.get<Teacher[]>('/api/admin');
+            const params: any = {};
+            if (searchState.keyword) {
+                params.keyword = searchState.keyword;
+            }
+            const response = await apiClient.get<Teacher[]>('/api/admin', { params });
             const filtered = response.data.filter(u => u.role === 'TEACHER' && (u.status === 'ACTIVE' || u.status === 'DELETED'));
             setAllStudents(filtered);
+            setCurrentPage(1);
+
         } catch (error) {
             console.error(error);
+            crossPlatformAlert("Failed to load teachers", "");
         }
-    }, []);
+    }, [searchState]);
 
     useEffect(() => {
         fetchStudents();
@@ -57,7 +67,7 @@ const TeacherListPage = () => {
     return (
         <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm min-h-full flex flex-col">
             <div className="mb-4">
-                <SearchBox options={searchOptions} onSearch={() => {}} />
+                <SearchBox options={searchOptions} onSearch={onSearch} />
             </div>
 
             <div className="flex flex-row bg-gray-50 border-b-2 border-gray-200 py-3 px-2 font-bold text-gray-700 text-center">

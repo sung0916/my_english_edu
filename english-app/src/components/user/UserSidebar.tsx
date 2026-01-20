@@ -2,9 +2,9 @@ import { NavLink } from "react-router-dom";
 import { useUIStore } from "@/store/uiStore";
 
 const menuItems = [
-    { name: 'My Classes', href: '/user/licenseList' },
-    { name: 'Places', href: '/user/place' },
-    { name: 'Results', href: '/user/result' },
+    { name: 'Plans', href: '/user/licenseList' },
+    { name: 'Places', href: '/user/learnedPlaces' },
+    { name: 'Games', href: '/user/playedGames' },
     { name: 'Order History', href: '/user/payment' },
     { name: 'Edit Profile', href: '/auth/confirm-edit' },
     { name: 'Withdraw Account', href: '/auth/confirm-withdraw', isDanger: true },

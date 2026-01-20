@@ -37,7 +37,7 @@ const AddProduct = () => {
             price: item.price,
             amount: item.amount,
             type: item.type,
-            licensePeriod: item.licensePeriod, // [중요] 기간 정보 추가
+            licensePeriod: item.type === 'ITEM' ? null : item.licensePeriod, // [중요] 기간 정보 추가
             description: item.description,
             imageIds: item.galleryImages.map(img => img.imageId),
         };

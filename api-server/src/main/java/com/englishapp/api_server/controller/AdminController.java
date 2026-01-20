@@ -63,14 +63,16 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    // 전체 회원 검색
+    // 전체 회원 목록 (+ 이름으로 검색)
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepository.findAll();
+    public ResponseEntity<List<UserResponse>> getAllUsers(
+            @RequestParam(required = false) String keyword) {
+
+        List<UserResponse> users = adminService.findAllUsers(keyword);
         return ResponseEntity.ok(users);
     }
 
-    // 특정 회원 검색
+    // 특정 회원 조회
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
         User user = adminService.findUserById(userId);

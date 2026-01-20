@@ -14,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByLoginId(String loginId);
 
     List<User> findByStatus(UserStatus status);
+
+    // 이름으로 검색
+    List<User> findByUsernameContaining(String keyword);
 }

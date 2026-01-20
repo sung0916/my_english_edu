@@ -39,10 +39,13 @@ public class ProductController {
      *  @param pageable (예: /api/products/list?page=0&size=10&sort=id,desc)
      *  @return 상품 목록 페이지와 200 OK 상태 코드 */
     @GetMapping("/list")
-    public ResponseEntity<Page<ProductListResponse>> getAllProducts(Pageable pageable) {
+    public ResponseEntity<Page<ProductListResponse>> getAllProducts(
+            Pageable pageable,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String searchKeyword) {
 
         log.info("상품 목록 조회 요청 페이지: {}, 사이즈: {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<ProductListResponse> productPage = productService.getAllProducts(pageable);
+        Page<ProductListResponse> productPage = productService.getAllProducts(pageable, searchType, searchKeyword);
 
         return ResponseEntity.ok(productPage);
     }

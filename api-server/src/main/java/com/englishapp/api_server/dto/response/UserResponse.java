@@ -14,6 +14,7 @@ public class UserResponse {
     private String loginId;
     private String email;
     private String tel;
+    private String status;
     private UserRole role;
 
     // Entity를 DTO로 변환하는 생성자
@@ -24,6 +25,7 @@ public class UserResponse {
         this.loginId = user.getLoginId();
         this.email = user.getEmail();
         this.tel = user.getTel();
+        this.status = user.getStatus().name();
         this.role = user.getRole();
     }
 }

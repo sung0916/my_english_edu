@@ -76,7 +76,7 @@ export default function BoardDetailPage() {
     if (!announcement) return <div className="p-10 text-center">게시글을 찾을 수 없습니다.</div>;
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
+        <div className="min-w-[800px] mx-auto p-6 bg-white min-h-screen">
             <div className="border-b border-gray-200 pb-4 mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">{announcement.title}</h1>
                 <div className="flex justify-between text-sm text-gray-500">

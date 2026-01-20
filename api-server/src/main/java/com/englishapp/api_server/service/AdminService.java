@@ -19,7 +19,7 @@ public interface AdminService {
     void deleteUser(Long userId);
 
     // 회원 목록
-    List<UserResponse> findAllUsers();
+    List<UserResponse> findAllUsers(String keyword);
 
     // 회원 검색
     User findUserById(Long userId);

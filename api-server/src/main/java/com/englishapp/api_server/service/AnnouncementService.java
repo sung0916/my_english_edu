@@ -18,8 +18,8 @@ public interface AnnouncementService {
     // 공지사항 삭제
     void delete(Long id, User user);
 
-    // 공지사항 목록
-    Page<AnnouncementListResponse> findAll(Pageable pageable);
+    // 공지사항 목록 (+ 검색했을 때 파라미터 추가)
+    Page<AnnouncementListResponse> findAll(Pageable pageable, String searchType, String searchKeyword);
 
     // 공지사항 상세 보기
     AnnouncementResponse findById(Long id);

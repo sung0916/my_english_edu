@@ -15,11 +15,11 @@ const Footer = () => {
             </div>
 
             <div className="flex flex-row items-center space-x-2 mb-4">
-                <Link to="/terms" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
+                <Link to="/policy/service" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
                     서비스이용약관
                 </Link>
                 <span className="text-gray-400">|</span>
-                <Link to="/privacy" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
+                <Link to="/policy/privacy" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
                     개인정보처리방침
                 </Link>
             </div>

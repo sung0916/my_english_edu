@@ -59,7 +59,7 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
         THREEMONTH: { enabled: false, price: '' },
         SIXMONTH: { enabled: false, price: '' },
         ONEYEAR: { enabled: false, price: '' },
-        NONE: { enabled: false, price: '' },
+        // NONE: { enabled: false, price: '' },
     });
 
     // 초기 데이터 로드
@@ -154,7 +154,7 @@ export default function ProductForm({ initialData, onSubmit, submitButtonText }:
                 price: priceNum,
                 amount: amountNum,
                 type: 'ITEM',
-                licensePeriod: 'NONE',
+                licensePeriod: undefined,
                 description: descContent,
                 galleryImages
             });

@@ -5,6 +5,7 @@ import apiClient from "@/api";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchBox, SearchOption } from "@/components/common/SearchBox";
 import { crossPlatformAlert } from "@/utils/crossPlatformAlert";
+import { useSearch } from "@/hooks/useSearch";
 
 const ITEMS_PER_PAGE = 10;
 type ProductStatus = 'ONSALE' | 'NOTONSALE';
@@ -24,28 +25,37 @@ interface Page<T> {
 
 const ProductListPage = () => {
     const navigate = useNavigate();
-    const productSearchOptions: SearchOption[] = [{ value: 'productName', label: 'Product' }];
+    const productSearchOptions: SearchOption[] = [
+        { value: 'productName', label: 'name' },
+    ];
 
     const [isLoading, setIsLoading] = useState(true);
     const [products, setProducts] = useState<Product[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
+    const { onSearch, getSearchParams } = useSearch('name');
+
     const fetchProducts = useCallback(async (page: number) => {
         setIsLoading(true);
         try {
-            const response = await apiClient.get<Page<Product>>('/api/products/list', {
-                params: { page: page - 1, size: ITEMS_PER_PAGE, sort: 'id,desc' },
-            });
+            const params: any = {
+                page: page - 1,
+                size: ITEMS_PER_PAGE,
+                sort: 'id,desc',
+                ...getSearchParams() 
+            };
+            const response = await apiClient.get<Page<Product>>('/api/products/list', { params });
             setProducts(response.data.content);
             setTotalItems(response.data.totalElements);
+
         } catch (error) {
             console.error(error);
             crossPlatformAlert('오류', '목록 로드 실패');
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [getSearchParams]);
 
     useEffect(() => {
         fetchProducts(currentPage);
@@ -66,7 +76,7 @@ const ProductListPage = () => {
     return (
         <div className="bg-white min-w-[720px] p-6 rounded-lg shadow-sm h-full flex flex-col">
             <div className="mb-4">
-                <SearchBox options={productSearchOptions} onSearch={() => {}} />
+                <SearchBox options={productSearchOptions} onSearch={onSearch} />
             </div>
 
             <div className="flex flex-row bg-gray-50 border-b-2 border-gray-200 py-3 px-2 font-bold text-gray-700 text-center">

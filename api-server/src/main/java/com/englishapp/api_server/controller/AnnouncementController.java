@@ -38,9 +38,12 @@ public class AnnouncementController {
 
     // 공지사항 목록
     @GetMapping("/list")
-    public ResponseEntity<Page<AnnouncementListResponse>> getAllAnnouncements(Pageable pageable) {
+    public ResponseEntity<Page<AnnouncementListResponse>> getAllAnnouncements(
+            Pageable pageable,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String searchKeyword) {
 
-        Page<AnnouncementListResponse> response = announcementService.findAll(pageable);
+        Page<AnnouncementListResponse> response = announcementService.findAll(pageable, searchType, searchKeyword);
         return ResponseEntity.ok(response);
     }
 
