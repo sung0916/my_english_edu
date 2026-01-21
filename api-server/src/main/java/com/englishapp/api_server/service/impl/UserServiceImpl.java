@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
                 .tel(request.getTel())
                 .role(UserRole.STUDENT)
                 .status(UserStatus.PENDING)
+                .timezone(request.getTimezone())
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -64,6 +65,9 @@ public class UserServiceImpl implements UserService {
         }
         if (userRequest.getTel() != null) {
             existingUser.updateTel(userRequest.getTel());
+        }
+        if (userRequest.getTimezone() != null && !userRequest.getTimezone().isEmpty()) {
+            existingUser.updateTimezone(userRequest.getTimezone());
         }
         return new UserResponse(existingUser);
     }

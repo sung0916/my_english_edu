@@ -4,7 +4,7 @@ import apiClient from "@/api";
 import { useCartStore } from "@/store/useCartStore";
 import { useUserStore } from "@/store/userStore";
 import PermitCustomButton from "@/components/common/PosButtonProps";
-import { ProductType, LicensePeriod, PERIOD_LABELS } from '@/types/product'; 
+import { ProductType, LicensePeriod, PERIOD_LABELS } from '@/types/product';
 
 interface ImageDetail {
     imageId: number;
@@ -41,7 +41,7 @@ export default function StoreDetailPage() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
     const [isAddingCart, setIsAddingCart] = useState(false);
-    
+
     // 초기값을 id로 설정하되, 로딩 전이라 0이어도 무방함 (useEffect에서 곧바로 업데이트됨)
     const [currentId, setCurrentId] = useState<number>(0);
     const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -62,8 +62,8 @@ export default function StoreDetailPage() {
             setCurrentPrice(response.data.price);
 
             // 수량 초기화 (상품이 바뀌면 수량도 1로 리셋하는 것이 자연스러움)
-            setQuantity(1); 
-            
+            setQuantity(1);
+
             if (response.data.images && response.data.images.length > 0) {
                 setSelectedImage(response.data.images[0].imageUrl);
             }
@@ -176,13 +176,17 @@ export default function StoreDetailPage() {
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{product.productName}</h1>
 
                     {/* 구독권 태그 표시 */}
-                    {isSubscription && (
-                        <div className="mb-4">
-                            <span className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded font-medium mr-2">
-                                Plan
-                            </span>
-                        </div>
-                    )}
+                    <div className="mb-4">
+                        <span
+                            className={`inline-block text-sm px-2 py-1 rounded font-medium mr-2
+                                ${isSubscription
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}
+                        >
+                            {isSubscription ? 'Plan' : 'Goods'}
+                        </span>
+                    </div>
 
                     <div className="text-3xl font-bold text-red-600 mb-6">
                         {currentPrice.toLocaleString()} ₩

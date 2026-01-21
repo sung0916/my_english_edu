@@ -4,6 +4,7 @@ import com.englishapp.api_server.dto.request.AnnouncementRequest;
 import com.englishapp.api_server.dto.response.AnnouncementListResponse;
 import com.englishapp.api_server.dto.response.AnnouncementResponse;
 import com.englishapp.api_server.entity.User;
+import com.englishapp.api_server.service.impl.UserDetailsImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,10 +14,10 @@ public interface AnnouncementService {
     AnnouncementResponse create(AnnouncementRequest request, User user);
 
     // 공지사항 수정
-    AnnouncementResponse update(Long id, AnnouncementRequest request, User user);
+    AnnouncementResponse update(Long id, AnnouncementRequest request, UserDetailsImpl userDetails);
 
     // 공지사항 삭제
-    void delete(Long id, User user);
+    void delete(Long id, UserDetailsImpl userDetails);
 
     // 공지사항 목록 (+ 검색했을 때 파라미터 추가)
     Page<AnnouncementListResponse> findAll(Pageable pageable, String searchType, String searchKeyword);

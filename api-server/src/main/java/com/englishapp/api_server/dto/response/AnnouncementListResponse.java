@@ -1,10 +1,11 @@
 package com.englishapp.api_server.dto.response;
 
 import com.englishapp.api_server.entity.Announcement;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Getter
 @Builder
@@ -14,7 +15,9 @@ public class AnnouncementListResponse {
     private String title;
     private String authorName;
     private int viewCount;
-    private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yy-MM-dd'T'HH:mm:ssXXX", timezone = "UTC")
+    private OffsetDateTime createdAt;
 
     public static AnnouncementListResponse from(Announcement announcement) {
 

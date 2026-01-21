@@ -12,4 +12,5 @@ public class UserRequest {
     private String password;
     private String email;
     private String tel;
+    private String timezone;
 }

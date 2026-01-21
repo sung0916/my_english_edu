@@ -70,7 +70,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/carts/**", "/api/orders/**", "/api/payments/**").hasAnyAuthority("STUDENT", "TEACHER", "ADMIN")
 
                         // 5. 게시글/게임 작성 등
-                        .requestMatchers(HttpMethod.POST, "/api/announcement/write").hasAnyAuthority("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/announcements/**").hasAnyAuthority("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/announcements/**").hasAnyAuthority("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/announcements/**").hasAnyAuthority("ADMIN", "TEACHER")
                         .requestMatchers("/api/games/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
 
                         // 6. 관리자 전용 (상품관리, 게시판관리, 어드민페이지)

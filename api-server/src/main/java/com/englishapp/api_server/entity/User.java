@@ -2,6 +2,7 @@ package com.englishapp.api_server.entity;
 
 import com.englishapp.api_server.domain.UserRole;
 import com.englishapp.api_server.domain.UserStatus;
+import com.englishapp.api_server.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,8 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,9 +44,10 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserStatus status;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    // 글로벌 서비스용 시간대 필드
+    @Column(length = 50)
+    @Builder.Default
+    private String timezone = "Asia/Seoul";
 
     // 회원 정보 수정
     public void updatePassword(String newPassword) {
@@ -63,6 +64,11 @@ public class User {
         this.tel = newTel;
     }
 
+    // 시간대 변경 (마이페이지용)
+    public void updateTimezone(String newTimezone) {
+        this.timezone = newTimezone;
+    }
+
     // 회원 탈퇴 처리
     public void withdraw() {
 
@@ -73,7 +79,6 @@ public class User {
 
         // 상태를 DELETED로 변경
         this.status = UserStatus.DELETED;
-
         this.email = "-";
         this.tel = "-"; // 전화번호는 null로 변경
         this.password = "-";

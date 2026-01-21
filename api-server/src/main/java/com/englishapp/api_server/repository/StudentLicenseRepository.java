@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +33,5 @@ public interface StudentLicenseRepository extends JpaRepository<StudentLicense, 
     @Modifying(clearAutomatically = true)  // 쿼리 실행 후 영속성 컨텍스트 초기화 (데이터 초기화)
     @Query("UPDATE StudentLicense sl SET sl.status = 'EXPIRED' " +
             "WHERE sl.status = 'ACTIVE' AND sl.endAt < :now")
-    int bulkExpireLicenses(@Param("now") LocalDateTime now);
+    int bulkExpireLicenses(@Param("now") OffsetDateTime now);
 }

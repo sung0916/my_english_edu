@@ -60,9 +60,9 @@ public class AnnouncementController {
     public ResponseEntity<AnnouncementResponse> updateAnnouncement(
             @PathVariable Long id,
             @RequestBody AnnouncementRequest request,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        AnnouncementResponse response = announcementService.update(id, request, user);
+        AnnouncementResponse response = announcementService.update(id, request, userDetails);
         return ResponseEntity.ok(response);
     }
 
@@ -70,9 +70,9 @@ public class AnnouncementController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnnouncement(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        announcementService.delete(id, user);
+        announcementService.delete(id, userDetails);
         return ResponseEntity.noContent().build();
     }
 }

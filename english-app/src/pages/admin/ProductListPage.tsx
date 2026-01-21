@@ -26,7 +26,7 @@ interface Page<T> {
 const ProductListPage = () => {
     const navigate = useNavigate();
     const productSearchOptions: SearchOption[] = [
-        { value: 'productName', label: 'name' },
+        { value: 'productName', label: 'Name' },
     ];
 
     const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +34,7 @@ const ProductListPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
-    const { onSearch, getSearchParams } = useSearch('name');
+    const { onSearch, getSearchParams } = useSearch('Name');
 
     const fetchProducts = useCallback(async (page: number) => {
         setIsLoading(true);
