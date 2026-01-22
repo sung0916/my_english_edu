@@ -4,28 +4,28 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
     return (
         <footer className="bg-gray-100 py-8 px-8 flex flex-col items-center text-center mt-auto w-full">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">(주)몬스터어학원</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">(주)My Edu</h3>
 
             <div className="mb-4 text-sm text-gray-600 leading-relaxed">
-                <p>대표 : 박은영</p>
-                <p>사업자등록번호: 282-87-03084</p>
-                <p>통신판매 신고번호 : 2022-서울광진-2437</p>
-                <p>사업장주소 : 서울시 광진구 아차산로 463 4-5층</p>
-                <p>문의 전화 : 02-6929-4299</p>
+                <p>대표 : sung0916</p>
+                <p>사업자등록번호: 9l9-b7-jf0f87</p>
+                <p>통신판매 신고번호 : f392-서울-2f5j</p>
+                <p>사업장주소 : 서울특별시</p>
+                <p>문의 전화 : o2-5oo9-4o3o</p>
             </div>
 
             <div className="flex flex-row items-center space-x-2 mb-4">
-                <Link to="/policy/service" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
+                <Link to="/policy/service_term" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
                     서비스이용약관
                 </Link>
                 <span className="text-gray-400">|</span>
-                <Link to="/policy/privacy" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
+                <Link to="/policy/privacy_term" className="text-sm font-semibold text-gray-800 underline hover:text-blue-600">
                     개인정보처리방침
                 </Link>
             </div>
 
             <p className="text-xs text-gray-500">
-                Copyright © 2025-2028 Monster English Online. All Rights Reserved.
+                Copyright © 2025 My Edu Online. All Rights Reserved.
             </p>
         </footer>
     );
