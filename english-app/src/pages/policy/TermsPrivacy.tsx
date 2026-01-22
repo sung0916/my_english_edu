@@ -4,7 +4,7 @@ const TermsPrivacy = () => {
     return (
         <div className="iframe-container">
             <iframe 
-                src="https://monstereng.com/terms/privacy/"
+                src="https://my_edu.com/terms/privacy/"
                 className="policy-nav-iframe"
             />
         </div>
