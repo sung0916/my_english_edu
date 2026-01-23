@@ -42,7 +42,8 @@ bash
 cd api-server
 ### Build & Run
 ./gradlew bootRun
-설정파일 application.yml
+### 설정파일
+application.yml
 
 2. Frontend Setup (english-app)
 bash
