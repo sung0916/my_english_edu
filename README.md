@@ -1,16 +1,17 @@
 ## English Education Platform (english-edu)
-영어 교육을 위한 올인원 플랫폼 프로젝트입니다.  
-Spring Boot 기반의 백엔드와 React 기반의 프론트엔드로 구성된 모노레포 구조를 가지고 있습니다.
+영어 교육을 위한 올인원 플랫폼 프로젝트
+Spring Boot 기반의 백엔드와 React 기반의 프론트엔드로 구성된 모노레포 구조
 
 ## 🛠 Tech Stack
-### Frontend (`/english-app`)
+### Frontend 
 - **Core**: React 18, TypeScript, Vite
 - **State Management**: Zustand
 - **Styling**: TailwindCSS, clsx, tailwind-merge
 - **Routing**: React Router DOM v6
 - **UI Components**: React Icons, Lucide React, Toast UI Editor
 - **Http Client**: Axios
-### Backend (`/api-server`)
+  
+### Backend 
 - **Framework**: Spring Boot 3.x
 - **Language**: Java 17+
 - **Build Tool**: Gradle
@@ -34,6 +35,7 @@ Prerequisites
 Java JDK 17 이상
 Node.js 18 이상
 MySQL Server
+
 1. Backend Setup (api-server)
 bash
 ### 디렉토리 이동
