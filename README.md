@@ -54,16 +54,16 @@ npm install
 ### 개발 서버 실행
 npm run dev
 
-Learning Contents
+- Learning Contents
 ### 기존 코드 리팩토링 후 개발 예정
 
-Game Contents
+- Game Contents
 Crossword Puzzle: 단어 십자말풀이
 Falling Words: 떨어지는 단어 맞추기 게임
 Maze Adventure: 미로 찾기 모험
 Mystery Cards: 카드 뒤집기 퀴즈
 
-Core Features
+- Core Features
 User System: 회원가입, 로그인 (JWT 기반), 마이페이지
 Dashboard: 학습 현황 차트 및 통계 (Chart.js)
 Community: 게시판 기능, 에디터 지원 (Toast UI)
