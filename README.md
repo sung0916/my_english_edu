@@ -54,6 +54,9 @@ npm install
 ### 개발 서버 실행
 npm run dev
 
+Learning Contents
+### 기존 코드 리팩토링 후 개발 예정
+
 Game Contents
 Crossword Puzzle: 단어 십자말풀이
 Falling Words: 떨어지는 단어 맞추기 게임
