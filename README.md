@@ -1,6 +1,6 @@
 ## English Education Platform (english-edu)
 영어 교육을 위한 올인원 플랫폼 프로젝트<br/>
-Spring Boot 기반의 백엔드와 React 기반의 프론트엔드로 구성된 모노레포 구조
+Spring Boot 기반의 백엔드와 React 기반의 프론트엔드로 구성된 모노레포 구조<br/>
 
 ## 🛠 Tech Stack
 ### Frontend 
@@ -17,7 +17,7 @@ Spring Boot 기반의 백엔드와 React 기반의 프론트엔드로 구성된 
 - **Build Tool**: Gradle
 - **Database**: MySQL (JPA/Hibernate)
 - **Security**: Spring Security, JWT
-- **Cloud/Infra**: Google Cloud Platform (Text-to-Speech, Storage)
+- **Cloud/Infra**: Google Cloud Platform (Text-to-Speech, Storage)<br/>
 
 ## 📂 Project Structure
 ```bash
@@ -42,9 +42,7 @@ bash
 cd api-server
 ### Build & Run
 ./gradlew bootRun
-설정 파일(
-application.yml
-)에 DB 연결 정보 및 Google Cloud Credential 설정이 필요할 수 있습니다.
+설정파일 application.yml
 
 2. Frontend Setup (english-app)
 bash
@@ -54,14 +52,13 @@ cd english-app
 npm install
 ### 개발 서버 실행
 npm run dev
-🎮 Features
-Game Contents
-학습 흥미를 높이기 위한 다양한 게임 모드를 제공합니다.
 
+Game Contents
 Crossword Puzzle: 단어 십자말풀이
 Falling Words: 떨어지는 단어 맞추기 게임
 Maze Adventure: 미로 찾기 모험
 Mystery Cards: 카드 뒤집기 퀴즈
+
 Core Features
 User System: 회원가입, 로그인 (JWT 기반), 마이페이지
 Dashboard: 학습 현황 차트 및 통계 (Chart.js)
