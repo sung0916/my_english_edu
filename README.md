@@ -1,4 +1,4 @@
-## English Education Platform (english-edu)
+## 🏫 English Education Platform (english-edu)
 영어 교육을 위한 올인원 플랫폼 프로젝트<br/>
 Spring Boot 기반의 백엔드와 React 기반의 프론트엔드로 구성된 모노레포 구조<br/>
 
